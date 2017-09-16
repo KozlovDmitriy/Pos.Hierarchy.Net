@@ -17,27 +17,19 @@ export function setFilteredData (ids) {
 
 const filterDataByModelName = (data, device, modelName) =>
   (device.type === 'physical' ? device : data.find(d => d.id === device.PhysicalDeviceId))
-  .ModelName
-    .toLowerCase()
-    .includes(modelName.toLowerCase())
+    .ModelName.toLowerCase().includes(modelName)
 
 const filterDataByTerminalId = (data, device, terminalId) =>
-(device.type === 'logical' ? device : data.find(d => d.PhysicalDeviceId === device.id))
-  .TerminalId
-    .toLowerCase()
-    .includes(terminalId.toLowerCase())
+  (device.type === 'logical' ? [ device ] : data.filter(d => d.PhysicalDeviceId === device.id))
+    .find(i => i.TerminalId.toLowerCase().includes(terminalId)) !== void 0
 
 const filterDataBySerialNumber = (data, device, serialNumber) =>
-(device.type === 'physical' ? device : data.find(d => d.id === device.PhysicalDeviceId))
-  .SerialNumber
-    .toLowerCase()
-    .includes(serialNumber.toLowerCase())
+  (device.type === 'physical' ? device : data.find(d => d.id === device.PhysicalDeviceId))
+    .SerialNumber.toLowerCase().includes(serialNumber)
 
 const filterDataByMerchant = (data, device, merchant) =>
-(device.type === 'logical' ? device : data.find(d => d.PhysicalDeviceId === device.id))
-  .MerchantNumberX
-    .toLowerCase()
-    .includes(merchant.toLowerCase())
+  (device.type === 'logical' ? [device] : data.filter(d => d.PhysicalDeviceId === device.id))
+    .find(i => i.MerchantNumberX.toLowerCase().includes(merchant)) !== void 0
 
 export function filterData () {
   return (dispatch, getState) => {
@@ -45,10 +37,10 @@ export function filterData () {
     const ids = data.filter(
         d => ['logical', 'physical'].indexOf(d.type) !== -1
       ).filter(
-        d => filterDataByModelName(data, d, filters.modelName) &&
-          filterDataByTerminalId(data, d, filters.terminalId) &&
-          filterDataBySerialNumber(data, d, filters.serialNumber) &&
-          filterDataByMerchant(data, d, filters.merchant)
+        d => filterDataByModelName(data, d, filters.modelName.toLowerCase()) &&
+          filterDataByTerminalId(data, d, filters.terminalId.toLowerCase()) &&
+          filterDataBySerialNumber(data, d, filters.serialNumber.toLowerCase()) &&
+          filterDataByMerchant(data, d, filters.merchant.toLowerCase())
       ).map(d => d.id)
     dispatch(setFilteredData(ids))
     dispatch(rewriteTree())

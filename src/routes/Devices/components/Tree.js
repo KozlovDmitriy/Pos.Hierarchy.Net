@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Group } from '@vx/group'
-import { Cluster } from '@vx/hierarchy'
+import { Graph } from '@vx/network'
 import { LinkVertical } from '@vx/shape'
-import { hierarchy } from 'd3-hierarchy'
+import * as d3 from 'd3-force'
 import { LinearGradient } from '@vx/gradient'
 import './Tree.scss'
 
@@ -19,12 +19,9 @@ const styles = {
 }
 
 function Node ({ node, events }) {
-  if (node.depth === 0) {
-    return null
-  }
   return (
-    <Group top={node.depth === 1 ? 20 : node.y} left={node.x}>
-      {node.data.type === 'physical' &&
+    <Group y={node.y} x={node.x}>
+      {node.type === 'physical' &&
         <rect
           width={16}
           height={16}
@@ -35,7 +32,7 @@ function Node ({ node, events }) {
           strokeWidth={2}
         />
       }
-      {node.data.type === 'logical' &&
+      {node.type === 'logical' &&
         <circle
           r={10}
           strokeWidth={3}
@@ -44,7 +41,7 @@ function Node ({ node, events }) {
           strokeOpacity={0.6}
           stroke={'#26deb0'}
           onClick={() => {
-            alert(`clicked: ${JSON.stringify(node.data.name)}`)
+            alert(`clicked: ${JSON.stringify(node.title)}`)
           }}
         />
       }
@@ -57,33 +54,86 @@ function Node ({ node, events }) {
         fill={'#222'}
         stroke={void 0}
       >
-        {node.data.name}
+        {node.title}
       </text>
     </Group>
   )
 }
 
 function Link ({ link }) {
-  return link.source.depth !== 0 ? (
+  return (
     <LinkVertical
-      data={
-        link.source.depth === 1 ?
-        {source: {...link.source, y: 20}, target: link.target} :
-        link
-      }
+      data={link}
       stroke='#374469'
       strokeWidth='1'
       strokeOpacity={0.4}
       fill='none'
     />
-  ) : null
+  )
 }
+
+const width = 1300
+const height = 1000
 
 class Tree extends Component {
   static propTypes = {
     tree: PropTypes.object.isRequired,
-    rewriteTree: PropTypes.func.isRequired,
-    setTree: PropTypes.func.isRequired
+    animation: PropTypes.bool,
+    rewriteTree: PropTypes.func.isRequired
+  }
+
+  constructor (props) {
+    super(props)
+    this.state = {}
+  }
+
+  getTreeIds = (tree) => tree === void 0 ? [] : [
+    tree.nodes === void 0 ? [] : tree.nodes.map(i => i.id),
+    tree.links === void 0 ? [] : tree.links.map(i => [i.source.id, i.target.id])
+  ]
+
+  computeSimulation (simulation) {
+    simulation.stop()
+    // See https://github.com/d3/d3-force/blob/master/README.md#simulation_tick
+    const ticksCount = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay()))
+    for (var i = 0; i < ticksCount; ++i) {
+      simulation.tick()
+    }
+  }
+
+  componentWillReceiveProps (nextProps) {
+    try {
+      const newIds = this.getTreeIds(nextProps.tree)
+    } catch (e) {
+      console.log(nextProps.tree)
+    }
+    const newIds = this.getTreeIds(nextProps.tree)
+    const oldIds = this.getTreeIds(this.props.tree)
+    if (JSON.stringify(newIds) !== JSON.stringify(oldIds)) {
+      const nodes = [ ...nextProps.tree.nodes ]
+      const links = nextProps.tree.links
+        .map(i => {
+          return {
+            source: i.source.id,
+            target: i.target.id
+          }
+        })
+      var force = d3.forceSimulation(nodes)
+        .force('link', d3.forceLink().id(d => d.id))
+        .force('forceX', d3.forceX().strength(0.1).x(width * 0.5))
+        .force('forceY', d3.forceY().strength(0.1).y(height * 0.5))
+        .force('center', d3.forceCenter().x(width * 0.5).y(height * 0.5))
+        .force('charge', d3.forceManyBody().strength(-1500))
+      force.force('link').links(links).distance(40).strength(1)
+      if (nextProps.animation) {
+        force.on('tick', () => {
+          this.setState({ nodes, links: nextProps.tree.links })
+        })
+      } else {
+        this.computeSimulation(force)
+      }
+      this.setState({ nodes, links: nextProps.tree.links })
+    }
   }
 
   componentWillMount () {
@@ -93,31 +143,34 @@ class Tree extends Component {
   }
 
   render () {
-    const width = 1300
-    const height = 900
+    if (this.state.nodes === void 0) {
+      return <div id='graph' style={styles.graph} />
+    }
     const margin = {
       top: 20,
       left: 0,
       right: 20,
       bottom: 110,
     }
-    const data = hierarchy(this.props.tree)
 
     //  <LinearGradient id='top' from='#79d259' to='#37ac8c' />
     //  <rect width='100%' height='100%' fill='#306c90' />
     return (
       <div id='graph' style={styles.graph}>
         <svg width='100%' height='100%'>
-          <Cluster
+          <Graph
             top={margin.top}
             left={margin.left}
-            root={data}
+            graph={{
+              nodes: this.state.nodes,
+              links: this.state.links
+            }}
             size={[
               width - margin.left - margin.right,
               height - margin.top - margin.bottom
             ]}
             nodeComponent={Node}
-            linkComponent={Link}
+            //linkComponent={Link}
           />
         </svg>
       </div>

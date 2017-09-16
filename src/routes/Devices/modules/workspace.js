@@ -36,6 +36,13 @@ const initialState = {
       MerchantNumberX: 'MerchNum2'
     },
     {
+      id: 5,
+      type: 'logical',
+      TerminalId: 'Test TId-3',
+      PhysicalDeviceId: 2,
+      MerchantNumberX: 'MerchNum2'
+    },
+    {
       numberX: 'MerchNum1',
       name: 'TestMerch1',
       adressId: 1
@@ -66,8 +73,8 @@ const initialState = {
       adressId: 3
     }
   ],
-  tree: { },
-  filteredData: [1,2,3,4],
+  tree: {},
+  filteredData: [1, 2, 3, 4, 5],
   filters: {
     modelName: '',
     terminalId: '',
