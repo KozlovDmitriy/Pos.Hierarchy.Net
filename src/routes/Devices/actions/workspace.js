@@ -15,27 +15,27 @@ export function rewriteTree () {
   return (dispatch, getState) => {
     const { data, filteredData } = getState().devices
     const filtered = data.filter(d => filteredData.indexOf(d.id) !== -1)
-    const nodes = filtered.map(d => {
+    const lds = filtered.filter(d => d.type === 'logical')
+    const pds = filtered.filter(d => d.type === 'physical')
+    const nodes = pds.map(d => {
       return {
-        title: d.type === 'physical' ? d.SerialNumber :
-          d.type === 'logical' ? d.TerminalId : 'incorrect node type',
-        type: d.type === 'physical' ? 'empty' : 'special',
-        id: d.id
+        name: d.type === 'physical' ? d.SerialNumber :
+          d.type === 'logical' ? d.TerminalId :
+          'incorrect node type',
+        type: 'physical',
+        id: d.id,
+        children : lds
+          .filter(j => j.PhysicalDeviceId === d.id)
+          .map((j, i) => {
+        		return {
+              name: j.TerminalId,
+              type: 'logical',
+              id: j.id
+        		}
+          })
   		}
   	})
-  	const lds = filtered.filter(d => d.type === 'logical')
-  	const pds = filtered.filter(d => d.type === 'physical')
-  	const edges = lds.map((d, i) => {
-  		return {
-  			source: pds.find(pd => pd.id === d.PhysicalDeviceId).id,
-  			target: d.id,
-        type: 'emptyEdge',
-        weight: 1,
-        id: i
-  		}
-  	})
-  	const tree = { nodes, edges }
-  	dispatch(setTree(tree))
+  	dispatch(setTree({ name: 'Устройства', children: nodes }))
   }
 }
 

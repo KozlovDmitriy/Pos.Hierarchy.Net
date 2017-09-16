@@ -2,21 +2,22 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import AceEditor from 'react-ace'
 import Filters from '../containers/FiltersContainer'
-import 'brace/mode/json'
-import 'brace/theme/solarized_light'
 import Tree from '../containers/TreeContainer'
+import 'brace/mode/json'
+import 'brace/theme/solarized_dark'
 
 const style = {
-  padding: '2px 20px',
+  padding: '2px 0px',
   position: 'absolute',
-  top: 5,
-  bottom: 5,
-  left: 5,
-  right: 5
+  top: 0,
+  bottom: 0,
+  left: 0,
+  right: 0,
+  background: '#f9f9f9'
 }
 
 const itemStyle = {
-  padding: '2px 20px'
+  padding: '2px 2px'
 }
 
 class Workspace extends Component {
@@ -43,7 +44,7 @@ class Workspace extends Component {
         <div style={{ ...itemStyle, width: 550, height: '100%' }}>
           <AceEditor
             mode='json'
-            theme='solarized_light'
+            theme='solarized_dark'
             onChange={onChange}
             name='UNIQUE_ID_OF_DIV'
             editorProps={{ $blockScrolling: true }}
@@ -63,13 +64,12 @@ class Workspace extends Component {
             position: 'absolute',
             top: -20,
             bottom: 0,
-            left: 550,
+            left: 520,
             right: 5,
             padding: '2px 20px'
           }}
         >
           <Filters />
-          filtered ids: <code>{JSON.stringify(filteredData)}</code>
           <Tree />
         </div>
       </div>

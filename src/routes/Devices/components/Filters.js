@@ -38,7 +38,7 @@ class Filters extends Component {
   render () {
     const { filters } = this.props
     return (
-      <div className='row'>
+      <div className='row' style={{background: '#fcfcfc'}}>
         <div className='col col-xs-3'>
           <TextField
             id={'modelFilter'}
