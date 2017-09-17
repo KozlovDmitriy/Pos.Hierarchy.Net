@@ -15,7 +15,7 @@ import './Tree.scss'
 const styles = {
   graph: {
     position: 'absolute',
-    top: 80,
+    top: 120,
     left: 6,
     right: 6,
     bottom: 20,
@@ -97,9 +97,8 @@ class Tree extends Component {
         .force('center', d3.forceCenter().x(width * 0.5).y(height * 0.5))
         .force('charge', d3.forceManyBody().strength(-900))
       force.force('link').links(links).distance(40).strength(1)
-      if (true){//nextProps.animation) {
+      if (nextProps.animation) {
         force.on('tick', () => {
-          console.log(newIds)
           this.setState({ nodes, links: nextProps.tree.links, force: this.state.force })
         })
       } else {

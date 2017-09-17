@@ -6,6 +6,7 @@ export const SET_FILTERED_DATA = 'SET_FILTERED_DATA'
 export const SET_TERMINAL_ID_FILTER = 'SET_TERMINAL_ID_FILTER'
 export const SET_SERIAL_NUMBER_FILTER = 'SET_SERIAL_NUMBER_FILTER'
 export const SET_MERCHANT_FILTER = 'SET_MERCHANT_FILTER'
+export const SET_SHOWING_TYPES = 'SET_SHOWING_TYPES'
 
 export function setFilters (filters) {
   return { type: SET_FILTERS, filters }
@@ -13,6 +14,26 @@ export function setFilters (filters) {
 
 export function setFilteredData (ids) {
   return { type: SET_FILTERED_DATA, ids }
+}
+
+export function setShowingTypes (types) {
+  return { type: SET_SHOWING_TYPES, types }
+}
+
+export function toggleShowingType (type) {
+  return (dispatch, getState) => {
+    const { showingTypes } = getState().devices
+    if (showingTypes.indexOf(type) === -1) {
+      dispatch(setShowingTypes(
+        [...showingTypes, type]
+      ))
+    } else {
+      dispatch(setShowingTypes(
+        showingTypes.filter(i => i !== type)
+      ))
+    }
+    dispatch(filterData())
+  }
 }
 
 const getPdByLd = (ld, data) =>

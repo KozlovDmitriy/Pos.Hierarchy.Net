@@ -29,7 +29,7 @@ class PhysicalDevice extends Component {
           fill={'#03a09c'}
           stroke={void 0}
         >
-          {node.title}
+          {node.name}
         </text>
       </Group>
     )

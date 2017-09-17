@@ -12,7 +12,7 @@ class Customer extends Component {
     return (
       <Group y={node.y} x={node.x}>
         <polygon
-          points={'-10,-20 10,-20 20,0 10,20 -10,20 -20,0'}
+          points={'-10,-20 10,-20 22,0 10,20 -10,20 -22,0'}
           fill={'#CCCCFF'}
           stroke={'#5053FF'}
           strokeWidth={2}
@@ -27,7 +27,7 @@ class Customer extends Component {
           fill={'#5053FF'}
           stroke={void 0}
         >
-          {node.title}
+          {node.name}
         </text>
       </Group>
     )

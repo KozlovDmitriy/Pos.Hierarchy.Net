@@ -4,7 +4,8 @@ import {
 } from '../actions/workspace'
 import {
   SET_FILTERS,
-  SET_FILTERED_DATA
+  SET_FILTERED_DATA,
+  SET_SHOWING_TYPES
 } from '../actions/filters'
 
 const initialState = {
@@ -105,6 +106,7 @@ const initialState = {
   ],
   tree: {},
   filteredData: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+  showingTypes: ['logical', 'physical', 'merchant', 'account', 'customer'],
   filters: {
     modelName: '',
     terminalId: '',
@@ -126,6 +128,9 @@ export default function workspace (state = initialState, action) {
     }
     case SET_FILTERED_DATA: {
       return { ...state, filteredData: action.ids }
+    }
+    case SET_SHOWING_TYPES: {
+      return { ...state, showingTypes: action.types }
     }
     default: return state
   }

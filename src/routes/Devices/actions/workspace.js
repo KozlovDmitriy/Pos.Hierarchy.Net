@@ -11,94 +11,160 @@ export function setTree (tree) {
   return { type: SET_TREE, tree }
 }
 
+const cloneArray = (arr) => arr.map(i => { return { ...i } })
+const isArrContains = (node, arr) => arr.find(i => i === node) !== void 0
+
+const getPdByLd = (node, data) =>
+  data.find(i => i.deviceId === node.PhysicalDeviceId)
+
+const getMerchantByLd = (node, data) =>
+  data.find(i => i.numberX === node.MerchantNumberX)
+
+const getAccountByMerchant = (node, data) =>
+  data.find(i => i.numberX === node.accountNumberX)
+
+const getCustomerByAccount = (node, data) =>
+  data.find(i => i.numberX === node.customerNumberX)
+
+const distinctLinks = (arr) => {
+  const getId = (link) => `${link.source.id},${link.target.id}`
+  const ids = arr.map(i => getId(i))
+  return arr.filter((i, index) => ids.indexOf(getId(i)) === index)
+}
+
 export function rewriteTree () {
   return (dispatch, getState) => {
-    const { data, filteredData } = getState().devices
+    const { data, filteredData, showingTypes } = getState().devices
     const filtered = data.filter(d => filteredData.indexOf(d.id) !== -1)
-    const ldNodes = filtered
-      .filter(d => d.type === 'logical')
-      .map(d => {
+    const ldNodes = cloneArray(filtered.filter(d => d.type === 'logical'))
+      .map(i => ({ ...i, name: i.TerminalId }))
+    const pdNodes = cloneArray(filtered.filter(d => d.type === 'physical'))
+      .map(i => ({ ...i, name: i.SerialNumber }))
+    const merchantNodes = cloneArray(filtered.filter(d => d.type === 'merchant'))
+    const accountNodes = cloneArray(filtered.filter(d => d.type === 'account'))
+    const customerNodes = cloneArray(filtered.filter(d => d.type === 'customer'))
+
+    const pdLinks = isArrContains('physical', showingTypes) ?
+      isArrContains('logical', showingTypes) ?
+        ldNodes.map((d, i) => {
+          return {
+            source: getPdByLd(d, pdNodes),
+            target: d,
+            id: i
+          }
+        }) :
+      isArrContains('merchant', showingTypes) ?
+        ldNodes.map((d, i) => {
+          const pd = getPdByLd(d, pdNodes)
+          return {
+            source: getMerchantByLd(d, merchantNodes),
+            target: pd,
+            id: i
+          }
+        }) :
+      isArrContains('account', showingTypes) ?
+        ldNodes.map((d, i) => {
+          const pd = getPdByLd(d, pdNodes)
+          return {
+            source: getAccountByMerchant(
+              getMerchantByLd(d, merchantNodes),
+              accountNodes
+            ),
+            target: pd,
+            id: i
+          }
+        }) :
+      isArrContains('customer', showingTypes) ?
+        ldNodes.map((d, i) => {
+          const pd = getPdByLd(d, pdNodes)
+          return {
+            source: getCustomerByAccount(
+              getAccountByMerchant(
+                getMerchantByLd(d, merchantNodes),
+                accountNodes
+              ),
+              customerNodes
+            ),
+            target: pd,
+            id: i
+          }
+        }) :
+      [] :
+    []
+
+    const ldLinks = isArrContains('logical', showingTypes) ?
+      isArrContains('merchant', showingTypes) ?
+        ldNodes.map((d, i) => {
+          return {
+            source: getMerchantByLd(d, merchantNodes),
+            target: d,
+            id: i
+          }
+        }) :
+      isArrContains('account', showingTypes) ?
+        ldNodes.map((d, i) => {
+          return {
+            source: getAccountByMerchant(
+              getMerchantByLd(d, merchantNodes),
+              accountNodes
+            ),
+            target: d,
+            id: i
+          }
+        }) :
+      isArrContains('customer', showingTypes) ?
+        ldNodes.map((d, i) => {
+          return {
+            source: getCustomerByAccount(
+              getAccountByMerchant(
+                getMerchantByLd(d, merchantNodes),
+                accountNodes
+              ),
+              customerNodes
+            ),
+            target: d,
+            id: i
+          }
+        }) :
+      [] :
+    []
+
+    const merchantLinks = isArrContains('merchant', showingTypes) ?
+      isArrContains('account', showingTypes) ?
+        merchantNodes.map((m, i) => {
+          return {
+            source: getAccountByMerchant(m, accountNodes),
+            target: m,
+            id: i
+          }
+        }) :
+      isArrContains('customer', showingTypes) ?
+        merchantNodes.map((m, i) => {
+          return {
+            source: getCustomerByAccount(
+              getAccountByMerchant(m, accountNodes), customerNodes
+            ),
+            target: m,
+            id: i
+          }
+        }) :
+      [] :
+    []
+
+    const accountLinks = showingTypes.filter(i => i === 'account' || i === 'customer').length === 2 ?
+      accountNodes.map((m, i) => {
         return {
-          title: d.TerminalId,
-          type: d.type,
-          pdId: d.PhysicalDeviceId,
-          merchantNumberX: d.MerchantNumberX,
-          id: d.id
+          source: getCustomerByAccount(m, customerNodes),
+          target: m,
+          id: i
         }
-      })
-    const pdNodes = filtered
-      .filter(d => d.type === 'physical')
-      .map(d => {
-        return {
-          title: d.SerialNumber,
-          type: d.type,
-          id: d.id
-        }
-      })
-    const merchantNodes = filtered
-      .filter(d => d.type === 'merchant')
-      .map(d => {
-        return {
-          title: d.name,
-          numberX: d.numberX,
-          accountNumberX: d.accountNumberX,
-          type: d.type,
-          id: d.id
-        }
-      })
-    const accountNodes = filtered
-      .filter(d => d.type === 'account')
-      .map(d => {
-        return {
-          title: d.name,
-          numberX: d.numberX,
-          customerNumberX: d.customerNumberX,
-          type: d.type,
-          id: d.id
-        }
-      })
-    const customerNodes = filtered
-      .filter(d => d.type === 'customer')
-      .map(d => {
-        return {
-          title: d.name,
-          numberX: d.numberX,
-          type: d.type,
-          id: d.id
-        }
-      })
-    const ldPdLinks = ldNodes.map((d, i) => {
-      return {
-        source: pdNodes.find(pd => pd.id === d.pdId),
-        target: d,
-        id: i
-      }
-    })
-    const merchantLinks = ldNodes.map((d, i) => {
-      return {
-        source: merchantNodes.find(m => m.numberX === d.merchantNumberX),
-        target: d,
-        id: i
-      }
-    })
-    const accountLinks = merchantNodes.map((m, i) => {
-      return {
-        source: accountNodes.find(a => a.numberX === m.accountNumberX),
-        target: m,
-        id: i
-      }
-    })
-    const customerLinks = accountNodes.map((m, i) => {
-      return {
-        source: customerNodes.find(a => a.numberX === m.customerNumberX),
-        target: m,
-        id: i
-      }
-    })
-    const tree = {
-      nodes: [ ...pdNodes, ...ldNodes, ...merchantNodes, ...accountNodes, ...customerNodes ],
-      links: [ ...ldPdLinks, ...merchantLinks, ...accountLinks, ...customerLinks ]
-    }
+      }) : []
+
+    const nodes = [
+      ...pdNodes, ...ldNodes, ...merchantNodes, ...accountNodes, ...customerNodes
+    ].filter(i => showingTypes.indexOf(i.type) !== -1)
+    const links = [ ...distinctLinks(pdLinks), ...ldLinks, ...merchantLinks, ...accountLinks ]
+    const tree = { nodes, links }
   	dispatch(setTree(tree))
   }
 }

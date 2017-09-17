@@ -27,7 +27,7 @@ class Account extends Component {
           fill={'#D340E3'}
           stroke={void 0}
         >
-          {node.title}
+          {node.name}
         </text>
       </Group>
     )

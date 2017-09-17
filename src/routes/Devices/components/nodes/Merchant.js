@@ -29,7 +29,7 @@ class Merchant extends Component {
           fill={'#5053FF'}
           stroke={void 0}
         >
-          {node.title}
+          {node.name}
         </text>
       </Group>
     )
