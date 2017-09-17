@@ -27,7 +27,7 @@ class LogicalDevice extends Component {
           fontFamily='Arial'
           textAnchor={'middle'}
           style={{ pointerEvents: 'none' }}
-          fill={'#222'}
+          fill={'#46ae90'}
           stroke={void 0}
         >
           {node.title}

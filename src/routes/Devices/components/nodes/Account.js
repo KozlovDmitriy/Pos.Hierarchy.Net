@@ -12,19 +12,19 @@ class Account extends Component {
     return (
       <Group y={node.y} x={node.x}>
         <polygon
-          points={'0,-10 10,0 0,10 -10,0'}
+          points={'0,-15 15,0 0,15 -15,0'}
           fill={'#EEE0F0'}
           stroke={'#D340E3'}
           strokeWidth={2.5}
           strokeOpacity={0.8}
         />
         <text
-          dy={-16}
-          fontSize={13}
+          dy={-19}
+          fontSize={15}
           fontFamily='Arial'
           textAnchor={'middle'}
           style={{ pointerEvents: 'none' }}
-          fill={'#222'}
+          fill={'#D340E3'}
           stroke={void 0}
         >
           {node.title}

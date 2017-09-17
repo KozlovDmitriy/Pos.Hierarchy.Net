@@ -26,7 +26,7 @@ class PhysicalDevice extends Component {
           fontFamily='Arial'
           textAnchor={'middle'}
           style={{ pointerEvents: 'none' }}
-          fill={'#222'}
+          fill={'#03a09c'}
           stroke={void 0}
         >
           {node.title}

@@ -13,21 +13,21 @@ const initialState = {
       id: 1,
       deviceId: 1,
       type: 'physical',
-      SerialNumber: 'Test SerNum-1',
+      SerialNumber: 'Serial Number 1',
       ModelName: 'NewPOS 8210'
     },
     {
       id: 2,
       deviceId: 2,
       type: 'physical',
-      SerialNumber: 'Test SerNum-2',
+      SerialNumber: 'Serial Number 2',
       ModelName: 'Petroline'
     },
     {
       id: 3,
       deviceId: 3,
       type: 'logical',
-      TerminalId: 'Test TId-1',
+      TerminalId: 'Terminal ID 1',
       PhysicalDeviceId: 1,
       MerchantNumberX: 'MerchNum1'
     },
@@ -35,7 +35,7 @@ const initialState = {
       id: 4,
       deviceId: 4,
       type: 'logical',
-      TerminalId: 'Test TId-2',
+      TerminalId: 'Terminal ID 2',
       PhysicalDeviceId: 2,
       MerchantNumberX: 'MerchNum2'
     },
@@ -43,7 +43,7 @@ const initialState = {
       id: 5,
       deviceId: 5,
       type: 'logical',
-      TerminalId: 'Test TId-3',
+      TerminalId: 'Terminal ID 3',
       PhysicalDeviceId: 2,
       MerchantNumberX: 'MerchNum2'
     },
@@ -51,7 +51,7 @@ const initialState = {
       id: 6,
       deviceId: 6,
       type: 'logical',
-      TerminalId: 'Test TId-3',
+      TerminalId: 'Terminal ID 4',
       PhysicalDeviceId: 1,
       MerchantNumberX: 'MerchNum2'
     },
@@ -59,7 +59,7 @@ const initialState = {
       id: 7,
       type: 'merchant',
       numberX: 'MerchNum1',
-      name: 'TestMerch1',
+      name: 'Merchant 1',
       accountNumberX: 'AccNum2',
       adressId: 1
     },
@@ -67,7 +67,7 @@ const initialState = {
       id: 8,
       type: 'merchant',
       numberX: 'MerchNum2',
-      name: 'TestMerch2',
+      name: 'Merchant 2',
       accountNumberX: 'AccNum3',
       adressId: 2
     },
@@ -76,7 +76,7 @@ const initialState = {
       type: 'account',
       numberX: 'AccNum1',
       customerNumberX: 'CostNum1',
-      name: 'TestAcc1',
+      name: 'Account 1',
       adressId: 1
     },
     {
@@ -84,7 +84,7 @@ const initialState = {
       type: 'account',
       numberX: 'AccNum2',
       customerNumberX: 'CostNum1',
-      name: 'TestAcc2',
+      name: 'Account 2',
       adressId: 2
     },
     {
@@ -92,14 +92,14 @@ const initialState = {
       type: 'account',
       numberX: 'AccNum3',
       customerNumberX: 'CostNum1',
-      name: 'TestAcc3',
+      name: 'Account 3',
       adressId: 3
     },
     {
       id: 12,
       type: 'customer',
       numberX: 'CostNum1',
-      name: 'TestCost1',
+      name: 'Customer 1',
       adressId: 3
     }
   ],

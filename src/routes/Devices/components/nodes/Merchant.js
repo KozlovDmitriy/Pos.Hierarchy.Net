@@ -14,19 +14,19 @@ class Merchant extends Component {
     return (
       <Group y={node.y} x={node.x}>
         <polygon
-          points={'0,-8 -8,8 8,8'}
+          points={'0,-12 -12,12 12,12'}
           fill={'#CCCCFF'}
           stroke={'#5053FF'}
           strokeWidth={2}
           strokeOpacity={0.8}
         />
         <text
-          dy={-16}
-          fontSize={13}
+          dy={-18}
+          fontSize={14}
           fontFamily='Arial'
           textAnchor={'middle'}
           style={{ pointerEvents: 'none' }}
-          fill={'#222'}
+          fill={'#5053FF'}
           stroke={void 0}
         >
           {node.title}

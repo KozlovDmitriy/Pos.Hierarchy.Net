@@ -12,19 +12,19 @@ class Customer extends Component {
     return (
       <Group y={node.y} x={node.x}>
         <polygon
-          points={'-4,-8 4,-8 9,0 4,8 -4,8 -9,0'}
+          points={'-10,-20 10,-20 20,0 10,20 -10,20 -20,0'}
           fill={'#CCCCFF'}
           stroke={'#5053FF'}
           strokeWidth={2}
           strokeOpacity={0.8}
         />
         <text
-          dy={-16}
-          fontSize={13}
+          dy={-26}
+          fontSize={16}
           fontFamily='Arial'
           textAnchor={'middle'}
           style={{ pointerEvents: 'none' }}
-          fill={'#222'}
+          fill={'#5053FF'}
           stroke={void 0}
         >
           {node.title}

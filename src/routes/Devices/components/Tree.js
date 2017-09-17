@@ -76,14 +76,12 @@ class Tree extends Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    try {
-      const newIds = this.getTreeIds(nextProps.tree)
-    } catch (e) {
-      console.log(nextProps.tree)
-    }
     const newIds = this.getTreeIds(nextProps.tree)
     const oldIds = this.getTreeIds(this.props.tree)
     if (JSON.stringify(newIds) !== JSON.stringify(oldIds)) {
+      if (this.state.force !== void 0) {
+        this.state.force.stop()
+      }
       const nodes = [ ...nextProps.tree.nodes ]
       const links = nextProps.tree.links
         .map(i => {
@@ -97,16 +95,17 @@ class Tree extends Component {
         .force('forceX', d3.forceX().strength(0.1).x(width * 0.5))
         .force('forceY', d3.forceY().strength(0.1).y(height * 0.5))
         .force('center', d3.forceCenter().x(width * 0.5).y(height * 0.5))
-        .force('charge', d3.forceManyBody().strength(-1500))
-      force.force('link').links(links).distance(20).strength(0.9)
-      if (nextProps.animation) {
+        .force('charge', d3.forceManyBody().strength(-900))
+      force.force('link').links(links).distance(40).strength(1)
+      if (true){//nextProps.animation) {
         force.on('tick', () => {
-          this.setState({ nodes, links: nextProps.tree.links })
+          console.log(newIds)
+          this.setState({ nodes, links: nextProps.tree.links, force: this.state.force })
         })
       } else {
         this.computeSimulation(force)
       }
-      this.setState({ nodes, links: nextProps.tree.links })
+      this.setState({ nodes, links: nextProps.tree.links, force })
     }
   }
 
