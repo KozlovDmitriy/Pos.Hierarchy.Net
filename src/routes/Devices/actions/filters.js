@@ -15,27 +15,105 @@ export function setFilteredData (ids) {
   return { type: SET_FILTERED_DATA, ids }
 }
 
-const filterDataByModelName = (data, device, modelName) =>
-  (device.type === 'physical' ? device : data.find(d => d.id === device.PhysicalDeviceId))
-    .ModelName.toLowerCase().includes(modelName)
+const getPdByLd = (ld, data) =>
+  data.find(d => d.deviceId === ld.PhysicalDeviceId)
 
-const filterDataByTerminalId = (data, device, terminalId) =>
-  (device.type === 'logical' ? [ device ] : data.filter(d => d.PhysicalDeviceId === device.id))
-    .find(i => i.TerminalId.toLowerCase().includes(terminalId)) !== void 0
+const getLdsByMerchant = (merchant, data) =>
+  data.filter(d => d.MerchantNumberX === merchant.numberX)
 
-const filterDataBySerialNumber = (data, device, serialNumber) =>
-  (device.type === 'physical' ? device : data.find(d => d.id === device.PhysicalDeviceId))
-    .SerialNumber.toLowerCase().includes(serialNumber)
+const getLdsByPd = (pd, data) =>
+  data.filter(d => d.PhysicalDeviceId === pd.deviceId)
 
-const filterDataByMerchant = (data, device, merchant) =>
-  (device.type === 'logical' ? [device] : data.filter(d => d.PhysicalDeviceId === device.id))
-    .find(i => i.MerchantNumberX.toLowerCase().includes(merchant)) !== void 0
+const getMerchantByLd = (ld, data) =>
+  data.find(d => d.numberX === ld.MerchantNumberX)
+
+const getMerchantsByAccount = (account, data) =>
+  data.filter(n => n.type === 'merchant' && n.accountNumberX === account.numberX)
+
+const getPdsByMerchant = (merchant, data) =>
+  getLdsByMerchant(merchant, data).map(d => getPdByLd(d, data))
+
+const arrReduce = (arr) =>
+  arr.reduce((x, y) => [ ...x, ...y ], [])
+
+const getPdsByAccount = (account, data) =>
+  arrReduce(
+    getMerchantsByAccount(account, data)
+      .map(m => getPdsByMerchant(m, data))
+  )
+
+const getLdsByAccount = (account, data) =>
+  arrReduce(
+    getMerchantsByAccount(account, data)
+      .map(m => getLdsByMerchant(m, data))
+  )
+
+const getAccountsByCustomer = (customer, data) =>
+  data.filter(i => i.type === 'account' && i.customerNumberX === customer.numberX)
+
+const getPdsByCustomer = (customer, data) =>
+  arrReduce(
+    getAccountsByCustomer(customer, data)
+      .map(i => getPdsByAccount(i, data))
+  )
+
+const getLdsByCustomer = (account, data) =>
+  arrReduce(
+    getAccountsByCustomer(account, data)
+      .map(i => getLdsByAccount(i, data))
+  )
+
+const getMerchantsByCustomer = (customer, data) =>
+  arrReduce(
+    getAccountsByCustomer(customer, data)
+      .map(i => getMerchantsByAccount(i, data))
+  )
+
+const filterDataByModelName = (data, node, modelName) =>
+  modelName === void 0 || modelName === '' ? true : (
+    node.type === 'physical' ? [ node ] :
+    node.type === 'logical' ? [ getPdByLd(node, data) ] :
+    node.type === 'merchant' ? getPdsByMerchant(node, data) :
+    node.type === 'account' ? getPdsByAccount(node, data) :
+    node.type === 'customer' ? getPdsByCustomer(node, data) :
+    []
+  ).find(i => i.ModelName.toLowerCase().includes(modelName)) !== void 0
+
+const filterDataByTerminalId = (data, node, terminalId) =>
+  terminalId === void 0 || terminalId === '' ? true : (
+    node.type === 'logical' ? [ node ] :
+    node.type === 'physical' ? getLdsByPd(node, data) :
+    node.type === 'merchant' ? getLdsByMerchant(node, data) :
+    node.type === 'account' ? getLdsByAccount(node, data) :
+    node.type === 'customer' ? getLdsByCustomer(node, data) :
+    []
+  ).find(i => i.TerminalId.toLowerCase().includes(terminalId)) !== void 0
+
+const filterDataBySerialNumber = (data, node, serialNumber) =>
+  serialNumber === void 0 || serialNumber === '' ? true : (
+    node.type === 'physical' ? [ node ] :
+    node.type === 'logical' ? [ getPdByLd(node, data) ] :
+    node.type === 'merchant' ? getPdsByMerchant(node, data) :
+    node.type === 'account' ? getPdsByAccount(node, data) :
+    node.type === 'customer' ? getPdsByCustomer(node, data) :
+    []
+  ).find(d => d.SerialNumber.toLowerCase().includes(serialNumber))
+
+const filterDataByMerchant = (data, node, merchant) =>
+  merchant === void 0 || merchant === '' ? true : (
+    node.type === 'merchant' ? [ node ] :
+    node.type === 'logical' ? [ getMerchantByLd(node, data) ] :
+    node.type === 'physical' ? getLdsByPd(node, data).map(d => getMerchantByLd(d, data)) :
+    node.type === 'account' ? getMerchantsByAccount(node, data) :
+    node.type === 'customer' ? getMerchantsByCustomer(node, data) :
+    []
+  ).find(i => i.name.toLowerCase().includes(merchant)) !== void 0
 
 export function filterData () {
   return (dispatch, getState) => {
     const { filters, data } = getState().devices
     const ids = data.filter(
-        d => ['logical', 'physical'].indexOf(d.type) !== -1
+        d => ['logical', 'physical', 'merchant', 'account', 'customer'].indexOf(d.type) !== -1
       ).filter(
         d => filterDataByModelName(data, d, filters.modelName.toLowerCase()) &&
           filterDataByTerminalId(data, d, filters.terminalId.toLowerCase()) &&

@@ -5,6 +5,11 @@ import { Graph } from '@vx/network'
 import { LinkVertical } from '@vx/shape'
 import * as d3 from 'd3-force'
 import { LinearGradient } from '@vx/gradient'
+import PhysicalDevice from './nodes/PhysicalDevice'
+import LogicalDevice from './nodes/LogicalDevice'
+import Merchant from './nodes/Merchant'
+import Account from './nodes/Account'
+import Customer from './nodes/Customer'
 import './Tree.scss'
 
 const styles = {
@@ -19,54 +24,23 @@ const styles = {
 }
 
 function Node ({ node, events }) {
-  return (
-    <Group y={node.y} x={node.x}>
-      {node.type === 'physical' &&
-        <rect
-          width={16}
-          height={16}
-          y={-8}
-          x={-8}
-          fill='white'
-          stroke='#03c0dc'
-          strokeWidth={2}
-        />
-      }
-      {node.type === 'logical' &&
-        <circle
-          r={10}
-          strokeWidth={3}
-          fill='white'
-          strokeDasharray={'1'}
-          strokeOpacity={0.6}
-          stroke={'#26deb0'}
-          onClick={() => {
-            alert(`clicked: ${JSON.stringify(node.title)}`)
-          }}
-        />
-      }
-      <text
-        dy={-16}
-        fontSize={13}
-        fontFamily='Arial'
-        textAnchor={'middle'}
-        style={{ pointerEvents: 'none' }}
-        fill={'#222'}
-        stroke={void 0}
-      >
-        {node.title}
-      </text>
-    </Group>
-  )
+  switch (node.type) {
+    case 'physical': return (<PhysicalDevice node={node} />)
+    case 'logical': return (<LogicalDevice node={node} />)
+    case 'merchant': return (<Merchant node={node} />)
+    case 'account': return (<Account node={node} />)
+    case 'customer': return (<Customer node={node} />)
+    default: return null
+  }
 }
 
 function Link ({ link }) {
   return (
     <LinkVertical
       data={link}
-      stroke='#374469'
-      strokeWidth='1'
-      strokeOpacity={0.4}
+      stroke='#878499'
+      strokeWidth='1.5'
+      strokeOpacity={0.5}
       fill='none'
     />
   )
@@ -124,7 +98,7 @@ class Tree extends Component {
         .force('forceY', d3.forceY().strength(0.1).y(height * 0.5))
         .force('center', d3.forceCenter().x(width * 0.5).y(height * 0.5))
         .force('charge', d3.forceManyBody().strength(-1500))
-      force.force('link').links(links).distance(40).strength(1)
+      force.force('link').links(links).distance(20).strength(0.9)
       if (nextProps.animation) {
         force.on('tick', () => {
           this.setState({ nodes, links: nextProps.tree.links })
@@ -170,7 +144,7 @@ class Tree extends Component {
               height - margin.top - margin.bottom
             ]}
             nodeComponent={Node}
-            //linkComponent={Link}
+            linkComponent={Link}
           />
         </svg>
       </div>
