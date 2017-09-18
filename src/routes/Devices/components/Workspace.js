@@ -70,7 +70,7 @@ class Workspace extends Component {
           }}
         >
           <Filters />
-          <Tree />
+          <Tree animation={false} />
         </div>
       </div>
     )

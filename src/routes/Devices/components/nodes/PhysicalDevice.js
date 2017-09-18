@@ -16,7 +16,7 @@ class PhysicalDevice extends Component {
           height={16}
           y={-8}
           x={-8}
-          fill='white'
+          fill={node.main ? '#03c0dc' : 'white'}
           stroke='#03c0dc'
           strokeWidth={2}
         />

@@ -58,6 +58,22 @@ const initialState = {
     },
     {
       id: 7,
+      deviceId: 7,
+      type: 'physical',
+      parentId: 2,
+      SerialNumber: 'Serial Number 3',
+      ModelName: 'Verifone VX520'
+    },
+    {
+      id: 8,
+      deviceId: 8,
+      type: 'logical',
+      TerminalId: 'Terminal ID 5',
+      PhysicalDeviceId: 7,
+      MerchantNumberX: 'MerchNum2'
+    },
+    {
+      id: 9,
       type: 'merchant',
       numberX: 'MerchNum1',
       name: 'Merchant 1',
@@ -65,7 +81,7 @@ const initialState = {
       adressId: 1
     },
     {
-      id: 8,
+      id: 10,
       type: 'merchant',
       numberX: 'MerchNum2',
       name: 'Merchant 2',
@@ -73,7 +89,7 @@ const initialState = {
       adressId: 2
     },
     {
-      id: 9,
+      id: 11,
       type: 'account',
       numberX: 'AccNum1',
       customerNumberX: 'CostNum1',
@@ -81,7 +97,7 @@ const initialState = {
       adressId: 1
     },
     {
-      id: 10,
+      id: 12,
       type: 'account',
       numberX: 'AccNum2',
       customerNumberX: 'CostNum1',
@@ -89,7 +105,7 @@ const initialState = {
       adressId: 2
     },
     {
-      id: 11,
+      id: 13,
       type: 'account',
       numberX: 'AccNum3',
       customerNumberX: 'CostNum1',
@@ -97,7 +113,7 @@ const initialState = {
       adressId: 3
     },
     {
-      id: 12,
+      id: 14,
       type: 'customer',
       numberX: 'CostNum1',
       name: 'Customer 1',
@@ -105,7 +121,7 @@ const initialState = {
     }
   ],
   tree: {},
-  filteredData: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+  filteredData: [],
   showingTypes: ['logical', 'physical', 'merchant', 'account', 'customer'],
   filters: {
     modelName: '',

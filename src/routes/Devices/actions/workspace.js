@@ -44,6 +44,22 @@ export function rewriteTree () {
     const accountNodes = cloneArray(filtered.filter(d => d.type === 'account'))
     const customerNodes = cloneArray(filtered.filter(d => d.type === 'customer'))
 
+    const pdPdLinks = isArrContains('physical', showingTypes) ?
+      pdNodes.filter(
+        i => i.parentId !== void 0 && pdNodes.find(j => j.deviceId === i.parentId) !== void 0
+      ).map((d, i) => {
+        const parent = pdNodes.find(i => i.deviceId === d.parentId)
+        if (parent.parentId === void 0) {
+          parent.main = true
+        }
+        return {
+          source: parent,
+          target: d,
+          type: 'ppd',
+          id: i
+        }
+      }) : []
+
     const pdLinks = isArrContains('physical', showingTypes) ?
       isArrContains('logical', showingTypes) ?
         ldNodes.map((d, i) => {
@@ -163,7 +179,7 @@ export function rewriteTree () {
     const nodes = [
       ...pdNodes, ...ldNodes, ...merchantNodes, ...accountNodes, ...customerNodes
     ].filter(i => showingTypes.indexOf(i.type) !== -1)
-    const links = [ ...distinctLinks(pdLinks), ...ldLinks, ...merchantLinks, ...accountLinks ]
+    const links = [ ...distinctLinks(pdLinks), ...pdPdLinks, ...ldLinks, ...merchantLinks, ...accountLinks ]
     const tree = { nodes, links }
   	dispatch(setTree(tree))
   }

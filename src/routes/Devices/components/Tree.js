@@ -35,7 +35,7 @@ function Node ({ node, events }) {
 }
 
 function Link ({ link }) {
-  return (
+  return link.type === void 0 ? (
     <LinkVertical
       data={link}
       stroke='#878499'
@@ -43,7 +43,16 @@ function Link ({ link }) {
       strokeOpacity={0.5}
       fill='none'
     />
-  )
+  ) : link.type === 'ppd' ? (
+    <LinkVertical
+      data={link}
+      stroke='#03c0dc'
+      strokeDasharray='12, 4'
+      strokeWidth={2.5}
+      strokeOpacity={0.5}
+      fill='none'
+    />
+  ) : null
 }
 
 const width = 1300
@@ -53,7 +62,7 @@ class Tree extends Component {
   static propTypes = {
     tree: PropTypes.object.isRequired,
     animation: PropTypes.bool,
-    rewriteTree: PropTypes.func.isRequired
+    filterData: PropTypes.func.isRequired
   }
 
   constructor (props) {
@@ -110,7 +119,7 @@ class Tree extends Component {
 
   componentWillMount () {
     if (this.props.tree.nodes === void 0) {
-      this.props.rewriteTree()
+      this.props.filterData()
     }
   }
 
