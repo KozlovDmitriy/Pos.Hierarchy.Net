@@ -105,7 +105,7 @@ class Tree extends Component {
         .force('forceY', d3.forceY().strength(0.1).y(height * 0.5))
         .force('center', d3.forceCenter().x(width * 0.5).y(height * 0.5))
         .force('charge', d3.forceManyBody().strength(-900))
-      force.force('link').links(links).distance(40).strength(1)
+      force.force('link').links(links)//.distance(40).strength(1)
       if (nextProps.animation) {
         force.on('tick', () => {
           this.setState({ nodes, links: nextProps.tree.links, force: this.state.force })

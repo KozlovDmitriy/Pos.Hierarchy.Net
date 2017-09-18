@@ -39,7 +39,7 @@ export function rewriteTree () {
     const ldNodes = cloneArray(filtered.filter(d => d.type === 'logical'))
       .map(i => ({ ...i, name: i.TerminalId }))
     const pdNodes = cloneArray(filtered.filter(d => d.type === 'physical'))
-      .map(i => ({ ...i, name: i.SerialNumber }))
+      .map(i => ({ ...i, name: i.SerialNumber, main: i.parentId === void 0 }))
     const merchantNodes = cloneArray(filtered.filter(d => d.type === 'merchant'))
     const accountNodes = cloneArray(filtered.filter(d => d.type === 'account'))
     const customerNodes = cloneArray(filtered.filter(d => d.type === 'customer'))
@@ -49,9 +49,6 @@ export function rewriteTree () {
         i => i.parentId !== void 0 && pdNodes.find(j => j.deviceId === i.parentId) !== void 0
       ).map((d, i) => {
         const parent = pdNodes.find(i => i.deviceId === d.parentId)
-        if (parent.parentId === void 0) {
-          parent.main = true
-        }
         return {
           source: parent,
           target: d,
