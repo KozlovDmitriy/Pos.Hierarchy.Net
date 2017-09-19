@@ -5,13 +5,15 @@ import Toggle from 'material-ui/Toggle'
 
 class Filters extends Component {
   static propTypes = {
+    filterWithPpd: PropTypes.bool.isRequired,
     filters: PropTypes.object.isRequired,
     showingTypes: PropTypes.array.isRequired,
     setModelNameFilter: PropTypes.func.isRequired,
     setTerminalIdFilter: PropTypes.func.isRequired,
     setSerialNumberFilter: PropTypes.func.isRequired,
     setMerchantFilter: PropTypes.func.isRequired,
-    toggleShowingType: PropTypes.func.isRequired
+    toggleShowingType: PropTypes.func.isRequired,
+    changeFilterWithPpd: PropTypes.func.isRequired
   }
 
   constructor (props) {
@@ -25,6 +27,7 @@ class Filters extends Component {
     this.onToggleMerchant = this.onToggleMerchant.bind(this)
     this.onToggleAccount = this.onToggleAccount.bind(this)
     this.onToggleCustomer = this.onToggleCustomer.bind(this)
+    this.onTogglePpd = this.onTogglePpd.bind(this)
   }
 
   onChangeModel (event, newValue) {
@@ -41,6 +44,10 @@ class Filters extends Component {
 
   onChangeMerchant (event, newValue) {
     this.props.setMerchantFilter(newValue)
+  }
+
+  onTogglePpd (event, value) {
+    this.props.changeFilterWithPpd(value)
   }
 
   onToggleLogical () {
@@ -64,46 +71,60 @@ class Filters extends Component {
   }
 
   render () {
-    const { filters, showingTypes } = this.props
+    const { filters, showingTypes, filterWithPpd } = this.props
     return (
       <div style={{ background: '#fcfcfc', marginRight: -15, marginLeft: -15, paddingLeft: 15, paddingRight: 15 }}>
         <div className='row' style={{ marginTop: 30, marginBottom: -25 }}>
-          <div className='col col-xs-3'>
+          <div className='col col-sm-4'>
+            <Toggle
+              label='Фильтр по связанным физическим устройствам'
+              labelPosition='right'
+              labelStyle={{ fontSize: 12 }}
+              defaultToggled={filterWithPpd}
+              onToggle={this.onTogglePpd}
+            />
+          </div>
+          <div className='col col-sm-2'>
             <Toggle
               label='Логические устройства'
               labelPosition='right'
+              labelStyle={{ fontSize: 12 }}
               defaultToggled={showingTypes.indexOf('logical') !== -1}
               onToggle={this.onToggleLogical}
             />
           </div>
-          <div className='col col-xs-3'>
+          <div className='col col-sm-2'>
             <Toggle
               label='Физические устройства'
               labelPosition='right'
+              labelStyle={{ fontSize: 12 }}
               defaultToggled={showingTypes.indexOf('physical') !== -1}
               onToggle={this.onTogglePhysical}
             />
           </div>
-          <div className='col col-xs-2'>
+          <div className='col col-sm-1'>
             <Toggle
               label='Merchant'
               labelPosition='right'
+              labelStyle={{ fontSize: 12 }}
               defaultToggled={showingTypes.indexOf('merchant') !== -1}
               onToggle={this.onToggleMerchant}
             />
           </div>
-          <div className='col col-xs-2'>
+          <div className='col col-sm-1'>
             <Toggle
               label='Account'
               labelPosition='right'
+              labelStyle={{ fontSize: 12 }}
               defaultToggled={showingTypes.indexOf('account') !== -1}
               onToggle={this.onToggleAccount}
             />
           </div>
-          <div className='col col-xs-2'>
+          <div className='col col-sm-2'>
             <Toggle
               label='Customer'
               labelPosition='right'
+              labelStyle={{ fontSize: 12 }}
               defaultToggled={showingTypes.indexOf('customer') !== -1}
               onToggle={this.onToggleCustomer}
             />

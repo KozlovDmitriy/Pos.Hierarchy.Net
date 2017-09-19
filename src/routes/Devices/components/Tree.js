@@ -1,15 +1,14 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Group } from '@vx/group'
 import { Graph } from '@vx/network'
 import { LinkVertical } from '@vx/shape'
 import * as d3 from 'd3-force'
-import { LinearGradient } from '@vx/gradient'
-import PhysicalDevice from './nodes/PhysicalDevice'
+import PhysicalDevice from '../containers/nodes/PhysicalDeviceContainer'
 import LogicalDevice from './nodes/LogicalDevice'
 import Merchant from './nodes/Merchant'
 import Account from './nodes/Account'
 import Customer from './nodes/Customer'
+import NodePopover from '../containers/NodePopoverContainer'
 import './Tree.scss'
 
 const styles = {
@@ -138,7 +137,7 @@ class Tree extends Component {
     //  <rect width='100%' height='100%' fill='#306c90' />
     return (
       <div id='graph' style={styles.graph}>
-        <svg width='100%' height='100%'>
+        <svg width='100%' height='100%' id='canvas'>
           <Graph
             top={margin.top}
             left={margin.left}
@@ -154,6 +153,7 @@ class Tree extends Component {
             linkComponent={Link}
           />
         </svg>
+        <NodePopover />
       </div>
     )
   }

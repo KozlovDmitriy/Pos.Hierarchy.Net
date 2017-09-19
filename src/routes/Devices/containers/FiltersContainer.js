@@ -5,6 +5,7 @@ import * as FilterActions from '../actions/filters'
 
 function mapStateToProps (state) {
   return {
+    filterWithPpd: state.devices.filterWithPpd,
     filters: state.devices.filters,
     showingTypes: state.devices.showingTypes
   }

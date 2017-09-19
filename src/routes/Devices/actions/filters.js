@@ -7,6 +7,11 @@ export const SET_TERMINAL_ID_FILTER = 'SET_TERMINAL_ID_FILTER'
 export const SET_SERIAL_NUMBER_FILTER = 'SET_SERIAL_NUMBER_FILTER'
 export const SET_MERCHANT_FILTER = 'SET_MERCHANT_FILTER'
 export const SET_SHOWING_TYPES = 'SET_SHOWING_TYPES'
+export const SET_FILTER_WITH_PPD = 'SET_FILTER_WITH_PPD'
+
+export function setFilterWithPpd (flag) {
+  return { type: SET_FILTER_WITH_PPD, flag }
+}
 
 export function setFilters (filters) {
   return { type: SET_FILTERS, filters }
@@ -90,9 +95,33 @@ const getMerchantsByCustomer = (customer, data) =>
       .map(i => getMerchantsByAccount(i, data))
   )
 
-const filterDataByModelName = (data, node, modelName) =>
+const getPpdParentDevices = (node, data) => {
+  if (node.parentId === void 0) {
+    return []
+  }
+  var parent = data.find(i => node.parentId === i.deviceId)
+  if (parent === void 0) {
+    return []
+  } else {
+    return [parent, ...getPpdParentDevices(parent, data)]
+  }
+}
+
+const getPpdChildDevices = (node, data) => {
+  var child = data.find(i => i.parentId === node.deviceId)
+  if (child === void 0) {
+    return []
+  } else {
+    return [child, ...getPpdChildDevices(child, data)]
+  }
+}
+
+const getPpdConnectedDevices = (node, data) =>
+  [ ...getPpdParentDevices(node, data), node, ...getPpdChildDevices(node, data) ]
+
+const filterDataByModelName = (data, node, modelName, filterWithPpd) =>
   modelName === void 0 || modelName === '' ? true : (
-    node.type === 'physical' ? [ node ] :
+    node.type === 'physical' ? (filterWithPpd ? getPpdConnectedDevices(node, data) : [ node ]) :
     node.type === 'logical' ? [ getPdByLd(node, data) ] :
     node.type === 'merchant' ? getPdsByMerchant(node, data) :
     node.type === 'account' ? getPdsByAccount(node, data) :
@@ -110,9 +139,9 @@ const filterDataByTerminalId = (data, node, terminalId) =>
     []
   ).find(i => i.TerminalId.toLowerCase().includes(terminalId)) !== void 0
 
-const filterDataBySerialNumber = (data, node, serialNumber) =>
+const filterDataBySerialNumber = (data, node, serialNumber, filterWithPpd) =>
   serialNumber === void 0 || serialNumber === '' ? true : (
-    node.type === 'physical' ? [ node ] :
+    node.type === 'physical' ? (filterWithPpd ? getPpdConnectedDevices(node, data) : [ node ]) :
     node.type === 'logical' ? [ getPdByLd(node, data) ] :
     node.type === 'merchant' ? getPdsByMerchant(node, data) :
     node.type === 'account' ? getPdsByAccount(node, data) :
@@ -120,7 +149,7 @@ const filterDataBySerialNumber = (data, node, serialNumber) =>
     []
   ).find(d => d.SerialNumber.toLowerCase().includes(serialNumber))
 
-const filterDataByMerchant = (data, node, merchant) =>
+const filterDataByMerchant = (data, node, merchant, filterWithPpd) =>
   merchant === void 0 || merchant === '' ? true : (
     node.type === 'merchant' ? [ node ] :
     node.type === 'logical' ? [ getMerchantByLd(node, data) ] :
@@ -132,17 +161,24 @@ const filterDataByMerchant = (data, node, merchant) =>
 
 export function filterData () {
   return (dispatch, getState) => {
-    const { filters, data } = getState().devices
+    const { filters, data, filterWithPpd } = getState().devices
     const ids = data.filter(
         d => ['logical', 'physical', 'merchant', 'account', 'customer'].indexOf(d.type) !== -1
       ).filter(
-        d => filterDataByModelName(data, d, filters.modelName.toLowerCase()) &&
-          filterDataByTerminalId(data, d, filters.terminalId.toLowerCase()) &&
-          filterDataBySerialNumber(data, d, filters.serialNumber.toLowerCase()) &&
-          filterDataByMerchant(data, d, filters.merchant.toLowerCase())
+        d => filterDataByModelName(data, d, filters.modelName.toLowerCase(), filterWithPpd) &&
+          filterDataByTerminalId(data, d, filters.terminalId.toLowerCase(), filterWithPpd) &&
+          filterDataBySerialNumber(data, d, filters.serialNumber.toLowerCase(), filterWithPpd) &&
+          filterDataByMerchant(data, d, filters.merchant.toLowerCase(), filterWithPpd)
       ).map(d => d.id)
     dispatch(setFilteredData(ids))
     dispatch(rewriteTree())
+  }
+}
+
+export function changeFilterWithPpd (flag) {
+  return (dispatch) => {
+    dispatch(setFilterWithPpd(flag))
+    dispatch(filterData())
   }
 }
 

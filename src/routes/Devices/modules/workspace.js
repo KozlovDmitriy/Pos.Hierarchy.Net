@@ -1,11 +1,13 @@
 import {
   SET_DEVICES,
-  SET_TREE
+  SET_TREE,
+  SET_POPOVER_IS_OPEN
 } from '../actions/workspace'
 import {
   SET_FILTERS,
   SET_FILTERED_DATA,
-  SET_SHOWING_TYPES
+  SET_SHOWING_TYPES,
+  SET_FILTER_WITH_PPD
 } from '../actions/filters'
 
 const initialState = {
@@ -121,6 +123,7 @@ const initialState = {
     }
   ],
   tree: {},
+  filterWithPpd: false,
   filteredData: [],
   showingTypes: ['logical', 'physical', 'merchant', 'account', 'customer'],
   filters: {
@@ -128,11 +131,26 @@ const initialState = {
     terminalId: '',
     serialNumber: '',
     merchant: ''
+  },
+  nodePopover: {
+    isOpen: false,
+    anchor: void 0,
+    data: void 0
   }
 }
 
 export default function workspace (state = initialState, action) {
   switch (action.type) {
+    case SET_POPOVER_IS_OPEN: {
+      return {
+        ...state,
+        nodePopover: {
+          isOpen: action.isOpen,
+          anchor: action.anchor,
+          data: action.data
+        }
+      }
+    }
     case SET_DEVICES: {
       return { ...state, data: action.devices }
     }
@@ -147,6 +165,9 @@ export default function workspace (state = initialState, action) {
     }
     case SET_SHOWING_TYPES: {
       return { ...state, showingTypes: action.types }
+    }
+    case SET_FILTER_WITH_PPD: {
+      return { ...state, filterWithPpd: action.flag }
     }
     default: return state
   }
