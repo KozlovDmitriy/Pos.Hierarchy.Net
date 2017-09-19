@@ -13,18 +13,22 @@ class PhysicalDevice extends Component {
     this.onClick = this.onClick.bind(this)
   }
 
-  onClick = () => {
+  onClick = (event) => {
+    var e = event.target
+    var dim = e.getBoundingClientRect()
+    var x = dim.left
+    var y = dim.top
+    this.getBoundingClientRect = () => ({
+      left: x,
+      right: 1 + x,
+      top: y,
+      bottom: 1 + y
+    })
     this.props.setPopoverIsOpen(true, this, this.props.node)
   }
 
   render () {
     const node = this.props.node
-      this.getBoundingClientRect = () => ({
-        left: 660 + node.x,
-        right: 661 + node.x,
-        top: 80 + node.y,
-        bottom: 81 + node.y
-      })
     var rect = (
       <rect
         width={16}
