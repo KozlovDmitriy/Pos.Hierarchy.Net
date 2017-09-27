@@ -119,10 +119,15 @@ const getPpdChildDevices = (node, data) => {
 const getPpdConnectedDevices = (node, data) =>
   [ ...getPpdParentDevices(node, data), node, ...getPpdChildDevices(node, data) ]
 
+const getPdByLdWithPpd = (node, data, filterWithPpd) =>
+  filterWithPpd ?
+    getPpdConnectedDevices(getPdByLd(node, data), data) :
+    [ getPdByLd(node, data) ]
+
 const filterDataByModelName = (data, node, modelName, filterWithPpd) =>
   modelName === void 0 || modelName === '' ? true : (
     node.type === 'physical' ? (filterWithPpd ? getPpdConnectedDevices(node, data) : [ node ]) :
-    node.type === 'logical' ? [ getPdByLd(node, data) ] :
+    node.type === 'logical' ? getPdByLdWithPpd(node, data, filterWithPpd) :
     node.type === 'merchant' ? getPdsByMerchant(node, data) :
     node.type === 'account' ? getPdsByAccount(node, data) :
     node.type === 'customer' ? getPdsByCustomer(node, data) :
@@ -142,7 +147,7 @@ const filterDataByTerminalId = (data, node, terminalId) =>
 const filterDataBySerialNumber = (data, node, serialNumber, filterWithPpd) =>
   serialNumber === void 0 || serialNumber === '' ? true : (
     node.type === 'physical' ? (filterWithPpd ? getPpdConnectedDevices(node, data) : [ node ]) :
-    node.type === 'logical' ? [ getPdByLd(node, data) ] :
+    node.type === 'logical' ? getPdByLdWithPpd(node, data, filterWithPpd) :
     node.type === 'merchant' ? getPdsByMerchant(node, data) :
     node.type === 'account' ? getPdsByAccount(node, data) :
     node.type === 'customer' ? getPdsByCustomer(node, data) :
