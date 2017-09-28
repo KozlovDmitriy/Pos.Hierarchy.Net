@@ -51,11 +51,18 @@ class GraphControls extends Component {
     modifyZoom: PropTypes.func.isRequired
   }
 
+  static defaultProps = {
+    primary: 'dodgerblue',
+    minZoom: 0.15,
+    maxZoom: 1.5
+  }
+
   constructor (props) {
     super(props)
     this.state = {
       styles: makeStyles(props.primary)
     }
+    this.zoom = this.zoom.bind(this)
   }
 
   // Convert slider val (0-steps) to original zoom value range
@@ -75,9 +82,9 @@ class GraphControls extends Component {
 
   // Modify current zoom of graph-view
   zoom (e) {
-    let sliderVal = e.target.value
-    let zoomLevelNext = this.sliderToZoom(sliderVal)
-    let delta = zoomLevelNext - this.props.zoomLevel
+    const sliderVal = e.target.value
+    const zoomLevelNext = this.sliderToZoom(sliderVal)
+    const delta = zoomLevelNext - this.props.zoomLevel
     if (zoomLevelNext <= this.props.maxZoom && zoomLevelNext >= this.props.minZoom) {
       this.props.modifyZoom(delta)
     }
@@ -96,7 +103,7 @@ class GraphControls extends Component {
             min={this.zoomToSlider(this.props.minZoom)}
             max={this.zoomToSlider(this.props.maxZoom)}
             value={this.zoomToSlider(this.props.zoomLevel)}
-            onChange={this.zoom.bind(this)}
+            onChange={this.zoom}
             step='1'
           />
           +
@@ -107,12 +114,6 @@ class GraphControls extends Component {
       </div>
     )
   }
-}
-
-GraphControls.defaultProps = {
-  primary: 'dodgerblue',
-  minZoom: 0.15,
-  maxZoom: 1.5
 }
 
 export default Radium(GraphControls)

@@ -11,18 +11,8 @@ import Account from './nodes/Account'
 import Customer from './nodes/Customer'
 import NodePopover from '../containers/NodePopoverContainer'
 import GraphControls from './GraphControls.js'
+import Radium from 'radium'
 import './Tree.scss'
-
-const styles = {
-  graph: {
-    position: 'absolute',
-    top: 120,
-    left: 6,
-    right: 6,
-    bottom: 20,
-    background: '#fcfcfc'
-  }
-}
 
 function Node ({ node, events }) {
   switch (node.type) {
@@ -65,19 +55,78 @@ const maxZoom = 1.5
 const zoomDur = 750
 const gridSize = 40960
 
+function styleToString (style) {
+  return Object.keys(style)
+    .map((k) => {
+      const key = k.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+      return `${key}:${style[k]}`
+    }).join(';')
+}
+
+function makeStyles (primary = 'dodgerblue', light = 'white', dark = 'black') {
+  const styles = {
+    graph: {
+      position: 'absolute',
+      top: 120,
+      left: 6,
+      right: 6,
+      bottom: 20,
+      background: '#fcfcfc'
+    },
+    wrapper: {
+      base: {
+        height: '100%',
+        margin: 0,
+        display: 'flex',
+        boxShadow: 'none',
+        opacity: 0.5,
+        background: '#F9F9F9'
+      },
+      focused: {
+        opacity: 1
+      }
+    },
+    svg: {
+      base: {
+        alignContent: 'stretch',
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        overflowX: 'scroll',
+        overflowY: 'scroll'
+      }
+    }
+  }
+  return styles
+}
+
 class Tree extends Component {
   static propTypes = {
     tree: PropTypes.object.isRequired,
     animation: PropTypes.bool,
+    primary: PropTypes.string,
+    light: PropTypes.string,
+    dark: PropTypes.string,
     filterData: PropTypes.func.isRequired
+  }
+
+  static defaultProps = {
+    primary: 'dodgerblue',
+    light: '#FFF',
+    dark: '#000'
   }
 
   constructor (props) {
     super(props)
-    this.state = { viewTransform: d3.zoomIdentity }
+    this.state = {
+      viewTransform: d3.zoomIdentity,
+      styles: makeStyles(props.primary, props.light, props.dark)
+    }
     this.handleZoom = this.handleZoom.bind(this)
     this.modifyZoom = this.modifyZoom.bind(this)
     this.handleZoomToFit = this.handleZoomToFit.bind(this)
+    this.containZoom = this.containZoom.bind(this)
+    this.renderView = this.renderView.bind(this)
     this.zoom = d3.zoom()
       .scaleExtent([minZoom, maxZoom])
       .on('zoom', this.handleZoom)
@@ -136,14 +185,36 @@ class Tree extends Component {
     }
   }
 
+  drag () {
+    this.setState({
+      ...this.state,
+      translate: d3.event.translate,
+      scale: d3.event.scale
+    })
+  }
+
+  componentDidMount () {
+    d3.select(this.refs.viewWrapper)
+      .on('touchstart', this.containZoom)
+      .on('touchmove', this.containZoom)
+      // .on('click', this.handleSvgClicked)
+      .select('svg')
+      .call(this.zoom)
+      .call(d3.drag().on('drag', this.drag))
+    this.renderView()
+  }
+
+  // Keeps 'zoom' contained
+  containZoom () {
+    d3.event.preventDefault()
+  }
+
   // View 'zoom' handler
   handleZoom () {
-    if (this.state.focused) {
-      this.setState({
-        ...this.state,
-        viewTransform: d3.event.transform
-      })
-    }
+    this.setState({
+      ...this.state,
+      viewTransform: d3.event.transform
+    })
   }
 
   // Zooms to contents of this.refs.entities
@@ -201,29 +272,35 @@ class Tree extends Component {
   // Programmatically resets zoom
   setZoom (k = 1, x = 0, y = 0, dur = 0) {
     var t = d3.zoomIdentity.translate(x, y).scale(k)
-    d3.select('#canvas')
+    d3.select(this.refs.viewWrapper)
+      .select('svg')
       .transition()
       .duration(dur)
       .call(this.zoom.transform, t)
   }
 
+  renderView () {
+    const tr = d3.select(this.refs.view)
+      .attr('transform', this.state.viewTransform)
+    if (this.state.translate) {
+      tr.attr('transform', 'translate(' + this.state.translate + ')')
+    }
+    if (this.state.scale) {
+      tr.attr('transform', 'scale(' + this.state.scale + ')')
+    }
+  }
+
   render () {
+    const styles = this.state.styles
     if (this.state.nodes === void 0) {
       return <div id='graph' style={styles.graph} />
     }
-    const margin = {
-      top: 20,
-      left: 0,
-      right: 20,
-      bottom: 110,
-    }
-
     //  <LinearGradient id='top' from='#79d259' to='#37ac8c' />
     //  <rect width='100%' height='100%' fill='#306c90' />
+    this.renderView()
     return (
       <div id='graph' style={styles.graph} ref='viewWrapper'>
-        <svg width='100%' height='100%' id='canvas'>
-
+        <svg style={styles.svg.base} id='canvas'>
           <g id='view' ref='view'>
             <rect
               className='background'
@@ -235,15 +312,15 @@ class Tree extends Component {
             />
             <g id='entities' ref='entities'>
               <Graph
-                top={margin.top}
-                left={margin.left}
+                top={-gridSize / 4}
+                left={-gridSize / 4}
                 graph={{
                   nodes: this.state.nodes,
                   links: this.state.links
                 }}
                 size={[
-                  width - margin.left - margin.right,
-                  height - margin.top - margin.bottom
+                  gridSize,
+                  gridSize
                 ]}
                 nodeComponent={Node}
                 linkComponent={Link}
@@ -265,4 +342,4 @@ class Tree extends Component {
   }
 }
 
-export default Tree
+export default Radium(Tree)
