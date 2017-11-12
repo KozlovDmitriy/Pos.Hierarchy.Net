@@ -46,31 +46,24 @@ function Link ({ link }) {
   ) : null
 }
 
-const width = 1300
-const height = 1000
-
 const minZoom = 0.15
-const maxZoom = 1.5
+const maxZoom = 1.0
 
-const zoomDur = 750
-const gridSize = 40960
-
-function styleToString (style) {
-  return Object.keys(style)
-    .map((k) => {
-      const key = k.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
-      return `${key}:${style[k]}`
-    }).join(';')
-}
+const zoomDur = 500
 
 function makeStyles (primary = 'dodgerblue', light = 'white', dark = 'black') {
   const styles = {
-    graph: {
+    container: {
       position: 'absolute',
       top: 120,
       left: 6,
       right: 6,
-      bottom: 20,
+      bottom: 6
+    },
+    graph: {
+      width: '100%',
+      height: '100%',
+      overflow: 'scroll',
       background: '#fcfcfc'
     },
     wrapper: {
@@ -88,12 +81,10 @@ function makeStyles (primary = 'dodgerblue', light = 'white', dark = 'black') {
     },
     svg: {
       base: {
-        alignContent: 'stretch',
-        flex: 1,
-        width: '100%',
-        height: '100%',
-        overflowX: 'scroll',
-        overflowY: 'scroll'
+        display: 'block',
+        margin: 'auto',
+        // border: '1px solid #000',
+        padding: 100
       }
     }
   }
@@ -146,6 +137,14 @@ class Tree extends Component {
     }
   }
 
+  getSize (nodes) {
+    const zoom = this.state.viewTransform !== void 0 ?
+      this.state.viewTransform.k :
+      1
+    const size = (zoom) * (Math.sqrt(nodes.length) * 120 + 100)
+    return size
+  }
+
   componentWillReceiveProps (nextProps) {
     const newIds = this.getTreeIds(nextProps.tree)
     const oldIds = this.getTreeIds(this.props.tree)
@@ -161,6 +160,8 @@ class Tree extends Component {
             target: i.target.id
           }
         })
+      const width = this.getSize(nodes)
+      const height = width
       var force = d3Force.forceSimulation(nodes)
         .force('link', d3Force.forceLink().id(d => d.id))
         .force('forceX', d3Force.forceX().strength(0.1).x(width * 0.5))
@@ -229,16 +230,16 @@ class Tree extends Component {
     if (viewBBox.width > 0 && viewBBox.height > 0) {
       const dx = viewBBox.width
       const dy = viewBBox.height
-      const x = viewBBox.x + viewBBox.width / 2
-      const y = viewBBox.y + viewBBox.height / 2
+      // const x = viewBBox.x + viewBBox.width / 2
+      // const y = viewBBox.y + viewBBox.height / 2
       next.k = 0.9 / Math.max(dx / width, dy / height)
       if (next.k < minZoom) {
         next.k = minZoom
       } else if (next.k > maxZoom) {
         next.k = maxZoom
       }
-      next.x = width / 2 - next.k * x
-      next.y = height / 2 - next.k * y
+      // next.x = width / 2 - next.k * x
+      // next.y = height / 2 - next.k * y
     } else {
       next.k = (minZoom + maxZoom) / 2
       next.x = 0
@@ -249,10 +250,10 @@ class Tree extends Component {
 
   // Updates current viewTransform with some delta
   modifyZoom (modK = 0, modX = 0, modY = 0, dur = 0) {
-    const parent = d3.select(this.refs.viewWrapper).node()
-    const width = parent.clientWidth
-    const height = parent.clientHeight
-    const center = [ width / 2, height / 2 ]
+    // const parent = d3.select(this.refs.viewWrapper).node()
+    // const width = parent.clientWidth
+    // const height = parent.clientHeight
+    // const center = [ width / 2, height / 2 ]
     const extent = this.zoom.scaleExtent()
     const translate = [this.state.viewTransform.x, this.state.viewTransform.y]
     const next = { x: translate[0], y: translate[1], k: this.state.viewTransform.k }
@@ -260,18 +261,20 @@ class Tree extends Component {
     if (targetZoom < extent[0] || targetZoom > extent[1]) {
       return false
     } else {
-      const translate0 = [(center[0] - next.x) / next.k, (center[1] - next.y) / next.k]
+      // const translate0 = [(center[0] - next.x) / next.k, (center[1] - next.y) / next.k]
       next.k = targetZoom
-      const l = [translate0[0] * next.k + next.x, translate0[1] * next.k + next.y]
-      next.x += center[0] - l[0] + modX
-      next.y += center[1] - l[1] + modY
+      // const l = [translate0[0] * next.k + next.x, translate0[1] * next.k + next.y]
+      // next.x += center[0] - l[0] + modX
+      // next.y += center[1] - l[1] + modY
       this.setZoom(next.k, next.x, next.y, dur)
     }
   }
 
   // Programmatically resets zoom
   setZoom (k = 1, x = 0, y = 0, dur = 0) {
-    var t = d3.zoomIdentity.translate(x, y).scale(k)
+    var t = d3.zoomIdentity
+      .translate(x, y)
+      .scale(k)
     d3.select(this.refs.viewWrapper)
       .select('svg')
       .transition()
@@ -298,36 +301,37 @@ class Tree extends Component {
     //  <LinearGradient id='top' from='#79d259' to='#37ac8c' />
     //  <rect width='100%' height='100%' fill='#306c90' />
     this.renderView()
+    const gridSize = this.getSize(this.state.nodes)
     return (
-      <div id='graph' style={styles.graph} ref='viewWrapper'>
-        <svg style={styles.svg.base} id='canvas'>
-          <g id='view' ref='view'>
-            <rect
-              className='background'
-              x={-gridSize / 4}
-              y={-gridSize / 4}
-              width={gridSize}
-              height={gridSize}
-              fill='url(#grid)'
-            />
-            <g id='entities' ref='entities'>
-              <Graph
-                top={-gridSize / 4}
-                left={-gridSize / 4}
-                graph={{
-                  nodes: this.state.nodes,
-                  links: this.state.links
-                }}
-                size={[
-                  gridSize,
-                  gridSize
-                ]}
-                nodeComponent={Node}
-                linkComponent={Link}
+      <div id='container' style={styles.container}>
+        <div id='graph' style={styles.graph} ref='viewWrapper'>
+          <svg style={styles.svg.base} id='canvas' width={gridSize + 200} height={gridSize + 200}>
+            <g id='view' ref='view'>
+              <rect
+                className='background'
+                width={gridSize}
+                height={gridSize}
+                fill='url(#grid)'
               />
+              <g id='entities' ref='entities'>
+                <Graph
+                  top={-gridSize / 4}
+                  left={-gridSize / 4}
+                  graph={{
+                    nodes: this.state.nodes,
+                    links: this.state.links
+                  }}
+                  size={[
+                    gridSize,
+                    gridSize
+                  ]}
+                  nodeComponent={Node}
+                  linkComponent={Link}
+                />
+              </g>
             </g>
-          </g>
-        </svg>
+          </svg>
+        </div>
         <GraphControls
           primary={'dodgerblue'}
           minZoom={minZoom}

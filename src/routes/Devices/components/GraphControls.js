@@ -11,7 +11,7 @@ function makeStyles (primary) {
   return {
     controls: {
       position: 'absolute',
-      bottom: '30px',
+      bottom: '40px',
       left: '15px',
       zIndex: 100
     },

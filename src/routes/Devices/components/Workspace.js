@@ -23,7 +23,6 @@ const itemStyle = {
 class Workspace extends Component {
   static propTypes = {
     data: PropTypes.array.isRequired,
-    filteredData: PropTypes.array.isRequired,
     changeDeviceData:  PropTypes.func.isRequired
   }
 
@@ -37,34 +36,36 @@ class Workspace extends Component {
   }
 
   render () {
-    const { data, filteredData } = this.props
+    /* const { data } = this.props
     const onChange = this.onChange.bind(this)
+    const jsEditor = (<div style={{ ...itemStyle, width: 550, height: '100%' }}>
+      <AceEditor
+        mode='json'
+        theme='solarized_dark'
+        onChange={onChange}
+        name='UNIQUE_ID_OF_DIV'
+        editorProps={{ $blockScrolling: true }}
+        fontSize={14}
+        height='100%'
+        highlightActiveLine
+        value={JSON.stringify(data, null, 2)}
+        setOptions={{
+          showLineNumbers: true,
+          tabSize: 2,
+        }}
+      />
+    </div>) */
+    const jsEditor = void 0
     return (
       <div style={style}>
-        <div style={{ ...itemStyle, width: 550, height: '100%' }}>
-          <AceEditor
-            mode='json'
-            theme='solarized_dark'
-            onChange={onChange}
-            name='UNIQUE_ID_OF_DIV'
-            editorProps={{ $blockScrolling: true }}
-            fontSize={14}
-            height='100%'
-            highlightActiveLine
-            value={JSON.stringify(data, null, 2)}
-            setOptions={{
-              showLineNumbers: true,
-              tabSize: 2,
-            }}
-          />
-        </div>
+        {jsEditor}
         <div
           id='devices'
           style={{
             position: 'absolute',
             top: -20,
             bottom: 0,
-            left: 520,
+            left: 5,
             right: 5,
             padding: '2px 20px'
           }}
