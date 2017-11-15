@@ -35,8 +35,8 @@ class PhysicalDevice extends Component {
         height={16}
         y={-8}
         x={-8}
-        fill={node.main ? '#03c0dc' : 'white'}
-        stroke='#03c0dc'
+        fill={node.parentId === void 0 ? '#00bde7' : 'white'}
+        stroke='#00bde7'
         strokeWidth={2}
         onClick={this.onClick}
       />
@@ -50,10 +50,10 @@ class PhysicalDevice extends Component {
           fontFamily='Arial'
           textAnchor={'middle'}
           style={{ pointerEvents: 'none' }}
-          fill={'#03a09c'}
+          fill={'#009dc7'}
           stroke={void 0}
         >
-          {node.name}
+          {node.SerialNumber}
         </text>
       </Group>
     )

@@ -9,6 +9,10 @@ import LogicalDevice from './nodes/LogicalDevice'
 import Merchant from './nodes/Merchant'
 import Account from './nodes/Account'
 import Customer from './nodes/Customer'
+import Address from './nodes/Address'
+import City from './nodes/City'
+import Region from './nodes/Region'
+import Country from './nodes/Country'
 import NodePopover from '../containers/NodePopoverContainer'
 import GraphControls from './GraphControls.js'
 import Radium from 'radium'
@@ -21,6 +25,10 @@ function Node ({ node, events }) {
     case 'merchant': return (<Merchant node={node} />)
     case 'account': return (<Account node={node} />)
     case 'customer': return (<Customer node={node} />)
+    case 'address': return (<Address node={node} />)
+    case 'city': return (<City node={node} />)
+    case 'region': return (<Region node={node} />)
+    case 'country': return (<Country node={node} />)
     default: return null
   }
 }
@@ -141,7 +149,7 @@ class Tree extends Component {
     const zoom = this.state.viewTransform !== void 0 ?
       this.state.viewTransform.k :
       1
-    const size = (zoom) * (Math.sqrt(nodes.length) * 120 + 100)
+    const size = (zoom) * (Math.sqrt(nodes.length) * 140 + 100)
     return size
   }
 
@@ -168,7 +176,7 @@ class Tree extends Component {
         .force('forceY', d3Force.forceY().strength(0.1).y(height * 0.5))
         .force('center', d3Force.forceCenter().x(width * 0.5).y(height * 0.5))
         .force('charge', d3Force.forceManyBody().strength(-900))
-      force.force('link').links(links)
+      force.force('link').links(links).distance(() => 70)
       if (nextProps.animation) {
         force.on('tick', () => {
           this.setState({ nodes, links: nextProps.tree.links, force: this.state.force })

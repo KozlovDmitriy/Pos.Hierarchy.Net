@@ -42,14 +42,16 @@ const distinctLinks = (arr) => {
 export function rewriteTree () {
   return (dispatch, getState) => {
     const { data, filteredData, showingTypes } = getState().devices
-    const filtered = data.filter(d => filteredData.indexOf(d.id) !== -1)
-    const ldNodes = cloneArray(filtered.filter(d => d.type === 'logical'))
-      .map(i => ({ ...i, name: i.TerminalId }))
-    const pdNodes = cloneArray(filtered.filter(d => d.type === 'physical'))
-      .map(i => ({ ...i, name: i.SerialNumber, main: i.parentId === void 0 }))
-    const merchantNodes = cloneArray(filtered.filter(d => d.type === 'merchant'))
-    const accountNodes = cloneArray(filtered.filter(d => d.type === 'account'))
-    const customerNodes = cloneArray(filtered.filter(d => d.type === 'customer'))
+    const filtered = cloneArray(data.filter(d => filteredData.indexOf(d.id) !== -1))
+    const ldNodes = filtered.filter(d => d.type === 'logical')
+    const pdNodes = filtered.filter(d => d.type === 'physical')
+    const merchantNodes = filtered.filter(d => d.type === 'merchant')
+    const accountNodes = filtered.filter(d => d.type === 'account')
+    const customerNodes = filtered.filter(d => d.type === 'customer')
+    const addressNodes = filtered.filter(d => d.type === 'address')
+    const cityNodes = filtered.filter(d => d.type === 'city')
+    const regionNodes = filtered.filter(d => d.type === 'region')
+    const countryNodes = filtered.filter(d => d.type === 'country')
 
     const pdPdLinks = isArrContains('physical', showingTypes) ?
       pdNodes.filter(
@@ -171,6 +173,54 @@ export function rewriteTree () {
       [] :
     []
 
+    const merchantAddressLinks = isArrContains('merchant', showingTypes) ?
+      isArrContains('address', showingTypes) ?
+        merchantNodes
+          .filter(m => m.addressId !== void 0)
+          .map((m, i) => ({
+            source: addressNodes.find(i => i.addressId === m.addressId),
+            target: m,
+            id: i
+          }))
+      : []
+    : []
+
+    const addressCityLinks = isArrContains('address', showingTypes) ?
+      isArrContains('city', showingTypes) ?
+        addressNodes
+          .filter(m => m.cityId !== void 0)
+          .map((m, i) => ({
+            source: cityNodes.find(i => i.cityId === m.cityId),
+            target: m,
+            id: i
+          }))
+      : []
+    : []
+
+    const cityRegionLinks = isArrContains('city', showingTypes) ?
+      isArrContains('region', showingTypes) ?
+        cityNodes
+          .filter(m => m.regionId !== void 0)
+          .map((m, i) => ({
+            source: regionNodes.find(i => i.regionId === m.regionId),
+            target: m,
+            id: i
+          }))
+      : []
+    : []
+
+    const regionCountryLinks = isArrContains('region', showingTypes) ?
+      isArrContains('country', showingTypes) ?
+        regionNodes
+          .filter(m => m.countryId !== void 0)
+          .map((m, i) => ({
+            source: countryNodes.find(i => i.countryId === m.countryId),
+            target: m,
+            id: i
+          }))
+      : []
+    : []
+
     const accountLinks = showingTypes.filter(i => i === 'account' || i === 'customer').length === 2 ?
       accountNodes.map((m, i) => {
         return {
@@ -180,10 +230,18 @@ export function rewriteTree () {
         }
       }) : []
 
-    const nodes = [
-      ...pdNodes, ...ldNodes, ...merchantNodes, ...accountNodes, ...customerNodes
-    ].filter(i => showingTypes.indexOf(i.type) !== -1)
-    const links = [ ...distinctLinks(pdLinks), ...pdPdLinks, ...ldLinks, ...merchantLinks, ...accountLinks ]
+    const nodes = filtered.filter(i => showingTypes.indexOf(i.type) !== -1)
+    const links = [
+      ...distinctLinks(pdLinks),
+      ...pdPdLinks,
+      ...ldLinks,
+      ...merchantLinks,
+      ...accountLinks,
+      ...merchantAddressLinks,
+      ...addressCityLinks,
+      ...cityRegionLinks,
+      ...regionCountryLinks
+    ]
     const tree = { nodes, links }
   	dispatch(setTree(tree))
   }

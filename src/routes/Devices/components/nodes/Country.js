@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Group } from '@vx/group'
 
-class Customer extends Component {
+class Country extends Component {
   static propTypes = {
     node: PropTypes.object.isRequired
   }
@@ -12,20 +12,19 @@ class Customer extends Component {
     return (
       <Group y={node.y} x={node.x}>
         <polygon
-          points={'-7,-14 7,-14 16,0 7,14 -7,14 -16,0'}
-          fill={'#fff'}
-          // {'#7777FF'}
-          stroke={'#008ba0'}
-          strokeWidth={3.5}
+          points={'-1, -10, -8, 11, 9, -2, -11, -2, 6, 11'}
+          fill={'#00afa3'}
+          stroke={'#00afa3'}
+          strokeWidth={2.5}
           strokeOpacity={0.8}
         />
         <text
-          dy={-22}
-          fontSize={16}
+          dy={-19}
+          fontSize={15}
           fontFamily='Arial'
           textAnchor={'middle'}
           style={{ pointerEvents: 'none' }}
-          fill={'#008ba0'}
+          fill={'#00afa3'}
           stroke={void 0}
         >
           {node.name}
@@ -35,4 +34,4 @@ class Customer extends Component {
   }
 }
 
-export default Customer
+export default Country

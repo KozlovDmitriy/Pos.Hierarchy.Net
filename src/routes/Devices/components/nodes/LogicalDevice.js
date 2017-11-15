@@ -16,7 +16,7 @@ class LogicalDevice extends Component {
           strokeWidth={2.5}
           fill={'white'}
           strokeOpacity={0.6}
-          stroke={'#46Fe90'}
+          stroke={'#00d8d4'}
           onClick={() => {
             alert(`clicked: ${JSON.stringify(node.title)}`)
           }}
@@ -27,10 +27,10 @@ class LogicalDevice extends Component {
           fontFamily='Arial'
           textAnchor={'middle'}
           style={{ pointerEvents: 'none' }}
-          fill={'#46ae90'}
+          fill={'#00b8b4'}
           stroke={void 0}
         >
-          {node.name}
+          {node.TerminalId}
         </text>
       </Group>
     )

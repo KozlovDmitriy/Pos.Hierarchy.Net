@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Group } from '@vx/group'
 
-class Customer extends Component {
+class Address extends Component {
   static propTypes = {
     node: PropTypes.object.isRequired
   }
@@ -12,27 +12,26 @@ class Customer extends Component {
     return (
       <Group y={node.y} x={node.x}>
         <polygon
-          points={'-7,-14 7,-14 16,0 7,14 -7,14 -16,0'}
+          points={'-9,10, -9,-2 -12,-2, 0,-11, 12,-2, 9,-2, 9,10, 3,10, 3,2, -3,2, -3,10'}
           fill={'#fff'}
-          // {'#7777FF'}
-          stroke={'#008ba0'}
-          strokeWidth={3.5}
+          stroke={'#00afa3'}
+          strokeWidth={2.5}
           strokeOpacity={0.8}
         />
         <text
-          dy={-22}
-          fontSize={16}
+          dy={-19}
+          fontSize={15}
           fontFamily='Arial'
           textAnchor={'middle'}
           style={{ pointerEvents: 'none' }}
-          fill={'#008ba0'}
+          fill={'#00afa3'}
           stroke={void 0}
         >
-          {node.name}
+          {node.address1}
         </text>
       </Group>
     )
   }
 }
 
-export default Customer
+export default Address

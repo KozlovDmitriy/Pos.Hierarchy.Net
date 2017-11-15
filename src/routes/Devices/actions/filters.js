@@ -167,13 +167,11 @@ const filterDataByMerchant = (data, node, merchant, filterWithPpd) =>
 export function filterData () {
   return (dispatch, getState) => {
     const { filters, data, filterWithPpd } = getState().devices
-    const ids = data.filter(
-        d => ['logical', 'physical', 'merchant', 'account', 'customer'].indexOf(d.type) !== -1
-      ).filter(
-        d => filterDataByModelName(data, d, filters.modelName.toLowerCase(), filterWithPpd) &&
-          filterDataByTerminalId(data, d, filters.terminalId.toLowerCase(), filterWithPpd) &&
-          filterDataBySerialNumber(data, d, filters.serialNumber.toLowerCase(), filterWithPpd) &&
-          filterDataByMerchant(data, d, filters.merchant.toLowerCase(), filterWithPpd)
+    const ids = data.filter(d =>
+        filterDataByModelName(data, d, filters.modelName.toLowerCase(), filterWithPpd) &&
+        filterDataByTerminalId(data, d, filters.terminalId.toLowerCase(), filterWithPpd) &&
+        filterDataBySerialNumber(data, d, filters.serialNumber.toLowerCase(), filterWithPpd) &&
+        filterDataByMerchant(data, d, filters.merchant.toLowerCase(), filterWithPpd)
       ).map(d => d.id)
     dispatch(setFilteredData(ids))
     dispatch(rewriteTree())

@@ -13,18 +13,21 @@ class Account extends Component {
       <Group y={node.y} x={node.x}>
         <polygon
           points={'0,-15 15,0 0,15 -15,0'}
-          fill={'#EEE0F0'}
-          stroke={'#D340E3'}
-          strokeWidth={2.5}
+          fill={'#fff'}
+          // {'#9999FF'}
+          stroke={'#008ba0'}
+          // fill={'#EEE0F0'}
+          // stroke={'#D340E3'}
+          strokeWidth={3.5}
           strokeOpacity={0.8}
         />
         <text
-          dy={-19}
+          dy={-21}
           fontSize={15}
           fontFamily='Arial'
           textAnchor={'middle'}
           style={{ pointerEvents: 'none' }}
-          fill={'#D340E3'}
+          fill={'#008ba0'} // fill={'#D340E3'}
           stroke={void 0}
         >
           {node.name}

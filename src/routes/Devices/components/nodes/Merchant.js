@@ -9,15 +9,14 @@ class Merchant extends Component {
 
   render () {
     const node = this.props.node
-    //fill={'#BBFFBB'}
-    //stroke={'#70CC53'}
     return (
       <Group y={node.y} x={node.x}>
         <polygon
-          points={'0,-12 -12,12 12,12'}
-          fill={'#CCCCFF'}
-          stroke={'#5053FF'}
-          strokeWidth={2}
+          points={'0,-10 -11,11 11,11'}
+          fill={'#fff'}
+          // {'#CCCCFF'}
+          stroke={'#008ba0'}
+          strokeWidth={3.5}
           strokeOpacity={0.8}
         />
         <text
@@ -26,7 +25,7 @@ class Merchant extends Component {
           fontFamily='Arial'
           textAnchor={'middle'}
           style={{ pointerEvents: 'none' }}
-          fill={'#5053FF'}
+          fill={'#008ba0'}
           stroke={void 0}
         >
           {node.name}
