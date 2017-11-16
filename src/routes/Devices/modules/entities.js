@@ -4,14 +4,16 @@ const entities = [
     deviceId: 1,
     type: 'physical',
     SerialNumber: 'Serial Number 1',
-    ModelName: 'NewPOS 8210'
+    ModelName: 'NewPOS 8210',
+    addressId: 1
   },
   {
     id: 2,
     deviceId: 2,
     type: 'physical',
     SerialNumber: 'Serial Number 2',
-    ModelName: 'Petroline'
+    ModelName: 'Petroline',
+    addressId: 2
   },
   {
     id: 3,
@@ -19,7 +21,7 @@ const entities = [
     type: 'logical',
     TerminalId: 'Terminal ID 1',
     PhysicalDeviceId: 1,
-    MerchantNumberX: 'MerchNum1'
+    MerchantNumberX: 'MerchNum3'
   },
   {
     id: 4,
@@ -43,7 +45,7 @@ const entities = [
     type: 'logical',
     TerminalId: 'Terminal ID 4',
     PhysicalDeviceId: 1,
-    MerchantNumberX: 'MerchNum2'
+    MerchantNumberX: 'MerchNum1'
   },
   {
     id: 7,
@@ -51,7 +53,8 @@ const entities = [
     type: 'physical',
     parentId: 2,
     SerialNumber: 'Serial Number 3',
-    ModelName: 'Verifone VX520'
+    ModelName: 'Verifone VX520',
+    addressId: 2
   },
   {
     id: 8,
@@ -66,7 +69,7 @@ const entities = [
     type: 'merchant',
     numberX: 'MerchNum1',
     name: 'Merchant 1',
-    accountNumberX: 'AccNum2',
+    accountNumberX: 'AccNum1',
     addressId: 1
   },
   {
@@ -91,7 +94,7 @@ const entities = [
     numberX: 'AccNum2',
     customerNumberX: 'CostNum2',
     name: 'Account 2',
-    addressId: 2
+    addressId: 1
   },
   {
     id: 13,
@@ -113,7 +116,7 @@ const entities = [
     type: 'customer',
     numberX: 'CostNum2',
     name: 'Customer 2',
-    addressId: 3
+    addressId: 1
   },
   {
     id: 16,
@@ -148,6 +151,35 @@ const entities = [
     type: 'country',
     name: 'Россия',
     countryId: 1
+  },
+  {
+    id: 21,
+    type: 'address',
+    address1: 'ул. Аэропортовская, 2',
+    addressId: 3,
+    cityId: 2
+  },
+  {
+    id: 22,
+    type: 'city',
+    name: 'Москва',
+    cityId: 2,
+    regionId: 2
+  },
+  {
+    id: 23,
+    type: 'region',
+    name: 'Московская область',
+    regionId: 2,
+    countryId: 1
+  },
+  {
+    id: 24,
+    type: 'merchant',
+    numberX: 'MerchNum3',
+    name: 'Merchant 3',
+    accountNumberX: 'AccNum2',
+    addressId: 1
   }
 ]
 

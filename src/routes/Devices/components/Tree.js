@@ -34,28 +34,72 @@ function Node ({ node, events }) {
 }
 
 function Link ({ link }) {
-  return link.type === void 0 ? (
-    <LinkVertical
-      data={link}
-      stroke='#878499'
-      strokeWidth='1.5'
-      strokeOpacity={0.5}
-      fill='none'
-    />
-  ) : link.type === 'ppd' ? (
-    <LinkVertical
-      data={link}
-      stroke='#03c0dc'
-      strokeDasharray='12, 4'
-      strokeWidth={2.5}
-      strokeOpacity={0.5}
-      fill='none'
-    />
-  ) : null
+  const isAddress = link.type.match(/(address)|(city)|(region)|(country)/)
+  if (isAddress !== null) {
+    return (
+      <LinkVertical
+        data={link}
+        stroke='#00afa3'
+        strokeDasharray='8, 12'
+        strokeWidth={1.5}
+        strokeOpacity={0.5}
+        fill='none'
+      />
+    )
+  }
+  const isLogical = link.type.match(/(logical)/)
+  if (isLogical !== null) {
+    return (
+      <LinkVertical
+        data={link}
+        stroke='#00d8d4'
+        strokeWidth={1.5}
+        strokeOpacity={0.5}
+        fill='none'
+      />
+    )
+  }
+  const isPhysical = link.type.match(/(physical)/)
+  if (isPhysical !== null) {
+    if (link.type === 'physical - physical') {
+      return (
+        <LinkVertical
+          data={link}
+          stroke='#03c0dc'
+          strokeDasharray='12, 4'
+          strokeWidth={3.5}
+          strokeOpacity={0.5}
+          fill='none'
+        />
+      )
+    } else {
+      return (
+        <LinkVertical
+          data={link}
+          stroke='#00bde7'
+          strokeWidth={1.5}
+          strokeOpacity={0.5}
+          fill='none'
+        />
+      )
+    }
+  }
+  const isOwner = link.type.match(/(merchant)|(account)|(customer)/)
+  if (isOwner !== null) {
+    return (
+      <LinkVertical
+        data={link}
+        stroke='#008ba0'
+        strokeWidth={2}
+        strokeOpacity={0.5}
+        fill='none'
+      />
+    )
+  }
 }
 
 const minZoom = 0.15
-const maxZoom = 1.0
+const maxZoom = 1.5
 
 const zoomDur = 500
 
@@ -145,11 +189,12 @@ class Tree extends Component {
     }
   }
 
-  getSize (nodes) {
+  getSize (nodes, links) {
     const zoom = this.state.viewTransform !== void 0 ?
       this.state.viewTransform.k :
       1
-    const size = (zoom) * (Math.sqrt(nodes.length) * 140 + 100)
+    const count = Math.sqrt(nodes.length) // Math.sqrt(Math.max(nodes.length, links.length))
+    const size = (zoom) * (count * 140 + 100)
     return size
   }
 
@@ -168,7 +213,7 @@ class Tree extends Component {
             target: i.target.id
           }
         })
-      const width = this.getSize(nodes)
+      const width = this.getSize(nodes, links)
       const height = width
       var force = d3Force.forceSimulation(nodes)
         .force('link', d3Force.forceLink().id(d => d.id))
@@ -309,7 +354,7 @@ class Tree extends Component {
     //  <LinearGradient id='top' from='#79d259' to='#37ac8c' />
     //  <rect width='100%' height='100%' fill='#306c90' />
     this.renderView()
-    const gridSize = this.getSize(this.state.nodes)
+    const gridSize = this.getSize(this.state.nodes, this.state.links)
     return (
       <div id='container' style={styles.container}>
         <div id='graph' style={styles.graph} ref='viewWrapper'>
