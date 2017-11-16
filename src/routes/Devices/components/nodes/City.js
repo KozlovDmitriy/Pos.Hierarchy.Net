@@ -12,7 +12,8 @@ class City extends Component {
     return (
       <Group y={node.y} x={node.x}>
         <polygon
-          points={'-1, -10, -8, 11, 9, -2, -11, -2, 6, 11'}
+          points={'-1,-10, -4,-2, -11,-2, -6,3, -8,11, -1,6, 6,11, 4,3, 9,-2, 3,-2'}
+          // points={'-1,-10, -8,11, 9,-2, -11,-2, 6,11'}
           fill={'#fff'}
           stroke={'#00afa3'}
           // fill={'#6791C5'}

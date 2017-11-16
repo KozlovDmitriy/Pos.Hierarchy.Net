@@ -12,6 +12,7 @@ import {
 } from '../actions/filters'
 
 const initialState = {
+  animation: true,
   data: entities,
   tree: {},
   filterWithPpd: false,

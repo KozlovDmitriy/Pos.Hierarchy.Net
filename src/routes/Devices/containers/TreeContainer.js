@@ -6,7 +6,8 @@ import * as FilterActions from '../actions/filters'
 
 function mapStateToProps (state) {
   return {
-    tree: state.devices.tree
+    tree: state.devices.tree,
+    animation: state.devices.animation
   }
 }
 
