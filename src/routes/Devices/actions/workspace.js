@@ -1,5 +1,5 @@
 import { filterData } from './filters'
-import getAllConnections from './connections'
+import { getAllConnections } from './connections'
 
 export const SET_DEVICES = 'SET_DEVICES'
 export const SET_TREE = 'SET_TREE'
