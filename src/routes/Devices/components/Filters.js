@@ -12,6 +12,12 @@ class Filters extends Component {
     setTerminalIdFilter: PropTypes.func.isRequired,
     setSerialNumberFilter: PropTypes.func.isRequired,
     setMerchantFilter: PropTypes.func.isRequired,
+    setAccountFilter: PropTypes.func.isRequired,
+    setCustomerFilter: PropTypes.func.isRequired,
+    setAddressFilter: PropTypes.func.isRequired,
+    setCityFilter: PropTypes.func.isRequired,
+    setRegionFilter: PropTypes.func.isRequired,
+    setCountryFilter: PropTypes.func.isRequired,
     toggleShowingType: PropTypes.func.isRequired,
     changeFilterWithPpd: PropTypes.func.isRequired
   }
@@ -22,6 +28,12 @@ class Filters extends Component {
     this.onChangeTerminalID = this.onChangeTerminalID.bind(this)
     this.onChangeSerNum = this.onChangeSerNum.bind(this)
     this.onChangeMerchant = this.onChangeMerchant.bind(this)
+    this.onChangeAccount = this.onChangeAccount.bind(this)
+    this.onChangeCustomer = this.onChangeCustomer.bind(this)
+    this.onChangeAddress = this.onChangeAddress.bind(this)
+    this.onChangeCity = this.onChangeCity.bind(this)
+    this.onChangeRegion = this.onChangeRegion.bind(this)
+    this.onChangeCountry = this.onChangeCountry.bind(this)
     this.onToggleLogical = this.onToggleLogical.bind(this)
     this.onTogglePhysical = this.onTogglePhysical.bind(this)
     this.onToggleMerchant = this.onToggleMerchant.bind(this)
@@ -48,6 +60,30 @@ class Filters extends Component {
 
   onChangeMerchant (event, newValue) {
     this.props.setMerchantFilter(newValue)
+  }
+
+  onChangeAccount (event, newValue) {
+    this.props.setAccountFilter(newValue)
+  }
+
+  onChangeCustomer (event, newValue) {
+    this.props.setCustomerFilter(newValue)
+  }
+
+  onChangeAddress (event, newValue) {
+    this.props.setAddressFilter(newValue)
+  }
+
+  onChangeCity (event, newValue) {
+    this.props.setCityFilter(newValue)
+  }
+
+  onChangeRegion (event, newValue) {
+    this.props.setRegionFilter(newValue)
+  }
+
+  onChangeCountry (event, newValue) {
+    this.props.setCountryFilter(newValue)
   }
 
   onTogglePpd (event, value) {
@@ -187,7 +223,7 @@ class Filters extends Component {
           </div>
         </div>
         <div className='row'>
-          <div className='col col-xs-3'>
+          <div className='col col-xs-1'>
             <TextField
               id={'modelFilter'}
               floatingLabelText={'Модель'}
@@ -196,7 +232,7 @@ class Filters extends Component {
               onChange={this.onChangeModel}
             />
           </div>
-          <div className='col col-xs-3'>
+          <div className='col col-xs-1'>
             <TextField
               id={'terminalIdFilter'}
               floatingLabelText={'Terminal ID'}
@@ -205,7 +241,7 @@ class Filters extends Component {
               onChange={this.onChangeTerminalID}
             />
           </div>
-          <div className='col col-xs-3'>
+          <div className='col col-xs-1'>
             <TextField
               id={'modelFilter'}
               floatingLabelText={'Serial Number'}
@@ -214,13 +250,67 @@ class Filters extends Component {
               onChange={this.onChangeSerNum}
             />
           </div>
-          <div className='col col-xs-3'>
+          <div className='col col-xs-1'>
             <TextField
               id={'modelFilter'}
               floatingLabelText={'Merchant'}
               fullWidth
               value={filters.merchant}
               onChange={this.onChangeMerchant}
+            />
+          </div>
+          <div className='col col-xs-1'>
+            <TextField
+              id={'accountFilter'}
+              floatingLabelText={'Account'}
+              fullWidth
+              value={filters.account}
+              onChange={this.onChangeAccount}
+            />
+          </div>
+          <div className='col col-xs-1'>
+            <TextField
+              id={'customerFilter'}
+              floatingLabelText={'Customer'}
+              fullWidth
+              value={filters.customer}
+              onChange={this.onChangeCustomer}
+            />
+          </div>
+          <div className='col col-xs-1'>
+            <TextField
+              id={'addressFilter'}
+              floatingLabelText={'Адрес'}
+              fullWidth
+              value={filters.address}
+              onChange={this.onChangeAddress}
+            />
+          </div>
+          <div className='col col-xs-1'>
+            <TextField
+              id={'cityFilter'}
+              floatingLabelText={'Город'}
+              fullWidth
+              value={filters.city}
+              onChange={this.onChangeCity}
+            />
+          </div>
+          <div className='col col-xs-1'>
+            <TextField
+              id={'regionFilter'}
+              floatingLabelText={'Регион'}
+              fullWidth
+              value={filters.region}
+              onChange={this.onChangeRegion}
+            />
+          </div>
+          <div className='col col-xs-1'>
+            <TextField
+              id={'countryFilter'}
+              floatingLabelText={'Страна'}
+              fullWidth
+              value={filters.country}
+              onChange={this.onChangeCountry}
             />
           </div>
         </div>

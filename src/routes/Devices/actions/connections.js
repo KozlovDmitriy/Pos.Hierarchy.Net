@@ -45,48 +45,108 @@ const getRegionByCountry = getCountryByRegion
 const getPhysicalByPhysical =
   (n, m) => n.parentId === m.deviceId
 
+const getPhysicalByPhysicalDown =
+  (n, m) => n.deviceId === m.parentId
+
+const filterBySubstring = (v, f) =>
+  v.toLowerCase().includes(f.toLowerCase())
+
 const connections = {
   physical: [
-    { type: 'logical', expr: getLogicalByPhysical, isRec: false, up: true },
-    { type: 'address', expr: getAddressByEntity, isRec: true, up: true },
-    { type: 'physical', expr: getPhysicalByPhysical, isRec: true, up: true }
+    { type: 'logical', expr: getLogicalByPhysical, isRec: false, isCycle: true, up: true },
+    { type: 'logical', expr: getLogicalByPhysical, isRec: false, isCycle: true, up: false },
+    { type: 'address', expr: getAddressByEntity, isRec: true, isCycle: true, up: true },
+    { type: 'physical', expr: getPhysicalByPhysical, isRec: true, isCycle: true, up: true },
+    { type: 'physical', expr: getPhysicalByPhysicalDown, isRec: true, isCycle: true, up: false },
+    { type: 'physical', expr: getPhysicalByPhysical, isRec: true, isCycle: true, up: false }
   ],
   logical: [
-    { type: 'merchant', expr: getMerchantByLogical, isRec: true, up: true },
-    { type: 'physical', expr: getPhysicalByLogical, isRec: true, up: true },
-    { type: 'physical', expr: getPhysicalByLogical, isRec: true, up: false },
+    { type: 'merchant', expr: getMerchantByLogical, isRec: true, isCycle: true, up: true },
+    { type: 'physical', expr: getPhysicalByLogical, isRec: true, isCycle: true, up: false }
   ],
   merchant: [
-    { type: 'account', expr: getAccountByMecrhant, isRec: true, up: true },
-    { type: 'address', expr: getAddressByEntity, isRec: false, up: true },
-    { type: 'logical', expr: getLogicalByMerchant, isRec: true, up: false }
+    { type: 'account', expr: getAccountByMecrhant, isRec: true, isCycle: true, up: true },
+    { type: 'address', expr: getAddressByEntity, isRec: false, isCycle: true, up: true },
+    { type: 'logical', expr: getLogicalByMerchant, isRec: true, isCycle: true, up: false }
   ],
   account: [
-    { type: 'customer', expr: getCustomerByAccount, isRec: true, up: true },
-    { type: 'address', expr: getAddressByEntity, isRec: false, up: true },
-    { type: 'merchant', expr: getMerchantByAccount, isRec: true, up: false }
+    { type: 'customer', expr: getCustomerByAccount, isRec: true, isCycle: true, up: true },
+    { type: 'address', expr: getAddressByEntity, isRec: false, isCycle: true, up: true },
+    { type: 'merchant', expr: getMerchantByAccount, isRec: true, isCycle: true, up: false }
   ],
   customer: [
-    { type: 'address', expr: getAddressByEntity, isRec: false, up: true },
-    { type: 'account', expr: getAccountByCustomer, isRec: true, up: false }
+    { type: 'address', expr: getAddressByEntity, isRec: false, isCycle: true, up: true },
+    { type: 'account', expr: getAccountByCustomer, isRec: true, isCycle: true, up: false }
   ],
   address: [
-    { type: 'city', expr: getCityByAddress, isRec: true, up: true },
-    { type: 'customer', expr: getEntityByAddress, isRec: true, up: false },
-    { type: 'account', expr: getEntityByAddress, isRec: true, up: false },
-    { type: 'merchant', expr: getEntityByAddress, isRec: true, up: false },
-    { type: 'physical', expr: getEntityByAddress, isRec: true, up: false }
+    { type: 'city', expr: getCityByAddress, isRec: true, isCycle: true, up: true },
+    { type: 'customer', expr: getEntityByAddress, isRec: true, isCycle: true, up: false },
+    { type: 'account', expr: getEntityByAddress, isRec: true, isCycle: true, up: false },
+    { type: 'merchant', expr: getEntityByAddress, isRec: true, isCycle: true, up: false },
+    { type: 'physical', expr: getEntityByAddress, isRec: true, isCycle: true, up: false }
   ],
   city: [
-    { type: 'region', expr: getRegionByCity, isRec: true, up: true },
-    { type: 'city', expr: getAddressByCity, isRec: true, up: false }
+    { type: 'region', expr: getRegionByCity, isRec: true, isCycle: true, up: true },
+    { type: 'address', expr: getAddressByCity, isRec: true, isCycle: true, up: false }
   ],
   region: [
-    { type: 'country', expr: getCountryByRegion, isRec: true, up: true },
-    { type: 'city', expr: getCityByRegion, isRec: true, up: false }
+    { type: 'country', expr: getCountryByRegion, isRec: true, isCycle: true, up: true },
+    { type: 'city', expr: getCityByRegion, isRec: true, isCycle: true, up: false }
   ],
   country: [
-    { type: 'region', expr: getRegionByCountry, isRec: true, up: false }
+    { type: 'region', expr: getRegionByCountry, isRec: true, isCycle: true, up: false }
+  ]
+}
+
+const connectionsInitialize = (withPpdConnections) => {
+  connections['physical'] = [
+    { type: 'logical', expr: getLogicalByPhysical, isRec: false, isCycle: true, up: true },
+    { type: 'logical', expr: getLogicalByPhysical, isRec: false, isCycle: true, up: false },
+    { type: 'address', expr: getAddressByEntity, isRec: true, isCycle: true, up: true }
+  ]
+  if (withPpdConnections) {
+    connections['physical'].push(
+      { type: 'physical', expr: getPhysicalByPhysical, isRec: true, isCycle: true, up: true }
+    )
+    connections['physical'].push(
+      { type: 'physical', expr: getPhysicalByPhysicalDown, isRec: true, isCycle: true, up: false }
+    )
+    connections['physical'].push(
+      { type: 'physical', expr: getPhysicalByPhysical, isRec: true, isCycle: true, up: false }
+    )
+  }
+}
+
+const filterRules = {
+  logical: [
+    { filter: 'terminalId', get: (e) => e.TerminalId, try: filterBySubstring, showSiblings: false }
+  ],
+  merchant: [
+    { filter: 'merchant', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
+  ],
+  account: [
+    { filter: 'account', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
+  ],
+  customer: [
+    { filter: 'customer', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
+  ],
+  address: [
+    { filter: 'address', get: (e) => e.address1, try: filterBySubstring, showSiblings: false }
+  ],
+  city: [
+    { filter: 'city', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
+  ],
+  region: [
+    { filter: 'region', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
+  ],
+  country: [
+    { filter: 'country', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
+  ]
+}
+const fiterRulesInitialize = (withSiblings) => {
+  filterRules['physical'] = [
+    { filter: 'modelName', get: (e) => e.ModelName, try: filterBySubstring, showSiblings: withSiblings },
+    { filter: 'serialNumber', get: (e) => e.SerialNumber, try: filterBySubstring, showSiblings: withSiblings }
   ]
 }
 
@@ -131,45 +191,29 @@ export const getAllConnections = (all, entitiesToShow) => {
   ).reduce((a, r) => [...a, ...r], [])
 }
 
-const filterBySubstring = (v, f) =>
-  v.toLowerCase().includes(f.toLowerCase())
-
-const filterRules = {
-  logical: [
-    { filter: 'terminalId', get: (e) => e.TerminalId, try: filterBySubstring }
-  ],
-  physical: [
-    { filter: 'modelName', get: (e) => e.ModelName, try: filterBySubstring },
-    { filter: 'serialNumber', get: (e) => e.SerialNumber, try: filterBySubstring }
-  ],
-  merchant: [
-    { filter: 'merchant', get: (e) => e.name, try: filterBySubstring }
-  ]
-}
-
 const getRoots = (entity, entitiesByType, ids, isRec = false) => {
-  const type = entity.type
-  const connectionVariants = connections[type].filter(i => i.up === false)
   if (ids.indexOf(entity.id) === -1) {
     ids.push(entity.id)
-    connectionVariants.map(t => {
-      if (t.isRec || !isRec) {
+    const type = entity.type
+    const connectionVariants = connections[type].filter(i => !i.up)
+    connectionVariants.forEach(t => {
+      if (t.isCycle || !isRec) {
         const entities = entitiesByType[t.type] || []
         const expr = t.expr
         const firstLevel = entities.filter(e => expr(entity, e))
-        firstLevel.map(e => getRoots(e, entitiesByType, true))
+        firstLevel.map(e => getRoots(e, entitiesByType, ids, true))
       }
     })
   }
 }
 
 const getLineConnectionsForEntity = (entity, entitiesByType, ids, isRec = false) => {
-  const type = entity.type
-  const connectionVariants = connections[type].filter(i => i.up)
   if (ids.indexOf(entity.id) === -1) {
     ids.push(entity.id)
-    connectionVariants.map(t => {
-      if (t.isRec || !isRec) {
+    const type = entity.type
+    const connectionVariants = connections[type].filter(i => i.up)
+    connectionVariants.forEach(t => {
+      if (t.isCycle || !isRec) {
         const entities = entitiesByType[t.type] || []
         const expr = t.expr
         const firstLevel = entities.filter(e => expr(entity, e))
@@ -186,45 +230,70 @@ const markEntity = (id, marks, isOk, force) => {
     mark && isOk
 }
 
-const markEntitiesUp = (d, marks, entitiesByType, isOk, force = false) => {
-  const ids = []
-  getLineConnectionsForEntity(d, entitiesByType, ids)
-  ids.forEach(e => markEntity(e, marks, isOk, force))
-}
-
 const markEntitiesAndConnections = (d, marks, entitiesByType, isOk, force = false) => {
-  const ids = []
-  getLineConnectionsForEntity(d, entitiesByType, ids)
-  getRoots(d, entitiesByType, ids)
+  const headIds = []
+  getLineConnectionsForEntity(d, entitiesByType, headIds)
+  const rootIds = []
+  getRoots(d, entitiesByType, rootIds)
+  const ids = [...headIds, ...rootIds].filter((e, i, arr) => arr.indexOf(e) === i)
   ids.forEach(e => markEntity(e, marks, isOk, force))
+  // const falseIds = Object.keys(marks).filter(i => ids.indexOf(parseInt(i, 10)) === -1)
+  // falseIds.forEach(e => markEntity(e, marks, false, force))
 }
 
-const markByFilters = (d, data, entitiesByType, filters, marks) => {
+const getSiblings = (d, type, entities, foundEntities) => {
+  if (foundEntities.indexOf(d) === -1) {
+    foundEntities.push(d)
+  }
+  connections[type].filter(i => i.type === type)
+    .map(r => entities.filter(e => r.expr(d, e)))
+    .reduce((x, y) => [...x, ...y], [])
+    .filter(e => foundEntities.indexOf(e) === -1)
+    .forEach(e => getSiblings(e, type, entities, foundEntities))
+}
+
+const markEntityWithSiblings = (d, ftype, entitiesByType, marks, isOk) => {
+  markEntity(d.id, marks, isOk)
+  if (ftype.showSiblings) {
+    const type = d.type
+    const entities = entitiesByType[type] || []
+    const siblings = [ d ]
+    getSiblings(d, type, entities, siblings)
+    if (siblings.find(e => marks[e.id]) !== void 0) {
+      siblings.forEach(e => markEntity(e.id, marks, true, true))
+    }
+  }
+}
+
+const markByFilters = (d, entitiesByType, filters, marks, filterWithPpd) => {
   (filterRules[d.type] || []).forEach(r => {
     const filterValue = filters[r.filter]
     if (filterValue !== void 0 && filterValue !== '') {
       const isOk = r.try(r.get(d), filterValue)
-      markEntitiesAndConnections(d, marks, entitiesByType, isOk)
+      markEntityWithSiblings(d, r, entitiesByType, marks, isOk)
     }
   })
 }
 
 export function getFilteredData (filters, data, filterWithPpd) {
   if (Object.keys(filters).find(i => filters[i] !== void 0 && filters[i] !== '') !== void 0) {
+    fiterRulesInitialize(filterWithPpd)
+    connectionsInitialize(filterWithPpd)
     const marks = {}
     data.forEach(d => { marks[d.id] = void 0 })
     const entitiesByType = separateEntitiesByTypes(data)
-    data.forEach(d => markByFilters(d, data, entitiesByType, filters, marks))
+    data.forEach(d => markByFilters(d, entitiesByType, filters, marks))
     const correctMarks = { ...marks }
     Object.keys(marks)
       .filter(id => marks[id])
       .forEach(id => {
         const d = data.find(e => e.id === parseInt(id, 10))
-        markEntitiesAndConnections(d, correctMarks, entitiesByType, true, true)
+        markEntitiesAndConnections(d, correctMarks, entitiesByType, true)
       })
     const filtered = Object.keys(correctMarks)
       .filter(id => correctMarks[id] === true/* >= filtersCount */)
       .map(id => parseInt(id, 10))
+    connectionsInitialize(true)
     return filtered
   } else {
     return data.map(i => i.id)

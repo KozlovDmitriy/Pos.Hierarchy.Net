@@ -22,7 +22,13 @@ const initialState = {
     modelName: '',
     terminalId: '',
     serialNumber: '',
-    merchant: ''
+    merchant: '',
+    account: '',
+    customer: '',
+    address: '',
+    city: '',
+    region: '',
+    country: ''
   },
   nodePopover: {
     isOpen: false,

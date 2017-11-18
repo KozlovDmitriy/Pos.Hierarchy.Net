@@ -30,36 +30,13 @@ export function toggleShowingType (type) {
   return (dispatch, getState) => {
     const { showingTypes } = getState().devices
     if (showingTypes.indexOf(type) === -1) {
-      dispatch(setShowingTypes(
-        [...showingTypes, type]
-      ))
+      dispatch(setShowingTypes([...showingTypes, type]))
     } else {
       dispatch(setShowingTypes(
         showingTypes.filter(i => i !== type)
       ))
     }
     dispatch(filterData())
-  }
-}
-
-const getPpdParentDevices = (node, data) => {
-  if (node.parentId === void 0) {
-    return []
-  }
-  var parent = data.find(i => node.parentId === i.deviceId)
-  if (parent === void 0) {
-    return []
-  } else {
-    return [parent, ...getPpdParentDevices(parent, data)]
-  }
-}
-
-const getPpdChildDevices = (node, data) => {
-  var child = data.find(i => i.parentId === node.deviceId)
-  if (child === void 0) {
-    return []
-  } else {
-    return [child, ...getPpdChildDevices(child, data)]
   }
 }
 
@@ -107,6 +84,54 @@ export function setMerchantFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, merchant: value }))
+    dispatch(filterData())
+  }
+}
+
+export function setAccountFilter (value) {
+  return (dispatch, getState) => {
+    const { filters } = getState().devices
+    dispatch(setFilters({ ...filters, account: value }))
+    dispatch(filterData())
+  }
+}
+
+export function setCustomerFilter (value) {
+  return (dispatch, getState) => {
+    const { filters } = getState().devices
+    dispatch(setFilters({ ...filters, customer: value }))
+    dispatch(filterData())
+  }
+}
+
+export function setAddressFilter (value) {
+  return (dispatch, getState) => {
+    const { filters } = getState().devices
+    dispatch(setFilters({ ...filters, address: value }))
+    dispatch(filterData())
+  }
+}
+
+export function setCityFilter (value) {
+  return (dispatch, getState) => {
+    const { filters } = getState().devices
+    dispatch(setFilters({ ...filters, city: value }))
+    dispatch(filterData())
+  }
+}
+
+export function setRegionFilter (value) {
+  return (dispatch, getState) => {
+    const { filters } = getState().devices
+    dispatch(setFilters({ ...filters, region: value }))
+    dispatch(filterData())
+  }
+}
+
+export function setCountryFilter (value) {
+  return (dispatch, getState) => {
+    const { filters } = getState().devices
+    dispatch(setFilters({ ...filters, country: value }))
     dispatch(filterData())
   }
 }
