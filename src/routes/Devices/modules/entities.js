@@ -3,66 +3,66 @@ const entities = [
     id: 1,
     deviceId: 1,
     type: 'physical',
-    SerialNumber: 'Serial Number 1',
-    ModelName: 'NewPOS 8210',
+    serialNumber: 'Serial Number 1',
+    modelName: 'NewPOS 8210',
     addressId: 1
   },
   {
     id: 2,
     deviceId: 2,
     type: 'physical',
-    SerialNumber: 'Serial Number 2',
-    ModelName: 'Petroline',
+    serialNumber: 'Serial Number 2',
+    modelName: 'Petroline',
     addressId: 2
   },
   {
     id: 3,
     deviceId: 3,
     type: 'logical',
-    TerminalId: 'Terminal ID 1',
-    PhysicalDeviceId: 1,
-    MerchantNumberX: 'MerchNum3'
+    terminalId: 'Terminal ID 1',
+    physicalDeviceId: 1,
+    merchantNumberX: 'MerchNum3'
   },
   {
     id: 4,
     deviceId: 4,
     type: 'logical',
-    TerminalId: 'Terminal ID 2',
-    PhysicalDeviceId: 2,
-    MerchantNumberX: 'MerchNum2'
+    terminalId: 'Terminal ID 2',
+    physicalDeviceId: 2,
+    merchantNumberX: 'MerchNum2'
   },
   {
     id: 5,
     deviceId: 5,
     type: 'logical',
-    TerminalId: 'Terminal ID 3',
-    PhysicalDeviceId: 2,
-    MerchantNumberX: 'MerchNum2'
+    terminalId: 'Terminal ID 3',
+    physicalDeviceId: 2,
+    merchantNumberX: 'MerchNum2'
   },
   {
     id: 6,
     deviceId: 6,
     type: 'logical',
-    TerminalId: 'Terminal ID 4',
-    PhysicalDeviceId: 1,
-    MerchantNumberX: 'MerchNum1'
+    terminalId: 'Terminal ID 4',
+    physicalDeviceId: 1,
+    merchantNumberX: 'MerchNum1'
   },
   {
     id: 7,
     deviceId: 7,
     type: 'physical',
     parentId: 2,
-    SerialNumber: 'Serial Number 3',
-    ModelName: 'Verifone VX520',
+    serialNumber: 'Serial Number 3',
+    modelName: 'Verifone VX520',
     addressId: 2
   },
   {
     id: 8,
     deviceId: 8,
     type: 'logical',
-    TerminalId: 'Terminal ID 5',
-    PhysicalDeviceId: 7,
-    MerchantNumberX: 'MerchNum2'
+    terminalId: 'Terminal ID 5',
+    physicalDeviceId: 7,
+    merchantNumberX: 'MerchNum2'
   },
   {
     id: 9,

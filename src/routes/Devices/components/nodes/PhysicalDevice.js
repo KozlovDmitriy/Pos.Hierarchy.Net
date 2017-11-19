@@ -35,7 +35,7 @@ class PhysicalDevice extends Component {
         height={16}
         y={-8}
         x={-8}
-        fill={node.parentId === void 0 ? '#00bde7' : 'white'}
+        fill={node.parentId === null || node.parentId === void 0 ? '#00bde7' : 'white'}
         stroke='#00bde7'
         strokeWidth={2}
         onClick={this.onClick}
@@ -53,7 +53,7 @@ class PhysicalDevice extends Component {
           fill={'#009dc7'}
           stroke={void 0}
         >
-          {node.SerialNumber}
+          {node.serialNumber}
         </text>
       </Group>
     )

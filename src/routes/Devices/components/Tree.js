@@ -47,6 +47,19 @@ function Link ({ link }) {
       />
     )
   }
+  const isOwner = link.type.match(/(merchant)|(account)|(customer)/)
+  if (isOwner !== null) {
+    return (
+      <LinkVertical
+        data={link}
+        stroke='#008ba0'
+        strokeDasharray='8, 4'
+        strokeWidth={2}
+        strokeOpacity={0.5}
+        fill='none'
+      />
+    )
+  }
   const isLogical = link.type.match(/(logical)/)
   if (isLogical !== null) {
     return (
@@ -66,8 +79,8 @@ function Link ({ link }) {
         <LinkVertical
           data={link}
           stroke='#03c0dc'
-          strokeDasharray='12, 4'
-          strokeWidth={3.5}
+          // strokeDasharray='12, 4'
+          strokeWidth={3.0}
           strokeOpacity={0.5}
           fill='none'
         />
@@ -83,18 +96,6 @@ function Link ({ link }) {
         />
       )
     }
-  }
-  const isOwner = link.type.match(/(merchant)|(account)|(customer)/)
-  if (isOwner !== null) {
-    return (
-      <LinkVertical
-        data={link}
-        stroke='#008ba0'
-        strokeWidth={2}
-        strokeOpacity={0.5}
-        fill='none'
-      />
-    )
   }
 }
 
@@ -194,7 +195,7 @@ class Tree extends Component {
       this.state.viewTransform.k :
       1
     const count = Math.sqrt(nodes.length) // Math.sqrt(Math.max(nodes.length, links.length))
-    const size = (zoom) * (count * 140 + 100)
+    const size = (zoom) * (count * 150 + nodes.length * 5)
     return size
   }
 

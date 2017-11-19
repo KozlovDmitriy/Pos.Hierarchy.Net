@@ -30,7 +30,7 @@ class LogicalDevice extends Component {
           fill={'#00b8b4'}
           stroke={void 0}
         >
-          {node.TerminalId}
+          {node.terminalId}
         </text>
       </Group>
     )

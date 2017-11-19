@@ -1,14 +1,14 @@
 const getLogicalByPhysical =
-  (n, m) => n.deviceId === m.PhysicalDeviceId
+  (n, m) => n.deviceId === m.physicalDeviceId
 
 const getPhysicalByLogical =
-  (n, m) => m.deviceId === n.PhysicalDeviceId
+  (n, m) => m.deviceId === n.physicalDeviceId
 
 const getMerchantByLogical =
-  (n, m) => n.MerchantNumberX === m.numberX
+  (n, m) => n.merchantNumberX === m.numberX
 
 const getLogicalByMerchant =
-  (n, m) => n.numberX === m.MerchantNumberX
+  (n, m) => n.numberX === m.merchantNumberX
 
 const getAccountByMecrhant =
   (n, m) => n.accountNumberX === m.numberX
@@ -119,7 +119,7 @@ const connectionsInitialize = (withPpdConnections) => {
 
 const filterRules = {
   logical: [
-    { filter: 'terminalId', get: (e) => e.TerminalId, try: filterBySubstring, showSiblings: false }
+    { filter: 'terminalId', get: (e) => e.terminalId, try: filterBySubstring, showSiblings: false }
   ],
   merchant: [
     { filter: 'merchant', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
@@ -145,8 +145,8 @@ const filterRules = {
 }
 const fiterRulesInitialize = (withSiblings) => {
   filterRules['physical'] = [
-    { filter: 'modelName', get: (e) => e.ModelName, try: filterBySubstring, showSiblings: withSiblings },
-    { filter: 'serialNumber', get: (e) => e.SerialNumber, try: filterBySubstring, showSiblings: withSiblings }
+    { filter: 'modelName', get: (e) => e.modelName, try: filterBySubstring, showSiblings: withSiblings },
+    { filter: 'serialNumber', get: (e) => e.serialNumber, try: filterBySubstring, showSiblings: withSiblings }
   ]
 }
 

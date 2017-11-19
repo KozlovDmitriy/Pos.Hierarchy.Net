@@ -1,4 +1,3 @@
-import entities from './entities'
 import {
   SET_DEVICES,
   SET_TREE,
@@ -13,7 +12,7 @@ import {
 
 const initialState = {
   animation: true,
-  data: entities,
+  data: [], // entities,
   tree: {},
   filterWithPpd: false,
   filteredData: [],

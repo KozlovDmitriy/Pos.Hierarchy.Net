@@ -22,8 +22,15 @@ const style = {
 
 class Workspace extends Component {
   static propTypes = {
-    // data: PropTypes.array.isRequired,
-    changeDeviceData:  PropTypes.func.isRequired
+    data: PropTypes.array.isRequired,
+    changeDeviceData:  PropTypes.func.isRequired,
+    loadEntities: PropTypes.func.isRequired
+  }
+
+  componentWillMount () {
+    if (this.props.data.length === 0) {
+      this.props.loadEntities()
+    }
   }
 
   onChange (newValue) {

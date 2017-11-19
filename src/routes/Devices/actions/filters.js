@@ -56,7 +56,7 @@ export function changeFilterWithPpd (flag) {
   }
 }
 
-export function setModelNameFilter (value) {
+export function setmodelNameFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, modelName: value }))
@@ -64,7 +64,7 @@ export function setModelNameFilter (value) {
   }
 }
 
-export function setTerminalIdFilter (value) {
+export function setterminalIdFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, terminalId: value }))
@@ -72,7 +72,7 @@ export function setTerminalIdFilter (value) {
   }
 }
 
-export function setSerialNumberFilter (value) {
+export function setserialNumberFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, serialNumber: value }))

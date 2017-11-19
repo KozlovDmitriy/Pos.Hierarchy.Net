@@ -8,9 +8,9 @@ class Filters extends Component {
     filterWithPpd: PropTypes.bool.isRequired,
     filters: PropTypes.object.isRequired,
     showingTypes: PropTypes.array.isRequired,
-    setModelNameFilter: PropTypes.func.isRequired,
-    setTerminalIdFilter: PropTypes.func.isRequired,
-    setSerialNumberFilter: PropTypes.func.isRequired,
+    setmodelNameFilter: PropTypes.func.isRequired,
+    setterminalIdFilter: PropTypes.func.isRequired,
+    setserialNumberFilter: PropTypes.func.isRequired,
     setMerchantFilter: PropTypes.func.isRequired,
     setAccountFilter: PropTypes.func.isRequired,
     setCustomerFilter: PropTypes.func.isRequired,
@@ -47,15 +47,15 @@ class Filters extends Component {
   }
 
   onChangeModel (event, newValue) {
-    this.props.setModelNameFilter(newValue)
+    this.props.setmodelNameFilter(newValue)
   }
 
   onChangeTerminalID (event, newValue) {
-    this.props.setTerminalIdFilter(newValue)
+    this.props.setterminalIdFilter(newValue)
   }
 
   onChangeSerNum (event, newValue) {
-    this.props.setSerialNumberFilter(newValue)
+    this.props.setserialNumberFilter(newValue)
   }
 
   onChangeMerchant (event, newValue) {
