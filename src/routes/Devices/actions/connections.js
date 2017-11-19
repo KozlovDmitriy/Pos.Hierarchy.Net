@@ -265,33 +265,56 @@ const markEntityWithSiblings = (d, ftype, entitiesByType, marks, isOk) => {
   }
 }
 
-const markByFilters = (d, entitiesByType, filters, marks, filterWithPpd) => {
-  (filterRules[d.type] || []).forEach(r => {
-    const filterValue = filters[r.filter]
-    if (filterValue !== void 0 && filterValue !== '') {
-      const isOk = r.try(r.get(d), filterValue)
-      markEntityWithSiblings(d, r, entitiesByType, marks, isOk)
-    }
-  })
+const findFilterRulesByFilter = (filterName) =>
+  Object.keys(filterRules)
+    .filter(r => filterRules[r].find(a => a.filter === filterName) !== void 0)
+
+const getNewMarks = (data) => {
+  const marks = {}
+  data.forEach(d => { marks[d.id] = void 0 })
+  return marks
+}
+
+const marksByConections = (marks, data, entitiesByType) =>
+  Object.keys(marks)
+    .filter(id => marks[id])
+    .forEach(id => {
+      const d = data.find(e => e.id === parseInt(id, 10))
+      markEntitiesAndConnections(d, marks, entitiesByType, true)
+    })
+
+const markByFilters = (data, entitiesByType, filters, marks, typeForFilter) => {
+  entitiesByType[typeForFilter].forEach(e => { marks[e.id] = true })
+  Object.keys(filters)
+    .filter(f => filters[f] !== void 0 && filters[f] !== '')
+    .map(f => {
+      const filterMarks = getNewMarks(data)
+      const filterValue = filters[f]
+      const rules = findFilterRulesByFilter(f)
+      rules.forEach(r => {
+        const rule = filterRules[r].find(cr => cr.filter === f)
+        entitiesByType[r].forEach(e => {
+          const isOk = rule.try(rule.get(e), filterValue)
+          markEntityWithSiblings(e, rule, entitiesByType, filterMarks, isOk)
+        })
+      })
+      marksByConections(filterMarks, data, entitiesByType)
+      const result = {}
+      entitiesByType[typeForFilter].forEach(e => { result[e.id] = filterMarks[e.id] })
+      return result
+    }).forEach(x => Object.keys(x).forEach((id) => { marks[id] = marks[id] && x[id] }))
 }
 
 export function getFilteredData (filters, data, filterWithPpd) {
   if (Object.keys(filters).find(i => filters[i] !== void 0 && filters[i] !== '') !== void 0) {
     fiterRulesInitialize(filterWithPpd)
     connectionsInitialize(filterWithPpd)
-    const marks = {}
-    data.forEach(d => { marks[d.id] = void 0 })
+    const marks = getNewMarks(data)
     const entitiesByType = separateEntitiesByTypes(data)
-    data.forEach(d => markByFilters(d, entitiesByType, filters, marks))
-    const correctMarks = { ...marks }
-    Object.keys(marks)
-      .filter(id => marks[id])
-      .forEach(id => {
-        const d = data.find(e => e.id === parseInt(id, 10))
-        markEntitiesAndConnections(d, correctMarks, entitiesByType, true)
-      })
-    const filtered = Object.keys(correctMarks)
-      .filter(id => correctMarks[id] === true/* >= filtersCount */)
+    markByFilters(data, entitiesByType, filters, marks, 'physical')
+    marksByConections(marks, data, entitiesByType)
+    const filtered = Object.keys(marks)
+      .filter(id => marks[id] === true/* >= filtersCount */)
       .map(id => parseInt(id, 10))
     connectionsInitialize(true)
     return filtered
