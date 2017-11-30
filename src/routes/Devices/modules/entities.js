@@ -116,7 +116,8 @@ const entities = [
     type: 'customer',
     numberX: 'CostNum2',
     name: 'Customer 2',
-    addressId: 1
+    addressId: 1/* ,
+    collapsed: true */
   },
   {
     id: 16,

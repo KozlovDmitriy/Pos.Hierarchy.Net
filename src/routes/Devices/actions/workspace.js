@@ -1,11 +1,23 @@
 import { filterData } from './filters'
-import { getAllConnections } from './connections'
+import { getAllConnections, collapseEntities } from './connections'
 import entities from '../modules/entities'
 import Url from 'url'
 
 export const SET_DEVICES = 'SET_DEVICES'
 export const SET_TREE = 'SET_TREE'
 export const SET_POPOVER_IS_OPEN = 'SET_POPOVER_IS_OPEN'
+export const COLLAPSE_NODE = 'COLLAPSE_NODE'
+
+export function collapseNode (id) {
+  return { type: COLLAPSE_NODE, id }
+}
+
+export function collapseNodeAndRewriteTree (id) {
+  return (dispatch) => {
+    dispatch(collapseNode(id))
+    dispatch(rewriteTree())
+  }
+}
 
 export function setDevices (devices) {
   return { type: SET_DEVICES, devices }
@@ -26,15 +38,17 @@ const cloneArray = (arr) => arr.map(i => { return { ...i } })
 export function rewriteTree () {
   return (dispatch, getState) => {
     const { data, filteredData, showingTypes } = getState().devices
+    collapseEntities(data)
     const filtered = cloneArray(data.filter(d => filteredData.indexOf(d.id) !== -1))
     const links = getAllConnections(filtered, showingTypes)
-    const typesForSort = [
+      .filter(i => i.source.hide !== true && i.target.hide !== true)
+    /* const typesForSort = [
       'logical', 'physical',
       'merchant', 'account', 'customer',
       'address', 'city', 'region', 'country'
-    ]
-    const nodes = filtered.filter(i => showingTypes.indexOf(i.type) !== -1)
-      //.sort((x, y) => typesForSort.indexOf(x.type) > typesForSort.indexOf(y.type) ? 1 : -1)
+    ] */
+    const nodes = filtered.filter(i => showingTypes.indexOf(i.type) !== -1 && i.hide !== true)
+      // .sort((x, y) => typesForSort.indexOf(x.type) > typesForSort.indexOf(y.type) ? 1 : -1)
     const tree = { nodes, links }
   	dispatch(setTree(tree))
   }

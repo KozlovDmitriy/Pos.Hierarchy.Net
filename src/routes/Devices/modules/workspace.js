@@ -1,7 +1,8 @@
 import {
   SET_DEVICES,
   SET_TREE,
-  SET_POPOVER_IS_OPEN
+  SET_POPOVER_IS_OPEN,
+  COLLAPSE_NODE
 } from '../actions/workspace'
 import {
   SET_FILTERS,
@@ -38,6 +39,14 @@ const initialState = {
 
 export default function workspace (state = initialState, action) {
   switch (action.type) {
+    case COLLAPSE_NODE: {
+      const old = state.data.find(i => i.id === action.id)
+      const now = { ...old, collapsed: !old.collapsed }
+      return {
+        ...state,
+        data: [...state.data.filter(i => i.id !== old.id), now]
+      }
+    }
     case SET_POPOVER_IS_OPEN: {
       return {
         ...state,

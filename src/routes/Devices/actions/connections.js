@@ -305,6 +305,33 @@ const markByFilters = (data, entitiesByType, filters, marks, typeForFilter) => {
     }).forEach(x => Object.keys(x).forEach((id) => { marks[id] = marks[id] && x[id] }))
 }
 
+const collapseEntity = (entity, entitiesByType, ids, isRec = false, hide = false) => {
+  entity.hide = hide
+  if (ids.indexOf(entity.id) === -1) {
+    ids.push(entity.id)
+    const type = entity.type
+    const connectionVariants = connections[type].filter(i => !i.up)
+    connectionVariants.forEach(t => {
+      if (t.isCycle || !isRec) {
+        const entities = entitiesByType[t.type] || []
+        const expr = t.expr
+        const firstLevel = entities.filter(e => expr(entity, e))
+        firstLevel.map(e => collapseEntity(e, entitiesByType, ids, true, entity.collapsed || hide))
+      }
+    })
+  }
+}
+
+export function collapseEntities (data) {
+  const entitiesByType = separateEntitiesByTypes(data)
+  data.forEach(e => { e.hide = false })
+  data.forEach(e => {
+    if (e.collapsed) {
+      collapseEntity(e, entitiesByType, [])
+    }
+  })
+}
+
 export function getFilteredData (filters, data, filterWithPpd) {
   if (Object.keys(filters).find(i => filters[i] !== void 0 && filters[i] !== '') !== void 0) {
     fiterRulesInitialize(filterWithPpd)
