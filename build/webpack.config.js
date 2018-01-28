@@ -27,6 +27,11 @@ const config = {
     publicPath: project.publicPath,
   },
   resolve: {
+    alias: {
+      src: `${project.basePath}/src`,
+      config: `${project.basePath}/src/config/${project.env}`,
+      net: `${project.basePath}/node_modules/net-browserify-ws/index.js`
+    },
     modules: [
       inProject(project.srcDir),
       'node_modules',

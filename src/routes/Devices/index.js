@@ -7,13 +7,13 @@ export default (store) => ({
     /*  Webpack - use 'require.ensure' to create a split point
         and embed an async module loader (jsonp) when bundling   */
     require.ensure([], (require) => {
-      /*  Webpack - use require callback to define
-          dependencies for bundling   */
-
       const reducer = require('./modules/workspace').default
-
-      /*  Add the reducer to the store on key 'counter'  */
+      /*  Add the reducer to the store on key 'devices'  */
       injectReducer(store, { key: 'devices', reducer })
+
+      const errorsReducer = require('src/modules/errors').default
+      /*  Add the reducer to the store on key 'devices'  */
+      injectReducer(store, { key: 'errors', reducer: errorsReducer })
 
       /*  Return getComponent   */
       cb(null, Workspace)

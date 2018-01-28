@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 // import AceEditor from 'react-ace'
 import Filters from '../containers/FiltersContainer'
 import Tree from '../containers/TreeContainer'
+// import ReactRethinkdb, { r } from 'react-rethinkdb'
+// import reactMixin from 'react-mixin'
 // import 'brace/mode/json'
 // import 'brace/theme/solarized_dark'
 
@@ -23,13 +25,26 @@ const style = {
 class Workspace extends Component {
   static propTypes = {
     data: PropTypes.array.isRequired,
-    changeDeviceData:  PropTypes.func.isRequired,
+    changeDeviceData: PropTypes.func.isRequired,
+    subscribeErrors: PropTypes.func.isRequired,
     loadEntities: PropTypes.func.isRequired
   }
+
+  /* observe (props, state) {
+    return {
+      items: new ReactRethinkdb.QueryRequest({
+        query: r.table('DeviceError')
+                .orderBy({ index: r.desc('acceptedAt') }), // RethinkDB query
+        changes: true,             // subscribe to realtime changefeed
+        initial: []               // return [] while loading
+      })
+    }
+  } */
 
   componentWillMount () {
     if (this.props.data.length === 0) {
       this.props.loadEntities()
+      this.props.subscribeErrors()
     }
   }
 
@@ -62,10 +77,11 @@ class Workspace extends Component {
         }}
       />
     </div>) */
-    const jsEditor = void 0
+    /* const data = this.data !== void 0 ?
+      this.data.items.value().sort((a, b) => b.acceptedAt - a.acceptedAt) :
+      { } */
     return (
       <div style={style}>
-        {jsEditor}
         <div
           id='devices'
           style={{
@@ -84,5 +100,7 @@ class Workspace extends Component {
     )
   }
 }
+
+// reactMixin(Workspace.prototype, ReactRethinkdb.DefaultMixin)
 
 export default Workspace

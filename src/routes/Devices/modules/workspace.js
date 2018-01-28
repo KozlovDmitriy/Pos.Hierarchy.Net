@@ -1,3 +1,6 @@
+import config from 'config'
+import ReactRethinkdb from 'react-rethinkdb'
+
 import {
   SET_DEVICES,
   SET_TREE,
@@ -10,6 +13,8 @@ import {
   SET_SHOWING_TYPES,
   SET_FILTER_WITH_PPD
 } from '../actions/filters'
+
+ReactRethinkdb.DefaultSession.connect(config.rethinkConfig)
 
 const initialState = {
   animation: true,
