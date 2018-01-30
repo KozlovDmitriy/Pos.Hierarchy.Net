@@ -1,3 +1,125 @@
+/* Base Application Styles */
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,300,500);
+@import url(https://fonts.googleapis.com/icon?family=Material+Icons);
+@import "~susy/sass/susy";
+
+$susy: (
+  columns: 12,
+  gutters: .25,
+  gutter-position: split
+);
+$mdwidth: 960px;
+
+a {
+  color: #00bcd4;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+html {
+  font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body, h1, h2, h4, h5, h6 {
+  margin: 0;
+}
+
+body {
+  font-size: 15px;
+  line-height: 24px;
+  background-color: #eeeeee;
+  //background-color: white;
+}
+
+h3{
+  margin: 0;
+  font-family: 'Helvetica';
+  font-size: 18px;
+  text-align: center;
+}
+
+.titles{
+  margin: 0;
+  font-family: 'Roboto';
+  font-size: 18px;
+  text-align: center;
+}
+
+.nav-link {
+  text-decoration: none;
+}
+
+.wrap {
+  @include container()
+}
+.card {
+  @include span(200px);
+  margin-top: gutter();
+  margin-bottom: gutter();
+  // @include susy-breakpoint($mdwidth) {
+  //   // nested code uses an 8-column grid,
+  //   // starting at a 30em min-width breakpoint...
+  //   //@include span(400px);
+  // }
+}
+
+.card-wide {
+  @include span(400px);
+  margin-bottom: gutter();
+  margin-top: gutter();
+  // @include susy-breakpoint($mdwidth) {
+  //   // nested code uses an 8-column grid,
+  //   // starting at a 30em min-width breakpoint...
+  //   @include span(4);
+  // }
+}
+
+.page-content {
+  padding: 20px 40px;
+  @include susy-breakpoint($mdwidth) {
+    // nested code uses an 8-column grid,
+    // starting at a 30em min-width breakpoint...
+    padding: 20px 40px;
+  }
+}
+
+.page-title {
+  max-width: 1200px;
+  margin: 20px auto;
+}
+
+.buttons {
+  float: right;
+}
+
+.left-sidebar{
+  width: 15%;
+  float: left;
+  font-family: 'Roboto';
+  font-size: 20px;
+  text-align: center;
+  margin: 0;
+  padding-top: 20px;
+}
+
+.right-sidebar{
+  width: 15%;
+  float: right;
+  font-family: 'Roboto';
+  font-size: 20px;
+  text-align: center;
+  padding-top: 20px;
+}
+
+.center-body{
+  width: 70%;
+  float: left
+}
+
 .page-layout__viewport {
   padding-top: 1rem;
 }

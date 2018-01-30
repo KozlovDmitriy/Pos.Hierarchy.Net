@@ -42,10 +42,28 @@ const config = {
   module: {
     rules: [],
     loaders: [
-      { test: /\.css$/, loader: 'style!css' },
+      {
+        test: /\.css$/,
+        loader: 'style-loader!css-loader!postcss-loader'
+      },
+      {
+        test: /\.sass/,
+        loader: 'style-loader!css-loader!postcss-loader!sass-loader?outputStyle=expanded&indentedSyntax'
+      },
+      {
+        test: /\.scss/,
+        loader: 'style-loader!css-loader!postcss-loader!sass-loader?outputStyle=expanded'
+      },
+      {
+        test: /\.less/,
+        loader: 'style-loader!css-loader!postcss-loader!less-loader'
+      },
+      {
+        test: /\.styl/,
+        loader: 'style-loader!css-loader!postcss-loader!stylus-loader'
+      },
       { test: /\.jsx?$/, loader: 'babel-loader' },
-      { test: /\.json$/, loader: 'json-loader' },
-      { test: /\.styl$/, loader: 'style!css!stylus' }
+      { test: /\.json$/, loader: 'json-loader' }
     ]
   },
   plugins: [

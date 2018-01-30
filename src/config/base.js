@@ -2,7 +2,8 @@
 
 // Settings configured here will be merged into the final config object.
 export default {
-  webapiurl: 'http://10.0.21.61/NewPOS',
+  webapiurl: 'http://10.0.21.61/newposwebapi',
+  webappurl: 'http://10.0.21.61/newposdevelop',
   realtimedashboardurl: 'http://localhost:3000',
   rethinkConfig: {
     host: 'localhost',         // hostname of the websocket server

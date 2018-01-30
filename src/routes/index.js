@@ -1,6 +1,7 @@
 // We only need to import the modules necessary for initial render
 import CoreLayout from '../layouts/PageLayout/PageLayout'
 import DevicesRoute from './Devices'
+import DashboardRoute from './Dashboard'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
@@ -8,8 +9,9 @@ import DevicesRoute from './Devices'
 export const createRoutes = (store) => ({
   path        : '/',
   component   : CoreLayout,
-  indexRoute  : DevicesRoute(store),
+  indexRoute  : DashboardRoute(store),
   childRoutes : [
+    DevicesRoute(store)
   ]
 })
 

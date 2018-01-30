@@ -14,8 +14,6 @@ import {
   SET_FILTER_WITH_PPD
 } from '../actions/filters'
 
-ReactRethinkdb.DefaultSession.connect(config.rethinkConfig)
-
 const initialState = {
   animation: true,
   data: [], // entities,

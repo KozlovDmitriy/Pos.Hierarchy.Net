@@ -11,7 +11,7 @@ import Tree from '../containers/TreeContainer'
 const style = {
   padding: '2px 0px',
   position: 'absolute',
-  top: 0,
+  top: 60,
   bottom: 0,
   left: 0,
   right: 0,

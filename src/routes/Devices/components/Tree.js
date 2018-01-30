@@ -187,6 +187,9 @@ class Tree extends Component {
     const ticksCount = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay()))
     for (var i = 0; i < ticksCount; ++i) {
       simulation.tick()
+      if (this._mounted === false) {
+        break
+      }
     }
   }
 
@@ -225,12 +228,12 @@ class Tree extends Component {
       force.force('link').links(links).distance(() => 70)
       if (nextProps.animation) {
         force.on('tick', () => {
-          this.setState({ nodes, links: nextProps.tree.links, force: this.state.force })
+          this._mounted && this.setState({ nodes, links: nextProps.tree.links, force: this.state.force })
         })
       } else {
         this.computeSimulation(force)
       }
-      this.setState({ nodes, links: nextProps.tree.links, force })
+      this._mounted && this.setState({ nodes, links: nextProps.tree.links, force })
     }
   }
 
@@ -241,7 +244,7 @@ class Tree extends Component {
   }
 
   drag () {
-    this.setState({
+    this._mounted && this.setState({
       ...this.state,
       translate: d3.event.translate,
       scale: d3.event.scale
@@ -249,6 +252,7 @@ class Tree extends Component {
   }
 
   componentDidMount () {
+    this._mounted = true
     d3.select(this.refs.viewWrapper)
       .on('touchstart', this.containZoom)
       .on('touchmove', this.containZoom)
@@ -259,6 +263,10 @@ class Tree extends Component {
     this.renderView()
   }
 
+  componentWillUnmount () {
+    this._mounted = false
+  }
+
   // Keeps 'zoom' contained
   containZoom () {
     d3.event.preventDefault()
@@ -266,7 +274,7 @@ class Tree extends Component {
 
   // View 'zoom' handler
   handleZoom () {
-    this.setState({
+    this._mounted && this.setState({
       ...this.state,
       viewTransform: d3.event.transform
     })
