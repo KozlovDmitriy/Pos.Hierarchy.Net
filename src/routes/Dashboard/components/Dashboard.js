@@ -4,7 +4,7 @@ import { CardTitle } from 'material-ui/Card'
 import ReactRethinkdb, { r } from 'react-rethinkdb'
 import reactMixin from 'react-mixin'
 import PropTypes from 'prop-types'
-import DeviceRequestsPerMinuteChart from './DeviceRequestsPerMinuteChart'
+// import DeviceRequestsPerMinuteChart from './DeviceRequestsPerMinuteChart'
 import config from 'config'
 
 const defaultDashboardInfo = {
@@ -13,11 +13,11 @@ const defaultDashboardInfo = {
   idleDevicesCount: '?'
 }
 
-const defaultDeviceRequestsPerMinute = {
+/* const defaultDeviceRequestsPerMinute = {
   acceptedAt: 1464780804,
   id:  '035eee37-42be-47de-bd09-53bd20165e76',
   value: '?'
-}
+} */
 
 try {
   ReactRethinkdb.DefaultSession.connect(config.rethinkConfig)
@@ -27,6 +27,10 @@ try {
  * Виджет главной страницы сайта
  */
 class Dashboard extends React.Component {
+  static propTypes = {
+    errors: PropTypes.array
+  }
+
   observe (props, state) {
     return {
       dashboardInfo: new ReactRethinkdb.QueryRequest({
@@ -34,39 +38,40 @@ class Dashboard extends React.Component {
                 .get('default'), // RethinkDB query
         changes: true,             // subscribe to realtime changefeed
         initial: null              // return [] while loading
-      }),
+      })/*,
       deviceRequestsPerMinute: new ReactRethinkdb.QueryRequest({
         query: r.table('DeviceRequestsPerMinute')
                 .orderBy({ index: r.desc('acceptedAt') })
                 .limit(10), // RethinkDB query
         changes: true,             // subscribe to realtime changefeed
         initial: []              // return [] while loading
-      })
+      }) */
     }
   }
 
   render () {
     const { router } = this.context
+    const errors = this.props.errors || []
     const dashboardInfo = this.data.dashboardInfo.value() || defaultDashboardInfo
-    const deviceRequestsPerMinute = this.data.deviceRequestsPerMinute.value()
+    /* const deviceRequestsPerMinute = this.data.deviceRequestsPerMinute.value()
       .sort((a, b) => b.acceptedAt - a.acceptedAt)
     const latestDeviceRequestPerMinute = deviceRequestsPerMinute[0] || defaultDeviceRequestsPerMinute
+    <ClickableCard
+      className='card-wide'
+      onClick={() => router.push('/devicerequests')} >
+      <DeviceRequestsPerMinuteChart data={deviceRequestsPerMinute} />
+      <CardTitle subtitle={`${latestDeviceRequestPerMinute.value} запросов в минуту`} />
+    </ClickableCard> */
     return (
       <div className='wrap page-content'>
         <ClickableCard
-          className='card-wide'
+          className='card'
           onClick={() => router.push('/devices')} >
           <CardTitle subtitle={`Устройства`} />
         </ClickableCard>
-        <ClickableCard
-          className='card-wide'
-          onClick={() => router.push('/devicerequests')} >
-          <DeviceRequestsPerMinuteChart data={deviceRequestsPerMinute} />
-          <CardTitle subtitle={`${latestDeviceRequestPerMinute.value} запросов в минуту`} />
-        </ClickableCard>
         <ClickableCard className='card'
-          onClick={() => router.push('/deviceerrorrequests')} >
-          <CardTitle title={dashboardInfo.errorsCount} subtitle='Ошибок' />
+          onClick={() => router.push('/errors')} >
+          <CardTitle title={errors.length} subtitle='Ошибок' />
         </ClickableCard>
         <ClickableCard className='card'
           onClick={() => router.push('/idledevices')}>

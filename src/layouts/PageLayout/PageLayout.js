@@ -18,7 +18,15 @@ class PageLayout extends React.Component {
   static propTypes = {
     children: PropTypes.node,
     headerText: PropTypes.string,
-    location: PropTypes.object
+    location: PropTypes.object,
+    errors: PropTypes.array,
+    subscribeErrors: PropTypes.func.isRequired
+  }
+
+  componentWillMount () {
+    if (this.props.errors === void 0) {
+      this.props.subscribeErrors()
+    }
   }
 
   contextTypes: {

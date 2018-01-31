@@ -1,7 +1,8 @@
 import { injectReducer } from 'src/store/reducers'
-import Dashboard from './containers/DashboardContainer'
+import ErrorList from './containers/ErrorListContainer'
 
 export default (store) => ({
+  path: 'errors',
   /*  Async getComponent is only invoked when route matches   */
   getComponent (nextState, cb) {
     /*  Webpack - use 'require.ensure' to create a split point
@@ -12,9 +13,9 @@ export default (store) => ({
       injectReducer(store, { key: 'errors', reducer: errorsReducer })
 
       /*  Return getComponent   */
-      cb(null, Dashboard)
+      cb(null, ErrorList)
 
     /* Webpack named bundle   */
-    }, 'dashboard')
+    }, 'errors')
   }
 })

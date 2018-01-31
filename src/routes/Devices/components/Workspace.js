@@ -26,7 +26,6 @@ class Workspace extends Component {
   static propTypes = {
     data: PropTypes.array.isRequired,
     changeDeviceData: PropTypes.func.isRequired,
-    subscribeErrors: PropTypes.func.isRequired,
     loadEntities: PropTypes.func.isRequired
   }
 
@@ -44,7 +43,6 @@ class Workspace extends Component {
   componentWillMount () {
     if (this.props.data.length === 0) {
       this.props.loadEntities()
-      this.props.subscribeErrors()
     }
   }
 

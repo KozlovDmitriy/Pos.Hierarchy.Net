@@ -147,7 +147,6 @@ function makeStyles (primary = 'dodgerblue', light = 'white', dark = 'black') {
 class Tree extends Component {
   static propTypes = {
     tree: PropTypes.object.isRequired,
-    animation: PropTypes.bool,
     primary: PropTypes.string,
     light: PropTypes.string,
     dark: PropTypes.string,
@@ -202,44 +201,50 @@ class Tree extends Component {
     return size
   }
 
+  drawTree (nextProps) {
+    if (this.state.force !== void 0) {
+      this.state.force.stop()
+    }
+    const nodes = [ ...nextProps.tree.nodes ]
+    const links = nextProps.tree.links
+      .map(i => {
+        return {
+          source: i.source.id,
+          target: i.target.id
+        }
+      })
+    const width = this.getSize(nodes, links)
+    const height = width
+    var force = d3Force.forceSimulation(nodes)
+      .force('link', d3Force.forceLink().id(d => d.id))
+      .force('forceX', d3Force.forceX().strength(0.1).x(width * 0.5))
+      .force('forceY', d3Force.forceY().strength(0.1).y(height * 0.5))
+      .force('center', d3Force.forceCenter().x(width * 0.5).y(height * 0.5))
+      .force('charge', d3Force.forceManyBody().strength(-900))
+    force.force('link').links(links).distance(() => 70)
+    if (nextProps.animation) {
+      force.on('tick', () => {
+        this._mounted && this.setState({ nodes, links: nextProps.tree.links, force: this.state.force })
+      })
+    } else {
+      this.computeSimulation(force)
+    }
+    this._mounted && this.setState({ nodes, links: nextProps.tree.links, force })
+  }
+
   componentWillReceiveProps (nextProps) {
     const newIds = this.getTreeIds(nextProps.tree)
     const oldIds = this.getTreeIds(this.props.tree)
     if (JSON.stringify(newIds) !== JSON.stringify(oldIds)) {
-      if (this.state.force !== void 0) {
-        this.state.force.stop()
-      }
-      const nodes = [ ...nextProps.tree.nodes ]
-      const links = nextProps.tree.links
-        .map(i => {
-          return {
-            source: i.source.id,
-            target: i.target.id
-          }
-        })
-      const width = this.getSize(nodes, links)
-      const height = width
-      var force = d3Force.forceSimulation(nodes)
-        .force('link', d3Force.forceLink().id(d => d.id))
-        .force('forceX', d3Force.forceX().strength(0.1).x(width * 0.5))
-        .force('forceY', d3Force.forceY().strength(0.1).y(height * 0.5))
-        .force('center', d3Force.forceCenter().x(width * 0.5).y(height * 0.5))
-        .force('charge', d3Force.forceManyBody().strength(-900))
-      force.force('link').links(links).distance(() => 70)
-      if (nextProps.animation) {
-        force.on('tick', () => {
-          this._mounted && this.setState({ nodes, links: nextProps.tree.links, force: this.state.force })
-        })
-      } else {
-        this.computeSimulation(force)
-      }
-      this._mounted && this.setState({ nodes, links: nextProps.tree.links, force })
+      this.drawTree(nextProps)
     }
   }
 
   componentWillMount () {
     if (this.props.tree.nodes === void 0) {
       this.props.filterData()
+    } else {
+      this.drawTree(this.props)
     }
   }
 

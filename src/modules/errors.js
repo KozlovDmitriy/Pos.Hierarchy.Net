@@ -6,7 +6,7 @@ import {
 } from '../actions/events'
 
 const initialState = {
-  errors: []
+  errors: void 0
 }
 
 export default function errors (state = initialState, action) {
