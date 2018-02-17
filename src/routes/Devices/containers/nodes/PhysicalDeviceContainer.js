@@ -5,7 +5,8 @@ import * as WorkspaceActions from '../../actions/workspace'
 
 function mapStateToProps (state, ownProps) {
   return {
-    errors: state.errors.errors.filter(i => ('' + i.deviceId) === ('' + ownProps.node.deviceId))
+    errors: (state.errors.errors || [])
+      .filter(i => ('' + i.deviceId) === ('' + ownProps.node.deviceId))
   }
 }
 
