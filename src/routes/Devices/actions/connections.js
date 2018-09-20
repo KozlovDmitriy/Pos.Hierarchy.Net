@@ -1,155 +1,28 @@
-const getLogicalByPhysical =
-  (n, m) => n.deviceId === m.physicalDeviceId
+import ConnectionRules from '../../../utils/ConnectionRules'
 
-const getPhysicalByLogical =
-  (n, m) => m.deviceId === n.physicalDeviceId
+const connections = new ConnectionRules(true, true)
 
-const getMerchantByLogical =
-  (n, m) => n.merchantNumberX === m.numberX
+/**
+ * Проверяет является ли строка пустой или undefined
+ */
+const isNullOrEmpty = (s) =>
+  s === void 0 || s === ''
 
-const getLogicalByMerchant =
-  (n, m) => n.numberX === m.merchantNumberX
+/**
+ * Возвращает массив полей объекта, которые заполнены
+ */
+const filterNotNullOrEmpryFields = (obj) =>
+  Object.keys(obj).filter(f => !isNullOrEmpty(obj[f]))
 
-const getAccountByMecrhant =
-  (n, m) => n.accountNumberX === m.numberX
+/**
+ * Проверяет, имеется ли у объекта хотя бы одно заполненое поле
+ */
+const isAnyFieldNotNullOrEmty = (obj) =>
+  Object.keys(obj).find(i => !isNullOrEmpty(obj[i])) !== void 0
 
-const getMerchantByAccount =
-  (n, m) => n.numberX === m.accountNumberX
-
-const getCustomerByAccount =
-  (n, m) => n.customerNumberX === m.numberX
-
-const getAccountByCustomer =
-  (n, m) => n.numberX === m.customerNumberX
-
-const getAddressByEntity =
-  (n, m) => n.addressId === m.addressId
-
-const getEntityByAddress = getAddressByEntity
-
-const getCityByAddress =
-  (n, m) => n.cityId === m.cityId
-
-const getAddressByCity = getCityByAddress
-
-const getRegionByCity =
-  (n, m) => n.regionId === m.regionId
-
-const getCityByRegion = getRegionByCity
-
-const getCountryByRegion =
-  (n, m) => n.countryId === m.countryId
-
-const getRegionByCountry = getCountryByRegion
-
-const getPhysicalByPhysical =
-  (n, m) => n.parentId === m.deviceId
-
-const getPhysicalByPhysicalDown =
-  (n, m) => n.deviceId === m.parentId
-
-const filterBySubstring = (v, f) =>
-  v.toLowerCase().includes(f.toLowerCase())
-
-const connections = {
-  physical: [
-    { type: 'logical', expr: getLogicalByPhysical, isRec: false, isCycle: true, up: true },
-    { type: 'logical', expr: getLogicalByPhysical, isRec: false, isCycle: true, up: false },
-    { type: 'address', expr: getAddressByEntity, isRec: true, isCycle: true, up: true },
-    { type: 'physical', expr: getPhysicalByPhysical, isRec: true, isCycle: true, up: true },
-    { type: 'physical', expr: getPhysicalByPhysicalDown, isRec: true, isCycle: true, up: false },
-    { type: 'physical', expr: getPhysicalByPhysical, isRec: true, isCycle: true, up: false }
-  ],
-  logical: [
-    { type: 'merchant', expr: getMerchantByLogical, isRec: true, isCycle: true, up: true },
-    { type: 'physical', expr: getPhysicalByLogical, isRec: true, isCycle: true, up: false }
-  ],
-  merchant: [
-    { type: 'account', expr: getAccountByMecrhant, isRec: true, isCycle: true, up: true },
-    { type: 'address', expr: getAddressByEntity, isRec: false, isCycle: true, up: true },
-    { type: 'logical', expr: getLogicalByMerchant, isRec: true, isCycle: true, up: false }
-  ],
-  account: [
-    { type: 'customer', expr: getCustomerByAccount, isRec: true, isCycle: true, up: true },
-    { type: 'address', expr: getAddressByEntity, isRec: false, isCycle: true, up: true },
-    { type: 'merchant', expr: getMerchantByAccount, isRec: true, isCycle: true, up: false }
-  ],
-  customer: [
-    { type: 'address', expr: getAddressByEntity, isRec: false, isCycle: true, up: true },
-    { type: 'account', expr: getAccountByCustomer, isRec: true, isCycle: true, up: false }
-  ],
-  address: [
-    { type: 'city', expr: getCityByAddress, isRec: true, isCycle: true, up: true },
-    { type: 'customer', expr: getEntityByAddress, isRec: true, isCycle: true, up: false },
-    { type: 'account', expr: getEntityByAddress, isRec: true, isCycle: true, up: false },
-    { type: 'merchant', expr: getEntityByAddress, isRec: true, isCycle: true, up: false },
-    { type: 'physical', expr: getEntityByAddress, isRec: true, isCycle: true, up: false }
-  ],
-  city: [
-    { type: 'region', expr: getRegionByCity, isRec: true, isCycle: true, up: true },
-    { type: 'address', expr: getAddressByCity, isRec: true, isCycle: true, up: false }
-  ],
-  region: [
-    { type: 'country', expr: getCountryByRegion, isRec: true, isCycle: true, up: true },
-    { type: 'city', expr: getCityByRegion, isRec: true, isCycle: true, up: false }
-  ],
-  country: [
-    { type: 'region', expr: getRegionByCountry, isRec: true, isCycle: true, up: false }
-  ]
-}
-
-const connectionsInitialize = (withPpdConnections) => {
-  connections['physical'] = [
-    { type: 'logical', expr: getLogicalByPhysical, isRec: false, isCycle: true, up: true },
-    { type: 'logical', expr: getLogicalByPhysical, isRec: false, isCycle: true, up: false },
-    { type: 'address', expr: getAddressByEntity, isRec: true, isCycle: true, up: true }
-  ]
-  if (withPpdConnections) {
-    connections['physical'].push(
-      { type: 'physical', expr: getPhysicalByPhysical, isRec: true, isCycle: true, up: true }
-    )
-    connections['physical'].push(
-      { type: 'physical', expr: getPhysicalByPhysicalDown, isRec: true, isCycle: true, up: false }
-    )
-    connections['physical'].push(
-      { type: 'physical', expr: getPhysicalByPhysical, isRec: true, isCycle: true, up: false }
-    )
-  }
-}
-
-const filterRules = {
-  logical: [
-    { filter: 'terminalId', get: (e) => e.terminalId, try: filterBySubstring, showSiblings: false }
-  ],
-  merchant: [
-    { filter: 'merchant', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
-  ],
-  account: [
-    { filter: 'account', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
-  ],
-  customer: [
-    { filter: 'customer', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
-  ],
-  address: [
-    { filter: 'address', get: (e) => e.address1, try: filterBySubstring, showSiblings: false }
-  ],
-  city: [
-    { filter: 'city', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
-  ],
-  region: [
-    { filter: 'region', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
-  ],
-  country: [
-    { filter: 'country', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
-  ]
-}
-const fiterRulesInitialize = (withSiblings) => {
-  filterRules['physical'] = [
-    { filter: 'modelName', get: (e) => e.modelName, try: filterBySubstring, showSiblings: withSiblings },
-    { filter: 'serialNumber', get: (e) => e.serialNumber, try: filterBySubstring, showSiblings: withSiblings }
-  ]
-}
-
+/**
+ * Разделяет массив объектов на двумерный массив по полю type
+ */
 const separateEntitiesByTypes = (entities) =>
   entities.reduce(
     (arr, e) => {
@@ -161,33 +34,86 @@ const separateEntitiesByTypes = (entities) =>
     []
   )
 
+/**
+ * Получает все узлы, итеющие прямое соединение переданного типа с переданным узлом
+ * @param entity узел для которого ищутся соединения
+ * @param entitiesByType двумерный массив всех узлов разбитый по типам узлов
+ * @param connectionType тип соединения
+ * @return массив узлов имеющих прямое соединение с переданным узлом
+ */
+const getFirstLevelEntityConnections = (entity, entitiesByType, connectionType) => {
+  const entities = entitiesByType[connectionType.type] || []
+  const expr = connectionType.expr
+  const result = entities.filter(e => expr(entity, e))
+  return result
+}
+
+/**
+ * Получает все узлы с которыми необходимо отобразить соединения
+ * если они соединены хотябы с одним из переданных узлов
+ * @param entity узел для которого ищутся соединения
+ * @param entitiesByType двумерный массив всех узлов разбитый по типам узлов
+ * @param entitiesToShow типы узлов которые необходимо отображать
+ * @return все узлы с которыми необходимо отобразить соединения
+ */
+const getAllConnectionsForEntities = (entities, entitiesByType, entitiesToShow) =>
+  entities
+    .map(e => getAllConnectionsForEntity(e, entitiesByType, entitiesToShow, true))
+    .reduce((a, r) => [...a, ...r], [])
+
+/**
+ * Получает все узлы с которыми необходимо отобразить соединие с переданным узлом
+ * @param entity узел для которого ищутся соединения
+ * @param entitiesByType двумерный массив всех узлов разбитый по типам узлов
+ * @param entitiesToShow типы узлов которые необходимо отображать
+ * @param isRec возвращать ли соединеные узлы рекурсивно
+ * @return Все узлы соединенные с переданным
+ */
 const getAllConnectionsForEntity = (entity, entitiesByType, entitiesToShow, isRec = false) => {
   const type = entity.type
-  const connectionVariants = connections[type].filter(i => i.up)
   if (entitiesToShow.indexOf(type) === -1 && !isRec) {
     return []
   }
-  const connected = connectionVariants.map(t => {
+  const connectionTypes = connections.getAllUpConnectionRulesByType(type)
+  const connected = connectionTypes.map(t => {
     if (entitiesToShow.indexOf(type) === -1 && !t.isRec) {
       return []
     }
-    const entities = entitiesByType[t.type] || []
-    const expr = t.expr
-    const firstLevel = entities.filter(e => expr(entity, e))
+    const firstLevel = getFirstLevelEntityConnections(entity, entitiesByType, t)
+    // Если узлы данного уровня имеют тип который не нужно отображать, то ...
     return entitiesToShow.indexOf(t.type) === -1 ?
-      firstLevel
-        .map(e => getAllConnectionsForEntity(e, entitiesByType, entitiesToShow, true))
-        .reduce((a, r) => [...a, ...r], []) :
+      // ... находим связанные со всеми найдеными узлами этого уровня узлы
+      // и отображаем их соединения с переданным узлом
+      getAllConnectionsForEntities(firstLevel, entitiesByType, entitiesToShow) :
+      // иначе, отображаем связи с найдеными узлами данного уровня
       firstLevel
   }).reduce((a, r) => [...a, ...r], [])
   return connected
 }
 
+/**
+ * Получает объект соединения между двумя узлами
+ * @param первый узел
+ * @param второй узел
+ * @return объект соединия
+ */
+const getConnectionObject = (sourceNode, targetNode) => ({
+  source: sourceNode,
+  target: targetNode,
+  type: `${sourceNode.type} - ${targetNode.type}`
+})
+
+/**
+ * Полует список всех соединения между узлами, которые необходимо отобразить
+ * @param все узлы
+ * @param типы узлов которые необходимо отображать
+ * @return список соединений
+ */
 export const getAllConnections = (all, entitiesToShow) => {
   const entitiesByType = separateEntitiesByTypes(all)
   return all.map(
     e => getAllConnectionsForEntity(e, entitiesByType, entitiesToShow)
-      .map((t, i) => ({ source: e, target: t, type: `${e.type} - ${t.type}` }))
+      .map((t, i) => getConnectionObject(e, t))
   ).reduce((a, r) => [...a, ...r], [])
 }
 
@@ -195,12 +121,10 @@ const getRoots = (entity, entitiesByType, ids, isRec = false) => {
   if (ids.indexOf(entity.id) === -1) {
     ids.push(entity.id)
     const type = entity.type
-    const connectionVariants = connections[type].filter(i => !i.up)
-    connectionVariants.forEach(t => {
+    const connectionTypes = connections.getAllDownConnectionRulesByType(type)
+    connectionTypes.forEach(t => {
       if (t.isCycle || !isRec) {
-        const entities = entitiesByType[t.type] || []
-        const expr = t.expr
-        const firstLevel = entities.filter(e => expr(entity, e))
+        const firstLevel = getFirstLevelEntityConnections(entity, entitiesByType, t)
         firstLevel.map(e => getRoots(e, entitiesByType, ids, true))
       }
     })
@@ -211,12 +135,10 @@ const getLineConnectionsForEntity = (entity, entitiesByType, ids, isRec = false)
   if (ids.indexOf(entity.id) === -1) {
     ids.push(entity.id)
     const type = entity.type
-    const connectionVariants = connections[type].filter(i => i.up)
+    const connectionVariants = connections.getAllUpConnectionRulesByType(type)
     connectionVariants.forEach(t => {
       if (t.isCycle || !isRec) {
-        const entities = entitiesByType[t.type] || []
-        const expr = t.expr
-        const firstLevel = entities.filter(e => expr(entity, e))
+        const firstLevel = getFirstLevelEntityConnections(entity, entitiesByType, t)
         firstLevel.map(e => getLineConnectionsForEntity(e, entitiesByType, ids, true))
       }
     })
@@ -245,7 +167,7 @@ const getSiblings = (d, type, entities, foundEntities) => {
   if (foundEntities.indexOf(d) === -1) {
     foundEntities.push(d)
   }
-  connections[type].filter(i => i.type === type)
+  connections.getSiblingConnectionTypes(type)
     .map(r => entities.filter(e => r.expr(d, e)))
     .reduce((x, y) => [...x, ...y], [])
     .filter(e => foundEntities.indexOf(e) === -1)
@@ -265,10 +187,6 @@ const markEntityWithSiblings = (d, ftype, entitiesByType, marks, isOk) => {
   }
 }
 
-const findFilterRulesByFilter = (filterName) =>
-  Object.keys(filterRules)
-    .filter(r => filterRules[r].find(a => a.filter === filterName) !== void 0)
-
 const getNewMarks = (data) => {
   const marks = {}
   data.forEach(d => { marks[d.id] = void 0 })
@@ -285,14 +203,13 @@ const marksByConections = (marks, data, entitiesByType) =>
 
 const markByFilters = (data, entitiesByType, filters, marks, typeForFilter) => {
   entitiesByType[typeForFilter].forEach(e => { marks[e.id] = true })
-  Object.keys(filters)
-    .filter(f => filters[f] !== void 0 && filters[f] !== '')
+  filterNotNullOrEmpryFields(filters)
     .map(f => {
       const filterMarks = getNewMarks(data)
       const filterValue = filters[f]
-      const rules = findFilterRulesByFilter(f)
+      const rules = connections.findFilterRulesByFilter(f)
       rules.forEach(r => {
-        const rule = filterRules[r].find(cr => cr.filter === f)
+        const rule = connections.findFilterRuleByTypeAndFilter(r, f)
         entitiesByType[r].forEach(e => {
           const isOk = rule.try(rule.get(e), filterValue)
           markEntityWithSiblings(e, rule, entitiesByType, filterMarks, isOk)
@@ -300,9 +217,9 @@ const markByFilters = (data, entitiesByType, filters, marks, typeForFilter) => {
       })
       marksByConections(filterMarks, data, entitiesByType)
       const result = {}
-      entitiesByType[typeForFilter].forEach(e => { result[e.id] = filterMarks[e.id] })
+      entitiesByType[typeForFilter].forEach(e => (result[e.id] = filterMarks[e.id]))
       return result
-    }).forEach(x => Object.keys(x).forEach((id) => { marks[id] = marks[id] && x[id] }))
+    }).forEach(x => Object.keys(x).forEach(id => (marks[id] = marks[id] && x[id])))
 }
 
 const collapseEntity = (entity, entitiesByType, ids, isRec = false, hide = false) => {
@@ -310,12 +227,10 @@ const collapseEntity = (entity, entitiesByType, ids, isRec = false, hide = false
   if (ids.indexOf(entity.id) === -1) {
     ids.push(entity.id)
     const type = entity.type
-    const connectionVariants = connections[type].filter(i => !i.up)
-    connectionVariants.forEach(t => {
+    const connectionTypes = connections.getAllDownConnectionRulesByType(type)
+    connectionTypes.forEach(t => {
       if (t.isCycle || !isRec) {
-        const entities = entitiesByType[t.type] || []
-        const expr = t.expr
-        const firstLevel = entities.filter(e => expr(entity, e))
+        const firstLevel = getFirstLevelEntityConnections(entity, entitiesByType, t)
         firstLevel.map(e => collapseEntity(e, entitiesByType, ids, true, entity.collapsed || hide))
       }
     })
@@ -333,9 +248,9 @@ export function collapseEntities (data) {
 }
 
 export function getFilteredData (filters, data, filterWithPpd) {
-  if (Object.keys(filters).find(i => filters[i] !== void 0 && filters[i] !== '') !== void 0) {
-    fiterRulesInitialize(filterWithPpd)
-    connectionsInitialize(filterWithPpd)
+  if (isAnyFieldNotNullOrEmty(filters)) {
+    connections.fiterRulesInitialize(filterWithPpd)
+    connections.connectionsInitialize(filterWithPpd)
     const marks = getNewMarks(data)
     const entitiesByType = separateEntitiesByTypes(data)
     markByFilters(data, entitiesByType, filters, marks, 'physical')
@@ -343,7 +258,7 @@ export function getFilteredData (filters, data, filterWithPpd) {
     const filtered = Object.keys(marks)
       .filter(id => marks[id] === true/* >= filtersCount */)
       .map(id => parseInt(id, 10))
-    connectionsInitialize(true)
+    connections.connectionsInitialize(true)
     return filtered
   } else {
     return data.map(i => i.id)

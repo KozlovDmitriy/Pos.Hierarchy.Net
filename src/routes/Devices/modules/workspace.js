@@ -1,6 +1,5 @@
 import config from 'config'
 import ReactRethinkdb from 'react-rethinkdb'
-
 import {
   SET_DEVICES,
   SET_TREE,
@@ -16,7 +15,7 @@ import {
 
 const initialState = {
   animation: true,
-  data: [], // entities,
+  data: [],
   tree: {},
   filterWithPpd: false,
   filteredData: [],
