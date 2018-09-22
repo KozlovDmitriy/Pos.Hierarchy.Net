@@ -16,20 +16,20 @@ class PhysicalDevice extends Component {
 
   constructor (props) {
     super(props)
+    this.state = { isUnderline: false }
     this.onClick = this.onClick.bind(this)
     this.handleDoubleClick = this.handleDoubleClick.bind(this)
   }
 
   onClick = (event) => {
-    var e = event.target
-    var dim = e.getBoundingClientRect()
-    var x = dim.left
-    var y = dim.top
+    const dim = event.target.getBoundingClientRect()
+    const x = dim.left
+    const y = dim.top
     this.getBoundingClientRect = () => ({
-      left: x,
-      right: 1 + x,
-      top: y,
-      bottom: 1 + y
+      left: x + 20,
+      right: 80 + x,
+      top: y + 20,
+      bottom: 21 + y
     })
     this.props.setPopoverIsOpen(true, this, this.props.node)
   }
@@ -41,6 +41,15 @@ class PhysicalDevice extends Component {
   refCallback (item) {
     if (item) {
       item.ondblclick = this.handleDoubleClick
+    }
+  }
+
+  textRefCallback (item) {
+    if (item) {
+      item.addEventListener('click', this.onClick)
+      item.addEventListener('mouseover', () => this.setState({ isUnderline: true }))
+      item.addEventListener('mouseout', () => this.setState({ isUnderline: false }))
+      item.onselectstart = () => false
     }
   }
 
@@ -78,19 +87,25 @@ class PhysicalDevice extends Component {
       <Group y={node.y} x={node.x}>
         {rect}
         {plus}
-        <a href={'#'} onClick={this.onClick}>
+        <g transform='translate(0, -16)' ref={this.textRefCallback.bind(this)}>
           <text
-            dy={-16}
             fontSize={13}
+            href='#'
+            className=''
             fontFamily='Arial'
             textAnchor={'middle'}
-            style={{ pointerEvents: 'none' }}
+            style={{
+              MozUserSelect: 'none',
+              WebkitUserSelect: 'none',
+              msUserSelect: 'none',
+              textDecoration: this.state.isUnderline ? 'underline' : 'none'
+            }}
             fill={isError ? errorColor : '#009dc7'}
             stroke={void 0}
           >
             {`${node.serialNumber}`}
           </text>
-        </a>
+        </g>
         {errorsBadge}
       </Group>
     )
