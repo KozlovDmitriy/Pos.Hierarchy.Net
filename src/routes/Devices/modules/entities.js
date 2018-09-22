@@ -13,7 +13,8 @@ const entities = [
     type: 'physical',
     serialNumber: 'Serial Number 2',
     modelName: 'Petroline',
-    addressId: 2
+    addressId: 2 //,
+    // collapsed: true
   },
   {
     id: 3,

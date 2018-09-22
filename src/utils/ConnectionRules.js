@@ -157,7 +157,7 @@ export default class ConnectionRules {
    * Получает массив типов соединений,
    * для узлов которые могут быть связаны на одном уровне
    * и имеют переданный тип
-   * @param тип узла
+   * @param nodeType тип узла
    * @return массив типов соединений
    */
   getSiblingConnectionTypes = (nodeType) =>
@@ -165,18 +165,25 @@ export default class ConnectionRules {
 
   /**
    * Возвращает все возможные соединения по типу узла и направлению (соединения вверх или вниз)
+   * @param type тип узла для соединения
+   * @param isUp true - искать вверх, false - искать вниз
+   * @return массив типов соединений
    */
   filterConnectionRulesByDirectionAndType = (type, isUp) =>
     this.connections[type].filter(i => i.up === isUp)
 
   /**
    * Возвращает все возможные соединения вверх по типу узла
+   * @param type тип узла для соединения
+   * @return массив типов соединений
    */
   getAllUpConnectionRulesByType = (type) =>
     this.filterConnectionRulesByDirectionAndType(type, true)
 
   /**
    * Возвращает все возможные соединения вниз по типу узла
+   * @param type тип узла для соединения
+   * @return массив типов соединений
    */
   getAllDownConnectionRulesByType = (type) =>
     this.filterConnectionRulesByDirectionAndType(type, false)

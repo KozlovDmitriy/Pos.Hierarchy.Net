@@ -14,6 +14,7 @@ export function collapseNode (id) {
 
 export function collapseNodeAndRewriteTree (id) {
   return (dispatch) => {
+    debugger
     dispatch(collapseNode(id))
     dispatch(rewriteTree())
   }

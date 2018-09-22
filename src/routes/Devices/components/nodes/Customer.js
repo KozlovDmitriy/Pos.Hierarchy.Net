@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Group } from '@vx/group'
+import Plus from './Plus'
 
 class Customer extends Component {
   static propTypes = {
@@ -21,14 +22,9 @@ class Customer extends Component {
   render () {
     const node = this.props.node
     const plus = node.collapsed ? (
-      <polygon
-        ref={this.refCallback.bind(this)}
-        transform='translate(22,12)'
-        points={'-6,-2, -2,-2, -2,-6, 2,-6, 2,-2, 6,-2, 6,2, 2,2, 2,6, -2,6, -2,2, -6,2'}
-        fill={'#fff'}
-        // {'#7777FF'}
-        stroke={'#008ba0'}
-        strokeWidth={2}
+      <Plus
+        color='#008ba0'
+        onDoubleClick={this.handleDoubleClick.bind(this)}
       />
     ) : void 0 /* (
       <polygon

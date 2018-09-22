@@ -1,6 +1,6 @@
 import ConnectionRules from '../../../utils/ConnectionRules'
 
-const connections = new ConnectionRules(true, true)
+const connections = new ConnectionRules()
 
 /**
  * Проверяет является ли строка пустой или undefined
@@ -231,7 +231,11 @@ const collapseEntity = (entity, entitiesByType, ids, isRec = false, hide = false
     connectionTypes.forEach(t => {
       if (t.isCycle || !isRec) {
         const firstLevel = getFirstLevelEntityConnections(entity, entitiesByType, t)
-        firstLevel.map(e => collapseEntity(e, entitiesByType, ids, true, entity.collapsed || hide))
+        firstLevel.forEach(e => {
+          if (e.id !== ids[0]) {
+            collapseEntity(e, entitiesByType, ids, true, entity.collapsed || hide)
+          }
+        })
       }
     })
   }
