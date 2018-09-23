@@ -1,14 +1,27 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { Group } from '@vx/group'
+import NodeLabel from './NodeLabel'
+import Node from './Node'
 
-class LogicalDevice extends Component {
+class LogicalDevice extends Node {
   static propTypes = {
-    node: PropTypes.object.isRequired
+    node: PropTypes.object.isRequired,
+    setPopoverIsOpen: PropTypes.func.isRequired
   }
 
   render () {
     const node = this.props.node
+    const label = (
+      <NodeLabel
+        x={0}
+        y={-16}
+        fontSize={13}
+        color={'#00b8b4'}
+        text={node.terminalId}
+        onClick={this.onClick}
+      />
+    )
     return (
       <Group y={node.y} x={node.x}>
         <circle
@@ -17,21 +30,8 @@ class LogicalDevice extends Component {
           fill={'white'}
           strokeOpacity={0.6}
           stroke={'#00d8d4'}
-          onClick={() => {
-            alert(`clicked: ${JSON.stringify(node.title)}`)
-          }}
         />
-        <text
-          dy={-16}
-          fontSize={13}
-          fontFamily='Arial'
-          textAnchor={'middle'}
-          style={{ pointerEvents: 'none' }}
-          fill={'#00b8b4'}
-          stroke={void 0}
-        >
-          {node.terminalId}
-        </text>
+        {label}
       </Group>
     )
   }

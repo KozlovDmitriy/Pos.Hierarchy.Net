@@ -1,27 +1,15 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { Group } from '@vx/group'
 import Plus from './Plus'
+import NodeLabel from './NodeLabel'
+import CollapsedNode from './CollapsedNode'
 
-class Account extends Component {
+class Account extends CollapsedNode {
   static propTypes = {
     node: PropTypes.object.isRequired,
+    setPopoverIsOpen: PropTypes.func.isRequired,
     collapseNodeAndRewriteTree: PropTypes.func.isRequired
-  }
-
-  constructor (props) {
-    super(props)
-    this.handleDoubleClick = this.handleDoubleClick.bind(this)
-  }
-
-  handleDoubleClick () {
-    this.props.collapseNodeAndRewriteTree(this.props.node.id)
-  }
-
-  refCallback (item) {
-    if (item) {
-      item.ondblclick = this.handleDoubleClick
-    }
   }
 
   render () {
@@ -32,10 +20,20 @@ class Account extends Component {
         onDoubleClick={this.handleDoubleClick}
       />
     ) : void 0
+    const label = (
+      <NodeLabel
+        x={0}
+        y={-21}
+        fontSize={15}
+        color={'#008ba0'}
+        text={node.name}
+        onClick={this.onClick}
+      />
+    )
     return (
       <Group y={node.y} x={node.x}>
         <polygon
-          ref={this.refCallback.bind(this)}
+          ref={this.refCallback}
           points={'0,-15 15,0 0,15 -15,0'}
           fill={'#fff'}
           // {'#9999FF'}
@@ -46,17 +44,7 @@ class Account extends Component {
           strokeOpacity={0.8}
         />
         {plus}
-        <text
-          dy={-21}
-          fontSize={15}
-          fontFamily='Arial'
-          textAnchor={'middle'}
-          style={{ pointerEvents: 'none' }}
-          fill={'#008ba0'} // fill={'#D340E3'}
-          stroke={void 0}
-        >
-          {node.name}
-        </text>
+        {label}
       </Group>
     )
   }

@@ -1,5 +1,3 @@
-import config from 'config'
-import ReactRethinkdb from 'react-rethinkdb'
 import {
   SET_DEVICES,
   SET_TREE,

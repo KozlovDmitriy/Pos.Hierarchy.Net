@@ -33,11 +33,8 @@ export function subscribeErrors (id) {
     connPromise
       .then((conn) => {
         return query.changes().run(conn).then((cursor) => {
-          cursor.on('error', (error) => {
-            console.log(error)
-          })
+          cursor.on('error', (error) => { /* console.log(error) */ })
           cursor.on('data', (message) => {
-            console.log(message)
             if (message.old_val === null && message.new_val !== null) {
               dispatch(addError(message.new_val))
             } else if (message.old_val !== null && message.new_val === null) {
@@ -48,14 +45,14 @@ export function subscribeErrors (id) {
             cursor.emit('message', message)
           })
         })
-      }).catch((error) => { console.log(error) })
+      }).catch((error) => { /* console.log(error) */ })
     connPromise
       .then((conn) => {
         return query.run(conn).then((cursor) => {
           cursor.toArray().then((results) => {
             dispatch(setErrors(results))
-          }).error(console.log)
+          }).error(() => { /* console.log */ })
         })
-      }).catch((error) => { console.log(error) })
+      }).catch((error) => { /* console.log(error) */ })
   }
 }

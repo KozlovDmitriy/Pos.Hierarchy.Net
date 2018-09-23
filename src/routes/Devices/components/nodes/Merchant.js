@@ -1,27 +1,15 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { Group } from '@vx/group'
 import Plus from './Plus'
+import NodeLabel from './NodeLabel'
+import CollapsedNode from './CollapsedNode'
 
-class Merchant extends Component {
+class Merchant extends CollapsedNode {
   static propTypes = {
     node: PropTypes.object.isRequired,
+    setPopoverIsOpen: PropTypes.func.isRequired,
     collapseNodeAndRewriteTree: PropTypes.func.isRequired
-  }
-
-  constructor (props) {
-    super(props)
-    this.handleDoubleClick = this.handleDoubleClick.bind(this)
-  }
-
-  handleDoubleClick () {
-    this.props.collapseNodeAndRewriteTree(this.props.node.id)
-  }
-
-  refCallback (item) {
-    if (item) {
-      item.ondblclick = this.handleDoubleClick.bind(this)
-    }
   }
 
   render () {
@@ -32,6 +20,16 @@ class Merchant extends Component {
         onDoubleClick={this.handleDoubleClick}
       />
     ) : void 0
+    const label = (
+      <NodeLabel
+        x={0}
+        y={-18}
+        fontSize={14}
+        color={'#008ba0'}
+        text={node.name}
+        onClick={this.onClick}
+      />
+    )
     return (
       <Group y={node.y} x={node.x}>
         <polygon
@@ -44,17 +42,7 @@ class Merchant extends Component {
           strokeOpacity={0.8}
         />
         {plus}
-        <text
-          dy={-18}
-          fontSize={14}
-          fontFamily='Arial'
-          textAnchor={'middle'}
-          style={{ pointerEvents: 'none' }}
-          fill={'#008ba0'}
-          stroke={void 0}
-        >
-          {node.name}
-        </text>
+        {label}
       </Group>
     )
   }

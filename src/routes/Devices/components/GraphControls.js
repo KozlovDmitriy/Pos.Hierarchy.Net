@@ -20,7 +20,10 @@ function makeStyles (primary) {
       color: primary,
       border: `solid 1px lightgray`,
       padding: '6.5px',
-      marginRight: '15px'
+      marginRight: '15px',
+      MozUserSelect: 'none',
+      WebkitUserSelect: 'none',
+      msUserSelect: 'none'
     },
     slider: {
       position: 'relative',
