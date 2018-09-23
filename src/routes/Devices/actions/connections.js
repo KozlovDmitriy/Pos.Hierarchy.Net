@@ -35,17 +35,42 @@ const separateEntitiesByTypes = (entities) =>
   )
 
 /**
+ * Получает все узлы, итеющие прямое соединение переданного типа с переданным узлом (скрытые узлы опускаются)
+ * @param entity узел для которого ищутся соединения
+ * @param entitiesByType двумерный массив всех узлов разбитый по типам узлов
+ * @param connectionType тип соединения
+ * @param entitiesToShow типы узлов которые необходимо отображать
+ * @return массив узлов имеющих прямое соединение с переданным узлом
+ */
+const getFirstLevelEntityConnections = (entity, entitiesByType, connectionType, entitiesToShow) => {
+  const connectedEntities = getFirstLevelEntityConnectionsWithHidden(
+    entity,
+    entitiesByType,
+    connectionType,
+    entitiesToShow
+  )
+  // но среди найденных могут оказаться скрытые узлы
+  const hiddenEntities = connectedEntities.filter(e => e.hide)
+  // ищем узлы связанные со скрытыми
+  const result = getAllConnectionsForEntities(hiddenEntities, entitiesByType, entitiesToShow)
+  // добавляем в результат нескрытые узлы
+  connectedEntities.filter(e => !e.hide).forEach(e => result.push(e))
+  return result
+}
+
+/**
  * Получает все узлы, итеющие прямое соединение переданного типа с переданным узлом
  * @param entity узел для которого ищутся соединения
  * @param entitiesByType двумерный массив всех узлов разбитый по типам узлов
  * @param connectionType тип соединения
+ * @param entitiesToShow типы узлов которые необходимо отображать
  * @return массив узлов имеющих прямое соединение с переданным узлом
  */
-const getFirstLevelEntityConnections = (entity, entitiesByType, connectionType) => {
+const getFirstLevelEntityConnectionsWithHidden = (entity, entitiesByType, connectionType, entitiesToShow) => {
   const entities = entitiesByType[connectionType.type] || []
   const expr = connectionType.expr
-  const result = entities.filter(e => expr(entity, e))
-  return result
+  const connectedEntities = entities.filter(e => expr(entity, e))
+  return connectedEntities
 }
 
 /**
@@ -79,7 +104,7 @@ const getAllConnectionsForEntity = (entity, entitiesByType, entitiesToShow, isRe
     if (entitiesToShow.indexOf(type) === -1 && !t.isRec) {
       return []
     }
-    const firstLevel = getFirstLevelEntityConnections(entity, entitiesByType, t)
+    const firstLevel = getFirstLevelEntityConnections(entity, entitiesByType, t, entitiesToShow)
     // Если узлы данного уровня имеют тип который не нужно отображать, то ...
     return entitiesToShow.indexOf(t.type) === -1 ?
       // ... находим связанные со всеми найдеными узлами этого уровня узлы
@@ -131,15 +156,15 @@ const getRoots = (entity, entitiesByType, ids, isRec = false) => {
   }
 }
 
-const getLineConnectionsForEntity = (entity, entitiesByType, ids, isRec = false) => {
+const getLineConnectionsForEntity = (entity, entitiesByType, entitiesToShow, ids, isRec = false) => {
   if (ids.indexOf(entity.id) === -1) {
     ids.push(entity.id)
     const type = entity.type
     const connectionVariants = connections.getAllUpConnectionRulesByType(type)
     connectionVariants.forEach(t => {
       if (t.isCycle || !isRec) {
-        const firstLevel = getFirstLevelEntityConnections(entity, entitiesByType, t)
-        firstLevel.map(e => getLineConnectionsForEntity(e, entitiesByType, ids, true))
+        const firstLevel = getFirstLevelEntityConnections(entity, entitiesByType, t, entitiesToShow)
+        firstLevel.map(e => getLineConnectionsForEntity(e, entitiesByType, entitiesToShow, ids, true))
       }
     })
   }
@@ -152,9 +177,9 @@ const markEntity = (id, marks, isOk, force) => {
     mark && isOk
 }
 
-const markEntitiesAndConnections = (d, marks, entitiesByType, isOk, force = false) => {
+const markEntitiesAndConnections = (d, marks, entitiesByType, entitiesToShow, isOk, force = false) => {
   const headIds = []
-  getLineConnectionsForEntity(d, entitiesByType, headIds)
+  getLineConnectionsForEntity(d, entitiesByType, entitiesToShow, headIds)
   const rootIds = []
   getRoots(d, entitiesByType, rootIds)
   const ids = [...headIds, ...rootIds].filter((e, i, arr) => arr.indexOf(e) === i)
@@ -193,15 +218,15 @@ const getNewMarks = (data) => {
   return marks
 }
 
-const marksByConections = (marks, data, entitiesByType) =>
+const marksByConections = (marks, data, entitiesByType, entitiesToShow) =>
   Object.keys(marks)
     .filter(id => marks[id])
     .forEach(id => {
       const d = data.find(e => e.id === parseInt(id, 10))
-      markEntitiesAndConnections(d, marks, entitiesByType, true)
+      markEntitiesAndConnections(d, marks, entitiesByType, entitiesToShow, true)
     })
 
-const markByFilters = (data, entitiesByType, filters, marks, typeForFilter) => {
+const markByFilters = (data, entitiesByType, filters, entitiesToShow, marks, typeForFilter) => {
   entitiesByType[typeForFilter].forEach(e => { marks[e.id] = true })
   filterNotNullOrEmpryFields(filters)
     .map(f => {
@@ -215,25 +240,25 @@ const markByFilters = (data, entitiesByType, filters, marks, typeForFilter) => {
           markEntityWithSiblings(e, rule, entitiesByType, filterMarks, isOk)
         })
       })
-      marksByConections(filterMarks, data, entitiesByType)
+      marksByConections(filterMarks, data, entitiesByType, entitiesToShow)
       const result = {}
       entitiesByType[typeForFilter].forEach(e => (result[e.id] = filterMarks[e.id]))
       return result
     }).forEach(x => Object.keys(x).forEach(id => (marks[id] = marks[id] && x[id])))
 }
 
-const collapseEntity = (entity, entitiesByType, ids, isRec = false, hide = false) => {
-  entity.hide = hide
+const collapseEntity = (entity, entitiesByType, entitiesToShow, ids, isRec = false) => {
   if (ids.indexOf(entity.id) === -1) {
     ids.push(entity.id)
     const type = entity.type
-    const connectionTypes = connections.getAllDownConnectionRulesByType(type)
+    const connectionTypes = connections.getAllConnectionRulesForCollapse(type)
     connectionTypes.forEach(t => {
       if (t.isCycle || !isRec) {
-        const firstLevel = getFirstLevelEntityConnections(entity, entitiesByType, t)
+        const firstLevel = getFirstLevelEntityConnectionsWithHidden(entity, entitiesByType, t, entitiesToShow)
         firstLevel.forEach(e => {
           if (e.id !== ids[0]) {
-            collapseEntity(e, entitiesByType, ids, true, entity.collapsed || hide)
+            e.hide = true
+            collapseEntity(e, entitiesByType, entitiesToShow, ids, true)
           }
         })
       }
@@ -241,24 +266,24 @@ const collapseEntity = (entity, entitiesByType, ids, isRec = false, hide = false
   }
 }
 
-export function collapseEntities (data) {
+export function collapseEntities (data, entitiesToShow) {
   const entitiesByType = separateEntitiesByTypes(data)
   data.forEach(e => { e.hide = false })
   data.forEach(e => {
     if (e.collapsed) {
-      collapseEntity(e, entitiesByType, [])
+      collapseEntity(e, entitiesByType, entitiesToShow, [])
     }
   })
 }
 
-export function getFilteredData (filters, data, filterWithPpd) {
+export function getFilteredData (filters, data, entitiesToShow, filterWithPpd) {
   if (isAnyFieldNotNullOrEmty(filters)) {
     connections.fiterRulesInitialize(filterWithPpd)
     connections.connectionsInitialize(filterWithPpd)
     const marks = getNewMarks(data)
     const entitiesByType = separateEntitiesByTypes(data)
-    markByFilters(data, entitiesByType, filters, marks, 'physical')
-    marksByConections(marks, data, entitiesByType)
+    markByFilters(data, entitiesByType, filters, entitiesToShow, marks, 'physical')
+    marksByConections(marks, data, entitiesByType, entitiesToShow)
     const filtered = Object.keys(marks)
       .filter(id => marks[id] === true/* >= filtersCount */)
       .map(id => parseInt(id, 10))

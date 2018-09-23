@@ -60,10 +60,10 @@ export default class ConnectionRules {
         { type: 'address', expr: getAddressByEntity, isRec: true, isCycle: true, up: true },
         { type: 'physical', expr: getPhysicalByPhysical, isRec: true, isCycle: true, up: true },
         { type: 'physical', expr: getPhysicalByPhysicalDown, isRec: true, isCycle: true, up: false },
-        { type: 'physical', expr: getPhysicalByPhysical, isRec: true, isCycle: true, up: false }
+        { type: 'physical', expr: getPhysicalByPhysical, isRec: true, isCycle: true, up: false, notForCollapse: true }
       ],
       logical: [
-        { type: 'merchant', expr: getMerchantByLogical, isRec: true, isCycle: true, up: true },
+        { type: 'merchant', expr: getMerchantByLogical, isRec: true, isCycle: true, up: true, notForCollapse: true },
         { type: 'physical', expr: getPhysicalByLogical, isRec: true, isCycle: true, up: false }
       ],
       merchant: [
@@ -141,7 +141,7 @@ export default class ConnectionRules {
         { type: 'physical', expr: getPhysicalByPhysicalDown, isRec: true, isCycle: true, up: false }
       )
       this.connections['physical'].push(
-        { type: 'physical', expr: getPhysicalByPhysical, isRec: true, isCycle: true, up: false }
+        { type: 'physical', expr: getPhysicalByPhysical, isRec: true, isCycle: true, up: false, notForCollapse: true }
       )
     }
   }
@@ -187,6 +187,16 @@ export default class ConnectionRules {
    */
   getAllDownConnectionRulesByType = (type) =>
     this.filterConnectionRulesByDirectionAndType(type, false)
+
+  /**
+   * Возвращает все возможные соединения вниз по типу узла
+   * @param type тип узла для соединения
+   * @return массив типов соединений
+   */
+  getAllConnectionRulesForCollapse = (type) =>
+    this
+      .getAllDownConnectionRulesByType(type)
+      .filter(i => !i.notForCollapse)
 
   findFilterRulesByFilter = (filterName) =>
     Object.keys(this.filterRules)

@@ -38,7 +38,7 @@ const cloneArray = (arr) => arr.map(i => { return { ...i } })
 export function rewriteTree () {
   return (dispatch, getState) => {
     const { data, filteredData, showingTypes } = getState().devices
-    collapseEntities(data)
+    collapseEntities(data, showingTypes)
     const filtered = cloneArray(data.filter(d => filteredData.indexOf(d.id) !== -1))
     const links = getAllConnections(filtered, showingTypes)
       .filter(i => i.source.hide !== true && i.target.hide !== true)

@@ -42,8 +42,8 @@ export function toggleShowingType (type) {
 
 export function filterData () {
   return (dispatch, getState) => {
-    const { filters, data, filterWithPpd } = getState().devices
-    const ids = getFilteredData(filters, data, filterWithPpd)
+    const { filters, data, showingTypes, filterWithPpd } = getState().devices
+    const ids = getFilteredData(filters, data, showingTypes, filterWithPpd)
     dispatch(setFilteredData(ids))
     dispatch(rewriteTree())
   }
