@@ -1,8 +1,8 @@
+import { SET_TREE } from '../actions/tree'
+import { COLLAPSE_NODE } from '../actions/collapse'
 import {
   SET_DEVICES,
-  SET_TREE,
-  SET_POPOVER_IS_OPEN,
-  COLLAPSE_NODE
+  SET_POPOVER_IS_OPEN
 } from '../actions/workspace'
 import {
   SET_FILTERS,

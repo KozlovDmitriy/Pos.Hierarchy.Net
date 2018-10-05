@@ -1,5 +1,11 @@
-import { rewriteTree } from './workspace'
-import { getFilteredData } from './connections'
+import ConnectionRules from '../../../utils/ConnectionRules'
+import { rewriteTree } from './tree'
+import {
+  separateEntitiesByTypes,
+  getFirstLevelEntityConnections
+} from './connections'
+
+const connections = new ConnectionRules()
 
 export const SET_FILTERS = 'SET_FILTERS'
 export const SET_MODEL_NAME_FILTER = 'SET_MODEL_NAME_FILTER'
@@ -141,3 +147,144 @@ export function setCountryFilter (value) {
     dispatch(filterData())
   }
 }
+
+function getFilteredData (filters, data, entitiesToShow, filterWithPpd) {
+  if (isAnyFieldNotNullOrEmty(filters)) {
+    connections.fiterRulesInitialize(filterWithPpd)
+    connections.connectionsInitialize(filterWithPpd)
+    const marks = getNewMarks(data)
+    const entitiesByType = separateEntitiesByTypes(data)
+    markByFilters(data, entitiesByType, filters, entitiesToShow, marks, 'physical')
+    marksByConections(marks, data, entitiesByType, entitiesToShow)
+    const filtered = Object.keys(marks)
+      .filter(id => marks[id] === true/* >= filtersCount */)
+      .map(id => parseInt(id, 10))
+    connections.connectionsInitialize(true)
+    return filtered
+  } else {
+    return data.map(i => i.id)
+  }
+}
+
+const markByFilters = (data, entitiesByType, filters, entitiesToShow, marks, typeForFilter) => {
+  entitiesByType[typeForFilter].forEach(e => { marks[e.id] = true })
+  filterNotNullOrEmptyFields(filters)
+    .map(f => {
+      const filterMarks = getNewMarks(data)
+      const filterValue = filters[f]
+      const rules = connections.findFilterRulesByFilter(f)
+      rules.forEach(r => {
+        const rule = connections.findFilterRuleByTypeAndFilter(r, f)
+        entitiesByType[r].forEach(e => {
+          const isOk = rule.try(rule.get(e), filterValue)
+          markEntityWithSiblings(e, rule, entitiesByType, filterMarks, isOk)
+        })
+      })
+      marksByConections(filterMarks, data, entitiesByType, entitiesToShow)
+      const result = {}
+      entitiesByType[typeForFilter].forEach(e => (result[e.id] = filterMarks[e.id]))
+      return result
+    }).forEach(x => Object.keys(x).forEach(id => (marks[id] = marks[id] && x[id])))
+}
+
+const markEntityWithSiblings = (d, ftype, entitiesByType, marks, isOk) => {
+  markEntity(d.id, marks, isOk)
+  if (ftype.showSiblings) {
+    const type = d.type
+    const entities = entitiesByType[type] || []
+    const siblings = [ d ]
+    getSiblings(d, type, entities, siblings)
+    if (siblings.find(e => marks[e.id]) !== void 0) {
+      siblings.forEach(e => markEntity(e.id, marks, true, true))
+    }
+  }
+}
+
+const getNewMarks = (data) => {
+  const marks = {}
+  data.forEach(d => { marks[d.id] = void 0 })
+  return marks
+}
+
+const marksByConections = (marks, data, entitiesByType, entitiesToShow) =>
+  Object.keys(marks)
+    .filter(id => marks[id])
+    .forEach(id => {
+      const d = data.find(e => e.id === parseInt(id, 10))
+      markEntitiesAndConnections(d, marks, entitiesByType, entitiesToShow, true)
+    })
+
+const markEntity = (id, marks, isOk, force) => {
+  const mark = marks[id]
+  marks[id] = force ? isOk :
+    mark === void 0 ? isOk :
+    mark && isOk
+}
+
+const markEntitiesAndConnections = (d, marks, entitiesByType, entitiesToShow, isOk, force = false) => {
+  const headIds = []
+  getLineConnectionsForEntity(d, entitiesByType, entitiesToShow, headIds)
+  const rootIds = []
+  getRoots(d, entitiesByType, rootIds)
+  const ids = [...headIds, ...rootIds].filter((e, i, arr) => arr.indexOf(e) === i)
+  ids.forEach(e => markEntity(e, marks, isOk, force))
+  // const falseIds = Object.keys(marks).filter(i => ids.indexOf(parseInt(i, 10)) === -1)
+  // falseIds.forEach(e => markEntity(e, marks, false, force))
+}
+
+const getSiblings = (d, type, entities, foundEntities) => {
+  if (foundEntities.indexOf(d) === -1) {
+    foundEntities.push(d)
+  }
+  connections.getSiblingConnectionTypes(type)
+    .map(r => entities.filter(e => r.expr(d, e)))
+    .reduce((x, y) => [...x, ...y], [])
+    .filter(e => foundEntities.indexOf(e) === -1)
+    .forEach(e => getSiblings(e, type, entities, foundEntities))
+}
+
+const getLineConnectionsForEntity = (entity, entitiesByType, entitiesToShow, ids, isRec = false) => {
+  if (ids.indexOf(entity.id) === -1) {
+    ids.push(entity.id)
+    const type = entity.type
+    const connectionVariants = connections.getAllUpConnectionRulesByType(type)
+    connectionVariants.forEach(t => {
+      if (t.isCycle || !isRec) {
+        const firstLevel = getFirstLevelEntityConnections(entity, entitiesByType, t, entitiesToShow)
+        firstLevel.map(e => getLineConnectionsForEntity(e, entitiesByType, entitiesToShow, ids, true))
+      }
+    })
+  }
+}
+
+const getRoots = (entity, entitiesByType, ids, isRec = false) => {
+  if (ids.indexOf(entity.id) === -1) {
+    ids.push(entity.id)
+    const type = entity.type
+    const connectionTypes = connections.getAllDownConnectionRulesByType(type)
+    connectionTypes.forEach(t => {
+      if (t.isCycle || !isRec) {
+        const firstLevel = getFirstLevelEntityConnections(entity, entitiesByType, t)
+        firstLevel.map(e => getRoots(e, entitiesByType, ids, true))
+      }
+    })
+  }
+}
+
+/**
+ * Проверяет является ли строка пустой или undefined
+ */
+const isNullOrEmpty = (s) =>
+  s === void 0 || s === ''
+
+/**
+ * Возвращает массив полей объекта, которые заполнены
+ */
+const filterNotNullOrEmptyFields = (obj) =>
+  Object.keys(obj).filter(f => !isNullOrEmpty(obj[f]))
+
+/**
+ * Проверяет, имеется ли у объекта хотя бы одно заполненое поле
+ */
+const isAnyFieldNotNullOrEmty = (obj) =>
+  Object.keys(obj).find(i => !isNullOrEmpty(obj[i])) !== void 0

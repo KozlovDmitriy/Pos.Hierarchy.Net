@@ -25,7 +25,6 @@ const style = {
 class Workspace extends Component {
   static propTypes = {
     data: PropTypes.array.isRequired,
-    changeDeviceData: PropTypes.func.isRequired,
     loadEntities: PropTypes.func.isRequired
   }
 
@@ -46,35 +45,7 @@ class Workspace extends Component {
     }
   }
 
-  onChange (newValue) {
-    try {
-      const obj = JSON.parse(newValue)
-      if (Array.isArray(obj)) {
-        this.props.changeDeviceData(obj)
-      }
-    } catch (e) { }
-  }
-
   render () {
-    /* const { data } = this.props
-    const onChange = this.onChange.bind(this)
-    const jsEditor = (<div style={{ ...itemStyle, width: 550, height: '100%' }}>
-      <AceEditor
-        mode='json'
-        theme='solarized_dark'
-        onChange={onChange}
-        name='UNIQUE_ID_OF_DIV'
-        editorProps={{ $blockScrolling: true }}
-        fontSize={14}
-        height='100%'
-        highlightActiveLine
-        value={JSON.stringify(data, null, 2)}
-        setOptions={{
-          showLineNumbers: true,
-          tabSize: 2,
-        }}
-      />
-    </div>) */
     /* const data = this.data !== void 0 ?
       this.data.items.value().sort((a, b) => b.acceptedAt - a.acceptedAt) :
       { } */
