@@ -17,7 +17,11 @@ const initialState = {
   tree: {},
   filterWithPpd: false,
   filteredData: [],
-  showingTypes: ['logical', 'physical', 'merchant', 'account', 'customer', 'address', 'city', 'region', 'country'],
+  showingTypes: [
+    'logical', 'physical', 'merchant',
+    'customer', 'address', 'city',
+    'region', 'country'
+  ],
   filters: {
     modelName: '',
     terminalId: '',

@@ -7,6 +7,7 @@ import * as d3Force from 'd3-force'
 import PhysicalDevice from '../containers/nodes/PhysicalDeviceContainer'
 import LogicalDevice from '../containers/nodes/LogicalDeviceContainer'
 import Merchant from '../containers/nodes/MerchantContainer'
+import TradePoint from '../containers/nodes/TradePointContainer'
 import Account from '../containers/nodes/AccountContainer'
 import Customer from '../containers/nodes/CustomerContainer'
 import Address from '../containers/nodes/AddressContainer'
@@ -29,6 +30,7 @@ function Node ({ node, events }) {
     case 'city': return (<City node={node} />)
     case 'region': return (<Region node={node} />)
     case 'country': return (<Country node={node} />)
+    case 'tradePoint': return (<TradePoint node={node} />)
     default: return null
   }
 }
@@ -47,7 +49,7 @@ function Link ({ link }) {
       />
     )
   }
-  const isOwner = link.type.match(/(merchant)|(account)|(customer)/)
+  const isOwner = link.type.match(/(merchant)|(account)|(customer)|(tradePoint)/)
   if (isOwner !== null) {
     return (
       <LinkVertical

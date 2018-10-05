@@ -26,17 +26,23 @@ export function setShowingTypes (types) {
   return { type: SET_SHOWING_TYPES, types }
 }
 
+export function updateShowingTypes (types) {
+  return (dispatch, getState) => {
+    dispatch(setShowingTypes(types))
+    dispatch(filterData())
+  }
+}
+
 export function toggleShowingType (type) {
   return (dispatch, getState) => {
     const { showingTypes } = getState().devices
     if (showingTypes.indexOf(type) === -1) {
-      dispatch(setShowingTypes([...showingTypes, type]))
+      dispatch(updateShowingTypes([...showingTypes, type]))
     } else {
-      dispatch(setShowingTypes(
+      dispatch(updateShowingTypes(
         showingTypes.filter(i => i !== type)
       ))
     }
-    dispatch(filterData())
   }
 }
 

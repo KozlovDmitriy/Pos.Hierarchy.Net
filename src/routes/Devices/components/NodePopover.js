@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import Popover from 'material-ui/Popover/Popover'
+import Popover from '@material-ui/core/Popover'
 
 class NodePopover extends Component {
   static propTypes = {
@@ -25,8 +25,8 @@ class NodePopover extends Component {
         open={isOpen}
         anchorEl={anchor}
         style={{padding: 20}}
-        anchorOrigin={{ horizontal:'middle', vertical:'top' }}
-        targetOrigin={{ horizontal:'middle', vertical:'bottom' }}
+        anchorOrigin={{ horizontal:'center', vertical:'top' }}
+        targetOrigin={{ horizontal:'center', vertical:'bottom' }}
         onRequestClose={this.handleRequestClose}
       >
         <pre>{JSON.stringify(data, null, 2)}</pre>

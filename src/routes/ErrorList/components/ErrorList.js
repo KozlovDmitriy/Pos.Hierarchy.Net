@@ -1,10 +1,14 @@
 import React from 'react'
-import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui/Table'
-import ActionGoToDevice from 'material-ui/svg-icons/action/build'
-import ActionDelete from 'material-ui/svg-icons/action/delete'
+import Table from '@material-ui/core/Table'
+import TableBody from '@material-ui/core/TableBody'
+import TableHead from '@material-ui/core/TableHead'
+import TableCell from '@material-ui/core/TableCell'
+import TableRow from '@material-ui/core/TableRow'
+import ActionGoToDevice from '@material-ui/icons/Build'
+import ActionDelete from '@material-ui/icons/Delete'
 import RequestType from './RequestType'
 import StatusCode from './StatusCode'
-import IconButton from 'material-ui/IconButton'
+import IconButton from '@material-ui/core/IconButton'
 import config from 'config'
 import request from 'superagent'
 import uuid from 'node-uuid'
@@ -32,9 +36,9 @@ LogicalDeviceLink.propTypes = {
  * Виджет таблица ошибочных реквестов от устройств
  */
 class ErrorList extends React.Component {
-  /* constructor(props) {
+  constructor(props) {
     super(props)
-  } */
+  }
 
   static propTypes = {
     data: PropTypes.array
@@ -67,78 +71,64 @@ class ErrorList extends React.Component {
     const data = this.props.data || []
     return (
       <div>
-        <Table
-          fixedHeader
-          fixedFooter={false}
-          selectable={false}
-          multiSelectable={false}
-        >
-          <TableHeader
-            displaySelectAll={false}
-            adjustForCheckbox={false}
-            enableSelectAll={false}
-          >
+        <Table>
+          <TableHead>
             <TableRow>
-              <TableHeaderColumn tooltip='Принято'>
+              <TableCell tooltip='Принято'>
                 Принято
-              </TableHeaderColumn>
+              </TableCell>
 
-              <TableHeaderColumn tooltip='Terminal ID'>
+              <TableCell tooltip='Terminal ID'>
                 Terminal ID
-              </TableHeaderColumn>
+              </TableCell>
 
-              <TableHeaderColumn tooltip='Серийный номер'>
+              <TableCell tooltip='Серийный номер'>
                 Серийный номер
-              </TableHeaderColumn>
+              </TableCell>
 
-              <TableHeaderColumn tooltip='Модель'>Модель</TableHeaderColumn>
+              <TableCell tooltip='Модель'>Модель</TableCell>
 
-              <TableHeaderColumn tooltip='Тип"'>Тип</TableHeaderColumn>
+              <TableCell tooltip='Тип"'>Тип</TableCell>
 
-              <TableHeaderColumn tooltip='RequestCode'>RequestCode</TableHeaderColumn>
+              <TableCell tooltip='RequestCode'>RequestCode</TableCell>
 
-              <TableHeaderColumn tooltip='StatusCode'>StatusCode</TableHeaderColumn>
-              <TableHeaderColumn style={{ width: '130px' }} />
+              <TableCell tooltip='StatusCode'>StatusCode</TableCell>
+              <TableCell style={{ width: '130px' }} />
             </TableRow>
-          </TableHeader>
-          <TableBody
-            displayRowCheckbox={false}
-            deselectOnClickaway={false}
-            showRowHover
-            stripedRows
-          >
+          </TableHead>
+          <TableBody>
             {data.map((row, index) => (
               <TableRow key={index} >
-                <TableRowColumn>
+                <TableCell>
                   {new Date(row['acceptedAt'] * 1000).toLocaleString()}
-                </TableRowColumn>
+                </TableCell>
 
-                <TableRowColumn >
+                <TableCell>
                   <LogicalDeviceLink item={row} />
-                </TableRowColumn>
+                </TableCell>
 
-                <TableRowColumn >
+                <TableCell>
                   <PhysicalDeviceLink item={row} />
-                </TableRowColumn>
+                </TableCell>
 
-                <TableRowColumn >
+                <TableCell>
                   {row['modelName']}
-                </TableRowColumn>
+                </TableCell>
 
-                <TableRowColumn >
+                <TableCell >
                   <RequestType code={row['requestType']} />
-                </TableRowColumn>
+                </TableCell>
 
-                <TableRowColumn >
+                <TableCell >
                   {row['reasonCode']}
-                </TableRowColumn>
+                </TableCell>
 
-                <TableRowColumn >
+                <TableCell >
                   <StatusCode codes={row['statusCode']} />
-                </TableRowColumn>
-                <TableRowColumn style={{ width: '130px' }}>
+                </TableCell>
+                <TableCell style={{ width: '130px' }}>
                   <IconButton
-                    onTouchTap={this.onGoToDevicePageBtnClick.bind(this, row)}
+                    onClick={this.onGoToDevicePageBtnClick.bind(this, row)}
                     tooltip='bottom-right'
                     touch
                     tooltipPosition='bottom-right'
@@ -146,14 +136,14 @@ class ErrorList extends React.Component {
                     <ActionGoToDevice />
                   </IconButton>
                   <IconButton
-                    onTouchTap={this.onDeleteErrorBtnClick.bind(this, row)}
+                    onClick={this.onDeleteErrorBtnClick.bind(this, row)}
                     tooltip='bottom-right'
                     touch
                     tooltipPosition='bottom-right'
                   >
                     <ActionDelete style={iconStyles} />
                   </IconButton>
-                </TableRowColumn>
+                </TableCell>
 
               </TableRow>
               ))}

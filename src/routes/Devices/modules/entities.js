@@ -5,7 +5,7 @@ const entities = [
     type: 'physical',
     serialNumber: 'Serial Number 1',
     modelName: 'NewPOS 8210',
-    addressId: 1
+    tradePointId: 'tp2'
   },
   {
     id: 2,
@@ -13,8 +13,7 @@ const entities = [
     type: 'physical',
     serialNumber: 'Serial Number 2',
     modelName: 'Petroline',
-    addressId: 2 //,
-    // collapsed: true
+    tradePointId: 'tp1'
   },
   {
     id: 3,
@@ -22,7 +21,7 @@ const entities = [
     type: 'logical',
     terminalId: 'Terminal ID 1',
     physicalDeviceId: 1,
-    merchantNumberX: 'MerchNum3'
+    merchantId: 'MerchNum3'
   },
   {
     id: 4,
@@ -30,7 +29,7 @@ const entities = [
     type: 'logical',
     terminalId: 'Terminal ID 2',
     physicalDeviceId: 2,
-    merchantNumberX: 'MerchNum2'
+    merchantId: 'MerchNum2'
   },
   {
     id: 5,
@@ -38,7 +37,7 @@ const entities = [
     type: 'logical',
     terminalId: 'Terminal ID 3',
     physicalDeviceId: 2,
-    merchantNumberX: 'MerchNum2'
+    merchantId: 'MerchNum2'
   },
   {
     id: 6,
@@ -46,7 +45,7 @@ const entities = [
     type: 'logical',
     terminalId: 'Terminal ID 4',
     physicalDeviceId: 1,
-    merchantNumberX: 'MerchNum1'
+    merchantId: 'MerchNum1'
   },
   {
     id: 7,
@@ -55,7 +54,7 @@ const entities = [
     parentId: 2,
     serialNumber: 'Serial Number 3',
     modelName: 'Verifone VX520',
-    addressId: 2
+    tradePointId: 'tp1'
   },
   {
     id: 8,
@@ -63,59 +62,58 @@ const entities = [
     type: 'logical',
     terminalId: 'Terminal ID 5',
     physicalDeviceId: 7,
-    merchantNumberX: 'MerchNum2'
+    merchantId: 'MerchNum2'
   },
   {
     id: 9,
     type: 'merchant',
-    numberX: 'MerchNum1',
+    merchantId: 'MerchNum1',
+    customerId: 'CostNum1',
     name: 'Merchant 1',
-    accountNumberX: 'AccNum1',
-    addressId: 1
+    accountId: 'AccNum1',
+    tradePoints: ['tp1', 'trade point 2']
   },
   {
     id: 10,
     type: 'merchant',
-    numberX: 'MerchNum2',
+    merchantId: 'MerchNum2',
+    customerId: 'CostNum1',
     name: 'Merchant 2',
-    accountNumberX: 'AccNum3',
-    addressId: 2
+    accountId: 'AccNum3',
+    tradePoints: ['tp1']
   },
   {
     id: 11,
     type: 'account',
-    numberX: 'AccNum1',
-    customerNumberX: 'CostNum1',
-    name: 'Account 1',
-    addressId: 1
+    accountId: 'AccNum1',
+    customerId: 'CostNum1',
+    name: 'Account 1'
   },
   {
     id: 12,
     type: 'account',
-    numberX: 'AccNum2',
-    customerNumberX: 'CostNum2',
-    name: 'Account 2',
-    addressId: 1
+    accountId: 'AccNum2',
+    customerId: 'CostNum2',
+    name: 'Account 2'
   },
   {
     id: 13,
     type: 'account',
-    numberX: 'AccNum3',
-    customerNumberX: 'CostNum1',
-    name: 'Account 3',
-    addressId: 3
+    accountId: 'AccNum3',
+    customerId: 'CostNum1',
+    name: 'Account 3'
   },
   {
     id: 14,
     type: 'customer',
-    numberX: 'CostNum1',
+    customerId: 'CostNum1',
     name: 'Customer 1',
     addressId: 3
   },
   {
     id: 15,
     type: 'customer',
-    numberX: 'CostNum2',
+    customerId: 'CostNum2',
     name: 'Customer 2',
     addressId: 1/* ,
     collapsed: true */
@@ -178,10 +176,27 @@ const entities = [
   {
     id: 24,
     type: 'merchant',
-    numberX: 'MerchNum3',
+    merchantId: 'MerchNum3',
+    customerId: 'CostNum2',
     name: 'Merchant 3',
-    accountNumberX: 'AccNum2',
+    accountId: 'AccNum2',
+    tradePoints: ['tp2']
+  },
+  {
+    id: 25,
+    type: 'tradePoint',
+    tradePointId: 'tp1',
+    name: 'trade point 1',
+    merchants: ['MerchNum1, MerchNum2'],
     addressId: 1
+  },
+  {
+    id: 26,
+    type: 'tradePoint',
+    tradePointId: 'tp2',
+    name: 'trade point 2',
+    merchants: ['MerchNum1', 'MerchNum3'],
+    addressId: 2
   }
 ]
 

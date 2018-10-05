@@ -5,48 +5,71 @@ const getPhysicalByLogical =
   (n, m) => m.deviceId === n.physicalDeviceId
 
 const getMerchantByLogical =
-  (n, m) => n.merchantNumberX === m.numberX
+  (n, m) => n.merchantId === m.merchantId
 
 const getLogicalByMerchant =
-  (n, m) => n.numberX === m.merchantNumberX
+  getMerchantByLogical
 
 const getAccountByMecrhant =
-  (n, m) => n.accountNumberX === m.numberX
+  (n, m) => n.accountId === m.accountId
 
 const getMerchantByAccount =
-  (n, m) => n.numberX === m.accountNumberX
+  getAccountByMecrhant
 
 const getCustomerByAccount =
-  (n, m) => n.customerNumberX === m.numberX
+  (n, m) => n.customerId === m.customerId
 
 const getAccountByCustomer =
-  (n, m) => n.numberX === m.customerNumberX
+  getCustomerByAccount
 
 const getAddressByEntity =
   (n, m) => n.addressId === m.addressId
 
-const getEntityByAddress = getAddressByEntity
+const getEntityByAddress =
+  getAddressByEntity
 
 const getCityByAddress =
   (n, m) => n.cityId === m.cityId
 
-const getAddressByCity = getCityByAddress
+const getAddressByCity =
+  getCityByAddress
 
 const getRegionByCity =
   (n, m) => n.regionId === m.regionId
 
-const getCityByRegion = getRegionByCity
+const getCityByRegion =
+  getRegionByCity
 
 const getCountryByRegion =
   (n, m) => n.countryId === m.countryId
 
-const getRegionByCountry = getCountryByRegion
+const getRegionByCountry =
+  getCountryByRegion
 
 const getPhysicalByPhysical =
   (n, m) => n.parentId === m.deviceId
 
 const getPhysicalByPhysicalDown =
   (n, m) => n.deviceId === m.parentId
+
+const getTradePointByPhysicalDevice =
+  (n, m) => n.tradePointId === m.tradePointId
+
+const getPhysicalDeviceByTradePoint =
+  getTradePointByPhysicalDevice
+
+const isMerchantWithCustomerConnected =
+  (m, c) => m.customerId === c.customerId
+
+const isCustomerWithMerchantConnected =
+  (c, m) => isMerchantWithCustomerConnected(m, c)
+
+const isMerchantWithTradePointConnected = (m, tp) =>
+  m.tradePoints.indexOf(tp.tradePointId) !== -1 ||
+  tp.merchants.indexOf(m.merchantId) !== -1
+
+const isTradePointWithMerchantConnected = (tp, m) =>
+  isMerchantWithTradePointConnected(m, tp)
 
 const filterBySubstring = (v, f) =>
   v.toLowerCase().includes(f.toLowerCase())
@@ -55,9 +78,9 @@ export default class ConnectionRules {
   constructor () {
     this.connections = {
       physical: [
-        { type: 'logical', expr: getLogicalByPhysical, isRec: false, isCycle: true, up: true },
-        { type: 'logical', expr: getLogicalByPhysical, isRec: false, isCycle: true, up: false },
-        { type: 'address', expr: getAddressByEntity, isRec: true, isCycle: true, up: true },
+        { type: 'logical', expr: getLogicalByPhysical, isRec: false, isCycle: false, up: true },
+        { type: 'logical', expr: getLogicalByPhysical, isRec: false, isCycle: false, up: false },
+        { type: 'tradePoint', expr: getTradePointByPhysicalDevice, isRec: true, isCycle: true, up: true },
         { type: 'physical', expr: getPhysicalByPhysical, isRec: true, isCycle: true, up: true },
         { type: 'physical', expr: getPhysicalByPhysicalDown, isRec: true, isCycle: true, up: false },
         { type: 'physical', expr: getPhysicalByPhysical, isRec: true, isCycle: true, up: false, notForCollapse: true }
@@ -67,25 +90,29 @@ export default class ConnectionRules {
         { type: 'physical', expr: getPhysicalByLogical, isRec: true, isCycle: true, up: false }
       ],
       merchant: [
+        { type: 'customer', expr: isMerchantWithCustomerConnected, isRec: true, isCycle: true, up: true },
         { type: 'account', expr: getAccountByMecrhant, isRec: true, isCycle: true, up: true },
-        { type: 'address', expr: getAddressByEntity, isRec: false, isCycle: true, up: true },
-        { type: 'logical', expr: getLogicalByMerchant, isRec: true, isCycle: true, up: false }
+        { type: 'logical', expr: getLogicalByMerchant, isRec: true, isCycle: true, up: false },
+        { type: 'tradePoint', expr: isMerchantWithTradePointConnected, isRec: true, isCycle: true, up: false }
       ],
       account: [
         { type: 'customer', expr: getCustomerByAccount, isRec: true, isCycle: true, up: true },
-        // { type: 'address', expr: getAddressByEntity, isRec: false, isCycle: true, up: true },
         { type: 'merchant', expr: getMerchantByAccount, isRec: true, isCycle: true, up: false }
       ],
       customer: [
         { type: 'address', expr: getAddressByEntity, isRec: false, isCycle: true, up: true },
-        { type: 'account', expr: getAccountByCustomer, isRec: true, isCycle: true, up: false }
+        { type: 'account', expr: getAccountByCustomer, isRec: true, isCycle: true, up: false },
+        { type: 'merchant', expr: isCustomerWithMerchantConnected, isRec: true, isCycle: true, up: false }
       ],
       address: [
         { type: 'city', expr: getCityByAddress, isRec: true, isCycle: true, up: true },
         { type: 'customer', expr: getEntityByAddress, isRec: true, isCycle: true, up: false },
-        // { type: 'account', expr: getEntityByAddress, isRec: true, isCycle: true, up: false },
-        { type: 'merchant', expr: getEntityByAddress, isRec: true, isCycle: true, up: false },
-        { type: 'physical', expr: getEntityByAddress, isRec: true, isCycle: true, up: false }
+        { type: 'tradePoint', expr: getEntityByAddress, isRec: true, isCycle: true, up: false }
+      ],
+      tradePoint: [
+        { type: 'physical', expr: getPhysicalDeviceByTradePoint, isRec: true, isCycle: true, up: false },
+        { type: 'address', expr: getAddressByEntity, isRec: true, isCycle: true, up: true },
+        { type: 'merchant', expr: isTradePointWithMerchantConnected, isRec: false, isCycle: true, up: true }
       ],
       city: [
         { type: 'region', expr: getRegionByCity, isRec: true, isCycle: true, up: true },

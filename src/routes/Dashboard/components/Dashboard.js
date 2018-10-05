@@ -1,6 +1,7 @@
 import React from 'react'
 import ClickableCard from 'src/components/cards/ClickableCard'
-import { CardTitle } from 'material-ui/Card'
+import Typography from '@material-ui/core/Typography'
+import CardContent from '@material-ui/core/CardContent'
 import ReactRethinkdb, { r } from 'react-rethinkdb'
 import reactMixin from 'react-mixin'
 import PropTypes from 'prop-types'
@@ -67,15 +68,33 @@ class Dashboard extends React.Component {
         <ClickableCard
           className='card'
           onClick={() => router.push('/devices')} >
-          <CardTitle subtitle={`Устройства`} />
+          <CardContent>
+            <Typography gutterBottom variant='headline' component='h2'>
+              Устройства
+            </Typography>
+          </CardContent>
         </ClickableCard>
         <ClickableCard className='card'
           onClick={() => router.push('/errors')} >
-          <CardTitle title={errors.length} subtitle='Ошибок' />
+          <CardContent>
+            <Typography gutterBottom variant='headline' component='h2'>
+              {errors.length}
+            </Typography>
+            <Typography gutterBottom variant='subheading' color='textSecondary'>
+              Ошибок
+            </Typography>
+          </CardContent>
         </ClickableCard>
         <ClickableCard className='card'
           onClick={() => router.push('/idledevices')}>
-          <CardTitle title={dashboardInfo.idleDevicesCount} subtitle='Простаивающих устройств' />
+          <CardContent>
+            <Typography gutterBottom variant='headline' component='h2'>
+              {dashboardInfo.idleDevicesCount}
+            </Typography>
+            <Typography gutterBottom variant='subheading' color='textSecondary'>
+              Простаивающих устройств
+            </Typography>
+          </CardContent>
         </ClickableCard>
       </div>
     )

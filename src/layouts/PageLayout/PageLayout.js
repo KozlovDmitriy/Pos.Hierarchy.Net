@@ -3,10 +3,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import config from 'config'
 import './PageLayout.scss'
-import IconButton from 'material-ui/IconButton'
-import HomeIcon from 'material-ui/svg-icons/action/home'
-import ArrowBackIcon from 'material-ui/svg-icons/navigation/arrow-back'
-import AppBar from 'material-ui/AppBar'
+import IconButton from '@material-ui/core/IconButton'
+import HomeIcon from '@material-ui/icons/Home'
+import ArrowBackIcon from '@material-ui/icons/ArrowBack'
+import AppBar from '@material-ui/core/AppBar'
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
 import { default as browserHistory } from 'react-router/lib/browserHistory'
 
 class PageLayout extends React.Component {
@@ -42,22 +44,27 @@ class PageLayout extends React.Component {
   render () {
     const { headerText, location, children } = this.props
     const leftIcon = location.pathname !== '/' ? (
-      <IconButton onTouchTap={browserHistory.goBack}>
+      <IconButton onClick={browserHistory.goBack}>
         <ArrowBackIcon />
       </IconButton>
     ) : <noscript />
     const rightIcon = (
-      <IconButton onTouchTap={this.onHomeBtnClick}>
+      <IconButton onClick={this.onHomeBtnClick}>
         <HomeIcon />
       </IconButton>
     )
     return (
       <div id='main'>
-        <AppBar
-          title={headerText}
-          iconElementLeft={leftIcon}
-          iconElementRight={rightIcon}
-        />
+        <AppBar position='static'>
+          <Toolbar>
+            {leftIcon}
+            <Typography variant='title' color='inherit'>
+              {headerText}
+            </Typography>
+            {rightIcon}
+          </Toolbar>
+        </AppBar>
+
         {children}
       </div>
     )
