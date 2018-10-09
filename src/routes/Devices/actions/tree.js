@@ -4,6 +4,13 @@ import {
   collapseEntities,
   collapseNotLoadedEntities
 } from './collapse'
+import {
+  runQuery,
+  addEntities
+} from './workspace'
+import {
+  filterData
+} from './filters'
 
 export const SET_TREE = 'SET_TREE'
 
@@ -11,10 +18,16 @@ export function setTree (tree) {
   return { type: SET_TREE, tree }
 }
 
-export function collapseNodeAndRewriteTree (id) {
+export function collapseNodeAndRewriteTree (node) {
   return (dispatch) => {
-    dispatch(collapseNode(id))
-    dispatch(rewriteTree())
+    if (node.collapsed === 'not-loaded') {
+      if (node.type === 'city') {
+        dispatch(loadCollapsedEntityChildren(node))
+      }
+    } else {
+      dispatch(collapseNode(node.id))
+      dispatch(rewriteTree())
+    }
   }
 }
 
@@ -36,5 +49,34 @@ export function rewriteTree () {
     const { data, filteredData, showingTypes } = getState().devices
     const tree = getTree(data, filteredData, showingTypes)
   	dispatch(setTree(tree))
+  }
+}
+
+export function loadCollapsedEntityChildren (node) {
+  return (dispatch, getState) => {
+    const query = {
+      $type: 'Techno.Tms.Models.CQRS.ReadModel.Other.FilterEntitiesForMonitorQuery, Techno.Tms.Models'
+    }
+    if (node.type === 'city') {
+      query.EntityType = 'address'
+      query.FilterField = 'cityId'
+      query.FilterValue = node.cityId
+    }
+    dispatch(
+      runQuery(
+        query,
+        (readyState, status) => {
+          if (readyState === 4 && status !== 200) { }
+        },
+        (data) => {
+          if (data.IsSuccess && data.Result) {
+            const dbEntities = JSON.parse(data.Result)
+            dispatch(addEntities(dbEntities))
+            dispatch(collapseNode(node.id))
+            dispatch(filterData())
+          }
+        }
+      )
+    )
   }
 }

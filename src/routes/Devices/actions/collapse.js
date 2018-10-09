@@ -12,9 +12,43 @@ export function collapseNode (id) {
   return { type: COLLAPSE_NODE, id }
 }
 
+const childCounts = {
+  'country': [{ type: 'region', count: 'regionsCount' }],
+  'region': [{ type: 'city', count: 'citiesCount' }],
+  'city': [{ type: 'address', count: 'addressesCount' }],
+  'address': [
+    { type: 'tradePoint', count: 'tradePointsCount' },
+    { type: 'customer', count: 'customersCount' }
+  ],
+  'tradePoint': [],
+  'customer': [
+    { type: 'merchant', count: 'merchantsCount' },
+    { type: 'account', count: 'accountsCount' }
+  ],
+  'account': [{ type: 'merchant', count: 'merchantsCount' }],
+  'merchant': [
+    { type: 'tradePoint', count: 'tradePointsCount' },
+    { type: 'logical', count: 'logicalDevicesCount' }
+  ],
+  'physical': [
+    { type: 'logical', count: 'logicalDevicesCount' },
+    { type: 'physical', count: 'childsCount' }
+  ],
+  'logical': []
+}
+
 export function collapseNotLoadedEntities (nodes, links) {
-  nodes.filter(n => n.addressesCount > getChildCount(n, 'address', links))
-    .forEach(n => { n.collapsed = true })
+  const nodesForMark = nodes.filter(n => {
+    const rules = childCounts[n.type]
+    const need = rules
+      .map(r => n[r.count])
+      .reduce((x, y) => x + y, 0)
+    const has = rules
+      .map(r => getChildCount(n, r.type, links))
+      .reduce((x, y) => x + y, 0)
+    return need > has
+  })
+  nodesForMark.forEach(n => { n.collapsed = 'not-loaded' })
 }
 
 export function collapseEntities (data, entitiesToShow) {
@@ -29,8 +63,8 @@ export function collapseEntities (data, entitiesToShow) {
 
 function getChildCount (node, childType, links) {
   return links.filter(l =>
-    (l.source.id === node.id && l.source.type === childType) ||
-    (l.target.id === node.id && l.target.type === childType)
+    (l.source.id === node.id && l.target.type === childType) ||
+    (l.target.id === node.id && l.source.type === childType)
   ).length
 }
 

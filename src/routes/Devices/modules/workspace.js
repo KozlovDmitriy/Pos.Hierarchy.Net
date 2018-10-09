@@ -2,6 +2,7 @@ import { SET_TREE } from '../actions/tree'
 import { COLLAPSE_NODE } from '../actions/collapse'
 import {
   SET_DEVICES,
+  ADD_ENTITIES,
   SET_POPOVER_IS_OPEN
 } from '../actions/workspace'
 import {
@@ -45,7 +46,7 @@ export default function workspace (state = initialState, action) {
   switch (action.type) {
     case COLLAPSE_NODE: {
       const old = state.data.find(i => i.id === action.id)
-      const now = { ...old, collapsed: !old.collapsed }
+      const now = { ...old, collapsed: !(!old.collapsed || old.collapsed === 'not-loaded') }
       return {
         ...state,
         data: [...state.data.filter(i => i.id !== old.id), now]
@@ -60,6 +61,13 @@ export default function workspace (state = initialState, action) {
           data: action.data
         }
       }
+    }
+    case ADD_ENTITIES: {
+      const newData = [...state.data, ...action.entities]
+      const newDataIds = newData.map(e => e.id)
+      const distinctData = newData
+        .filter((e, i, arr) => newDataIds.indexOf(e.id) === i)
+      return { ...state, data: distinctData }
     }
     case SET_DEVICES: {
       return { ...state, data: action.devices }

@@ -18,7 +18,7 @@ class CollapsedNode extends Node {
   }
 
   handleDoubleClick () {
-    this.props.collapseNodeAndRewriteTree(this.props.node.id)
+    this.props.collapseNodeAndRewriteTree(this.props.node)
   }
 
   refCallback (item) {
