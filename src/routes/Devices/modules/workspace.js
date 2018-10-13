@@ -1,5 +1,9 @@
 import { SET_TREE } from '../actions/tree'
-import { COLLAPSE_NODE } from '../actions/collapse'
+import {
+  COLLAPSE_NODE,
+  SET_NODES_LOADED,
+  SET_NODES_NOT_LOADED
+} from '../actions/collapse'
 import {
   SET_DEVICES,
   ADD_ENTITIES,
@@ -44,9 +48,31 @@ const initialState = {
 
 export default function workspace (state = initialState, action) {
   switch (action.type) {
+    case SET_NODES_LOADED: {
+      const ids = action.ids
+      const old = state.data.filter(i => ids.indexOf(i.id) === -1)
+      const now = state.data
+        .filter(i => ids.indexOf(i.id) !== -1)
+        .map(i => ({ ...i, collapsed: false }))
+      return {
+        ...state,
+        data: [ ...old, ...now ]
+      }
+    }
+    case SET_NODES_NOT_LOADED: {
+      const ids = action.ids
+      const old = state.data.filter(i => ids.indexOf(i.id) === -1)
+      const now = state.data
+        .filter(i => ids.indexOf(i.id) !== -1)
+        .map(i => ({ ...i, collapsed: 'not-loaded' }))
+      return {
+        ...state,
+        data: [ ...old, ...now ]
+      }
+    }
     case COLLAPSE_NODE: {
       const old = state.data.find(i => i.id === action.id)
-      const now = { ...old, collapsed: !(!old.collapsed || old.collapsed === 'not-loaded') }
+      const now = { ...old, collapsed: !old.collapsed }
       return {
         ...state,
         data: [...state.data.filter(i => i.id !== old.id), now]

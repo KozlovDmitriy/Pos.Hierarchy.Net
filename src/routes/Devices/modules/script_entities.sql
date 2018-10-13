@@ -1,4 +1,5 @@
 --select array_to_json(array_agg(row."row")) as "json" from (
+CREATE OR REPLACE VIEW public."JsonDomainView" AS
 select j."entity"::jsonb || jsonb_build_object('id', row_number() over()) as "row" from (
 -- COUNTRIES
 	select row_to_json(country) as "entity" from (
@@ -80,7 +81,12 @@ select j."entity"::jsonb || jsonb_build_object('id', row_number() over()) as "ro
 				select count(tpm."MerchantId")
 				from "TradePointMerchants" tpm
 				where tpm."TradePointId" = tp."Id"
-			) as "merchantsCount"
+			) as "merchantsCount",
+			(
+				select count(d."Id")
+				from "Device" d
+				where d."TradePoint_Id" = tp."Id" and d."Deleted" = False
+			) as "devicesCount"
 		from "TradePoint" tp
 	) tradePoint
 	union all
@@ -126,6 +132,7 @@ select j."entity"::jsonb || jsonb_build_object('id', row_number() over()) as "ro
 			m."NumberX" as "merchantId",
 			m."LName" as "name",
 			m."Account_NumberX" as "accountId",
+			m."CustomerId" as "customerId",
 			(
 				select coalesce(array_to_json(array_agg(tpm."TradePointId")), '[]')
 				from "TradePointMerchants" tpm
@@ -139,7 +146,7 @@ select j."entity"::jsonb || jsonb_build_object('id', row_number() over()) as "ro
 			(
 				select count(d."Id")
 				from "Device" d
-				where d."Merchant_NumberX" = m."NumberX"
+				where d."Merchant_NumberX" = m."NumberX" and d."Deleted" = False
 			) as "logicalDevicesCount"
 		from "Merchant" m
 	) merchant
@@ -170,7 +177,8 @@ select j."entity"::jsonb || jsonb_build_object('id', row_number() over()) as "ro
 				select count(ld."Id")
 				from "Device" ld
 				where ld."PhysicalDevice_Id" = d."Id"
-			) as "logicalDevicesCount"
+			) as "logicalDevicesCount",
+			1 as "devicesCount"
 		from "Device" d
 		join "DeviceType" dt on dt."Id" = d."DeviceType_Id"
 		join "DeviceBehavior" db on db."Id" = dt."DeviceBehavior_Id"
@@ -186,7 +194,8 @@ select j."entity"::jsonb || jsonb_build_object('id', row_number() over()) as "ro
 			d."Id" as "deviceId",
 			d."TerminalId" as "terminalId",
 			d."PhysicalDevice_Id" as "physicalDeviceId",
-			d."Merchant_NumberX" as "merchantId"
+			d."Merchant_NumberX" as "merchantId",
+			1 as "devicesCount"
 		from "Device" d
 		join "DeviceType" dt on dt."Id" = d."DeviceType_Id"
 		join "DeviceBehavior" db on db."Id" = dt."DeviceBehavior_Id"

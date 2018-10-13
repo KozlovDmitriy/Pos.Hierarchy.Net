@@ -5,11 +5,21 @@ import {
 } from './connections'
 
 export const COLLAPSE_NODE = 'COLLAPSE_NODE'
+export const SET_NODES_NOT_LOADED = 'SET_NODES_NOT_LOADED'
+export const SET_NODES_LOADED = 'SET_NODES_LOADED'
 
 const connections = new ConnectionRules()
 
 export function collapseNode (id) {
   return { type: COLLAPSE_NODE, id }
+}
+
+export function setNodesNotLoaded (ids) {
+  return { type: SET_NODES_NOT_LOADED, ids }
+}
+
+export function setNodesLoaded (ids) {
+  return { type: SET_NODES_LOADED, ids }
 }
 
 const childCounts = {
@@ -20,14 +30,17 @@ const childCounts = {
     { type: 'tradePoint', count: 'tradePointsCount' },
     { type: 'customer', count: 'customersCount' }
   ],
-  'tradePoint': [],
+  'tradePoint': [
+    { type: 'physical', count: 'devicesCount' },
+    // { type: 'merchant', count: 'merchantsCount' }
+  ],
   'customer': [
     { type: 'merchant', count: 'merchantsCount' },
     { type: 'account', count: 'accountsCount' }
   ],
   'account': [{ type: 'merchant', count: 'merchantsCount' }],
   'merchant': [
-    { type: 'tradePoint', count: 'tradePointsCount' },
+    // { type: 'tradePoint', count: 'tradePointsCount' },
     { type: 'logical', count: 'logicalDevicesCount' }
   ],
   'physical': [
@@ -37,25 +50,35 @@ const childCounts = {
   'logical': []
 }
 
-export function collapseNotLoadedEntities (nodes, links) {
-  const nodesForMark = nodes.filter(n => {
+export function collapseNotLoadedEntities (dispatch, entitiesToShow, nodes, links) {
+  const nodesForMark = []
+  const nodesForUnmark = []
+  nodes.filter(n => {
     const rules = childCounts[n.type]
+      .filter(r => entitiesToShow.indexOf(r.type) !== -1)
     const need = rules
       .map(r => n[r.count])
       .reduce((x, y) => x + y, 0)
     const has = rules
       .map(r => getChildCount(n, r.type, links))
       .reduce((x, y) => x + y, 0)
-    return need > has
+    if (need > has) {
+      n.collapsed = 'not-loaded'
+      nodesForMark.push(n.id)
+    } else if (need === has && n.collapsed === 'not-loaded') {
+      n.collapsed = false
+      nodesForUnmark.push(n.id)
+    }
   })
-  nodesForMark.forEach(n => { n.collapsed = 'not-loaded' })
+  dispatch(setNodesNotLoaded(nodesForMark))
+  dispatch(setNodesLoaded(nodesForUnmark))
 }
 
 export function collapseEntities (data, entitiesToShow) {
   const entitiesByType = separateEntitiesByTypes(data)
   data.forEach(e => { e.hide = false })
   data.forEach(e => {
-    if (e.collapsed) {
+    if (e.collapsed && e.collapsed !== 'not-loaded') {
       collapseEntity(e, entitiesByType, entitiesToShow, [])
     }
   })

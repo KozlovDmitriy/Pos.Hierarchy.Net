@@ -67,7 +67,8 @@ export function loadEntities () {
     dispatch(
       runQuery(
         {
-          $type: 'Techno.Tms.Models.CQRS.ReadModel.Other.GetEntitiesForMonitorQuery, Techno.Tms.Models'
+          $type: 'Techno.Tms.Models.CQRS.ReadModel.Other.GetEntitiesForMonitorQuery, Techno.Tms.Models',
+          Count: 30
         },
         (readyState, status) => {
           if (readyState === 4 && status !== 200) {
