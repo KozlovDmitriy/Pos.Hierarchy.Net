@@ -5,16 +5,19 @@ const connections = new ConnectionRules()
 /**
  * Разделяет массив объектов на двумерный массив по полю type
  */
-export const separateEntitiesByTypes = (entities) =>
-  entities.reduce(
+export const separateEntitiesByTypes = (entities) => {
+  const arr = {}
+  connections.getAllTypes().forEach(k => { arr[k] = [] })
+  return entities.reduce(
     (arr, e) => {
       arr[e.type] === void 0 ?
         arr[e.type] = [ e ] :
         arr[e.type].push(e)
       return arr
     },
-    []
+    arr
   )
+}
 
 /**
  * Получает объект соединения между двумя узлами

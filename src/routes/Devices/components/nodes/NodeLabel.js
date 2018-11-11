@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 class NodeLabel extends Component {
   static propTypes = {
-    text: PropTypes.string.isRequired,
+    text: PropTypes.string,
     x: PropTypes.number.isRequired,
     y: PropTypes.number.isRequired,
     fontSize: PropTypes.number,
@@ -48,7 +48,7 @@ class NodeLabel extends Component {
           fill={color}
           stroke={void 0}
         >
-          {text}
+          {text === null || text === void 0 || text === '' ? '[unknown]' : text}
         </text>
       </g>
     )

@@ -128,37 +128,85 @@ export default class ConnectionRules {
     }
     this.filterRules = {
       logical: [
-        { filter: 'terminalId', get: (e) => e.terminalId, try: filterBySubstring, showSiblings: false }
+        {
+          filter: 'terminalId',
+          type: 'logical',
+          field: 'terminalId',
+          try: filterBySubstring,
+          showSiblings: false
+        }
       ],
       merchant: [
-        { filter: 'merchant', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
+        {
+          filter: 'merchant',
+          type: 'merchant',
+          field: 'name',
+          try: filterBySubstring,
+          showSiblings: false
+        }
       ],
       account: [
-        { filter: 'account', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
+        {
+          filter: 'account',
+          type: 'account',
+          field: 'name',
+          try: filterBySubstring,
+          showSiblings: false
+        }
       ],
       customer: [
-        { filter: 'customer', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
+        {
+          filter: 'customer',
+          type: 'customer',
+          field: 'name',
+          try: filterBySubstring,
+          showSiblings: false
+        }
       ],
       address: [
-        { filter: 'address', get: (e) => e.address1, try: filterBySubstring, showSiblings: false }
+        {
+          filter: 'address',
+          type: 'address',
+          field: 'address1',
+          try: filterBySubstring,
+          showSiblings: false
+        }
       ],
       city: [
-        { filter: 'city', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
+        {
+          filter: 'city',
+          type: 'city',
+          field: 'name',
+          try: filterBySubstring,
+          showSiblings: false
+        }
       ],
       region: [
-        { filter: 'region', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
+        {
+          filter: 'region',
+          type: 'region',
+          field: 'name',
+          try: filterBySubstring,
+          showSiblings: false
+        }
       ],
       country: [
-        { filter: 'country', get: (e) => e.name, try: filterBySubstring, showSiblings: false }
+        {
+          filter: 'country',
+          type: 'country',
+          field: 'name',
+          try: filterBySubstring,
+          showSiblings: false
+        }
       ]
     }
   }
 
   connectionsInitialize = (withPpdConnections) => {
     this.connections.physical = [
+      { type: 'tradePoint', expr: getTradePointByPhysicalDevice, isRec: true, isCycle: true, up: true },
       { type: 'logical', expr: getLogicalByPhysical, isRec: false, isCycle: true, up: true },
-      { type: 'logical', expr: getLogicalByPhysical, isRec: false, isCycle: true, up: false },
-      { type: 'address', expr: getAddressByEntity, isRec: true, isCycle: true, up: true }
+      { type: 'logical', expr: getLogicalByPhysical, isRec: false, isCycle: true, up: false }
     ]
     if (withPpdConnections) {
       this.connections['physical'].push(
@@ -175,10 +223,24 @@ export default class ConnectionRules {
 
   fiterRulesInitialize = (withSiblings) => {
     this.filterRules['physical'] = [
-      { filter: 'modelName', get: (e) => e.modelName, try: filterBySubstring, showSiblings: withSiblings },
-      { filter: 'serialNumber', get: (e) => e.serialNumber, try: filterBySubstring, showSiblings: withSiblings }
+      {
+        filter: 'modelName',
+        type: 'physical',
+        field: 'modelName',
+        try: filterBySubstring,
+        showSiblings: withSiblings
+      },
+      {
+        filter: 'serialNumber',
+        type: 'physical',
+        field: 'serialNumber',
+        try: filterBySubstring,
+        showSiblings: withSiblings
+      }
     ]
   }
+
+  getAllTypes = () => Object.keys(this.connections)
 
   /**
    * Получает массив типов соединений,

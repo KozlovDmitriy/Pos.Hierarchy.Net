@@ -1,5 +1,8 @@
 import ConnectionRules from '../../../utils/ConnectionRules'
-import { rewriteTree } from './tree'
+import {
+  rewriteTree,
+  loadFilteredEntities
+} from './tree'
 import {
   separateEntitiesByTypes,
   getFirstLevelEntityConnections
@@ -52,6 +55,13 @@ export function toggleShowingType (type) {
   }
 }
 
+export function filterDataFromDb () {
+  return (dispatch, getState) => {
+    const { filters, filterWithPpd } = getState().devices
+    dispatch(loadFilteredEntities(filters, filterWithPpd))
+  }
+}
+
 export function filterData () {
   return (dispatch, getState) => {
     const { filters, data, showingTypes, filterWithPpd } = getState().devices
@@ -64,7 +74,7 @@ export function filterData () {
 export function changeFilterWithPpd (flag) {
   return (dispatch) => {
     dispatch(setFilterWithPpd(flag))
-    dispatch(filterData())
+    dispatch(filterDataFromDb())
   }
 }
 
@@ -72,7 +82,7 @@ export function setmodelNameFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, modelName: value }))
-    dispatch(filterData())
+    dispatch(filterDataFromDb())
   }
 }
 
@@ -80,7 +90,7 @@ export function setterminalIdFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, terminalId: value }))
-    dispatch(filterData())
+    dispatch(filterDataFromDb())
   }
 }
 
@@ -88,7 +98,7 @@ export function setserialNumberFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, serialNumber: value }))
-    dispatch(filterData())
+    dispatch(filterDataFromDb())
   }
 }
 
@@ -96,7 +106,7 @@ export function setMerchantFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, merchant: value }))
-    dispatch(filterData())
+    dispatch(filterDataFromDb())
   }
 }
 
@@ -104,7 +114,7 @@ export function setAccountFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, account: value }))
-    dispatch(filterData())
+    dispatch(filterDataFromDb())
   }
 }
 
@@ -112,7 +122,7 @@ export function setCustomerFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, customer: value }))
-    dispatch(filterData())
+    dispatch(filterDataFromDb())
   }
 }
 
@@ -120,7 +130,7 @@ export function setAddressFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, address: value }))
-    dispatch(filterData())
+    dispatch(filterDataFromDb())
   }
 }
 
@@ -128,7 +138,7 @@ export function setCityFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, city: value }))
-    dispatch(filterData())
+    dispatch(filterDataFromDb())
   }
 }
 
@@ -136,7 +146,7 @@ export function setRegionFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, region: value }))
-    dispatch(filterData())
+    dispatch(filterDataFromDb())
   }
 }
 
@@ -144,7 +154,7 @@ export function setCountryFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, country: value }))
-    dispatch(filterData())
+    dispatch(filterDataFromDb())
   }
 }
 
@@ -154,7 +164,9 @@ function getFilteredData (filters, data, entitiesToShow, filterWithPpd) {
     connections.connectionsInitialize(filterWithPpd)
     const marks = getNewMarks(data)
     const entitiesByType = separateEntitiesByTypes(data)
-    markByFilters(data, entitiesByType, filters, entitiesToShow, marks, 'physical')
+    const startMarksType = Object.keys(entitiesByType)
+      .find(type => entitiesByType[type] !== void 0 && entitiesByType[type].length !== 0)
+    markByFilters(data, entitiesByType, filters, entitiesToShow, marks, startMarksType)
     marksByConections(marks, data, entitiesByType, entitiesToShow)
     const filtered = Object.keys(marks)
       .filter(id => marks[id] === true/* >= filtersCount */)
@@ -176,7 +188,7 @@ const markByFilters = (data, entitiesByType, filters, entitiesToShow, marks, typ
       rules.forEach(r => {
         const rule = connections.findFilterRuleByTypeAndFilter(r, f)
         entitiesByType[r].forEach(e => {
-          const isOk = rule.try(rule.get(e), filterValue)
+          const isOk = rule.try(e[rule.field], filterValue)
           markEntityWithSiblings(e, rule, entitiesByType, filterMarks, isOk)
         })
       })
@@ -206,13 +218,13 @@ const getNewMarks = (data) => {
   return marks
 }
 
-const marksByConections = (marks, data, entitiesByType, entitiesToShow) =>
-  Object.keys(marks)
-    .filter(id => marks[id])
-    .forEach(id => {
-      const d = data.find(e => e.id === parseInt(id, 10))
-      markEntitiesAndConnections(d, marks, entitiesByType, entitiesToShow, true)
-    })
+const marksByConections = (marks, data, entitiesByType, entitiesToShow) => {
+  const trueMarks = Object.keys(marks).filter(id => marks[id])
+  return trueMarks.forEach(id => {
+    const d = data.find(e => e.id === parseInt(id, 10))
+    markEntitiesAndConnections(d, marks, entitiesByType, entitiesToShow, true)
+  })
+}
 
 const markEntity = (id, marks, isOk, force) => {
   const mark = marks[id]
@@ -286,5 +298,5 @@ const filterNotNullOrEmptyFields = (obj) =>
 /**
  * Проверяет, имеется ли у объекта хотя бы одно заполненое поле
  */
-const isAnyFieldNotNullOrEmty = (obj) =>
+export const isAnyFieldNotNullOrEmty = (obj) =>
   Object.keys(obj).find(i => !isNullOrEmpty(obj[i])) !== void 0

@@ -1,3 +1,4 @@
+import ConnectionRules from '../../../utils/ConnectionRules'
 import { getAllConnections } from './connections'
 import {
   collapseNode,
@@ -5,12 +6,17 @@ import {
   collapseNotLoadedEntities
 } from './collapse'
 import {
+  loadEntities,
   runQuery,
-  addEntities
+  addEntities,
+  changeDeviceData
 } from './workspace'
 import {
-  filterData
+  filterData,
+  isAnyFieldNotNullOrEmty
 } from './filters'
+
+const connections = new ConnectionRules()
 
 export const SET_TREE = 'SET_TREE'
 
@@ -69,7 +75,59 @@ export function rewriteTree () {
   }
 }
 
-// TODO: multiple filters
+export function loadFilteredEntities (filters, filterWithPpd) {
+  return (dispatch, getState) => {
+    if (isAnyFieldNotNullOrEmty(filters)) {
+      connections.fiterRulesInitialize(filterWithPpd)
+      connections.connectionsInitialize(filterWithPpd)
+      const items = Object.keys(filters)
+        .filter(k => filters[k] !== '')
+        .map(f =>
+          connections.findFilterRulesByFilter(f)
+            .map(r => connections.findFilterRuleByTypeAndFilter(r, f))
+            .map(r => ({
+              EntityType: r.type,
+              FilterField: r.field,
+              FilterValue: filters[f]
+            }))
+        ).reduce((x, y) => [...x, ...y], [])
+      const query = {
+        $type: 'Techno.Tms.Models.CQRS.ReadModel.Other.FilterEntitiesForMonitorQuery, Techno.Tms.Models',
+        Filter: {
+          FilterConcatOperator: 'and',
+          Items: items,
+          Count: 10
+        },
+        WithHierarchy: true
+      }
+      dispatch(
+        runQuery(
+          query,
+          (readyState, status) => {
+            if (readyState === 4 && status !== 200) { }
+          },
+          (data) => {
+            if (data.IsSuccess && data.Result) {
+              const result = JSON.parse(data.Result)
+              const dbEntities = result.map(
+                r => Object.keys(r)
+                  .filter(f => r[f] !== null)
+                  .map(f => r[f].row)
+              )
+              .reduce((x, y) => [...x, ...y], [])
+              .filter((x, i, arr) => arr.findIndex(y => y.id === x.id) === i)
+              dispatch(changeDeviceData(dbEntities))
+              dispatch(filterData())
+            }
+          }
+        )
+      )
+    } else {
+      dispatch(loadEntities())
+    }
+  }
+}
+
 export function loadCollapsedEntityChildren (node, type, field, value) {
   return (dispatch, getState) => {
     const query = {
@@ -79,11 +137,10 @@ export function loadCollapsedEntityChildren (node, type, field, value) {
         Items: subentities[node.type].map(r => ({
           EntityType: r.type,
           FilterField: r.field,
-          FilterValue:  node[r.valueField]
+          FilterValue: node[r.valueField]
         }))
       }
     }
-    console.log('Query: ', query)
     dispatch(
       runQuery(
         query,
@@ -91,7 +148,6 @@ export function loadCollapsedEntityChildren (node, type, field, value) {
           if (readyState === 4 && status !== 200) { }
         },
         (data) => {
-          console.log('Query result: ', data)
           if (data.IsSuccess && data.Result) {
             const dbEntities = JSON.parse(data.Result)
             dispatch(addEntities(dbEntities))
