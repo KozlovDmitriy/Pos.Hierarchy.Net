@@ -112,7 +112,7 @@ export function loadFilteredEntities (filters, filterWithPpd) {
               const dbEntities = result.map(
                 r => Object.keys(r)
                   .filter(f => r[f] !== null)
-                  .map(f => r[f].row)
+                  .map(f => r[f])
               )
               .reduce((x, y) => [...x, ...y], [])
               .filter((x, i, arr) => arr.findIndex(y => y.id === x.id) === i)
