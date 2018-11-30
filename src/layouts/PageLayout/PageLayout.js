@@ -10,11 +10,38 @@ import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import { default as browserHistory } from 'react-router/lib/browserHistory'
+import { AppBarContextProvider } from 'contexts/AppBarContext'
+import { withStyles } from '@material-ui/core/styles'
+import { fade } from '@material-ui/core/styles/colorManipulator'
+
+const styles = theme => ({
+  grow: {
+    flexGrow: 1,
+  },
+  widget: {
+    maxHeight: 34,
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: fade(theme.palette.common.white, 0.35),
+    '&:hover': {
+      backgroundColor: fade(theme.palette.common.white, 0.45),
+    },
+    marginLeft: 0,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: theme.spacing.unit,
+      width: 'auto',
+    }
+  }
+})
 
 class PageLayout extends React.Component {
   constructor (props) {
     super(props)
     this.onHomeBtnClick = this.onHomeBtnClick.bind(this)
+    this.state = {
+      widget: <div></div>
+    }
   }
 
   static propTypes = {
@@ -41,8 +68,14 @@ class PageLayout extends React.Component {
     win.focus()
   }
 
+  setWidget (widget) {
+    if (widget != this.state.widget) {
+      this.setState({ ...this.state, widget })
+    }
+  }
+
   render () {
-    const { headerText, location, children } = this.props
+    const { headerText, location, children, classes } = this.props
     const leftIcon = location.pathname !== '/' ? (
       <IconButton onClick={browserHistory.goBack}>
         <ArrowBackIcon />
@@ -54,21 +87,28 @@ class PageLayout extends React.Component {
       </IconButton>
     )
     return (
-      <div id='main'>
-        <AppBar position='static'>
-          <Toolbar>
-            {leftIcon}
-            <Typography variant='title' color='inherit'>
-              {headerText}
-            </Typography>
-            {rightIcon}
-          </Toolbar>
-        </AppBar>
+      <AppBarContextProvider value={{
+        widget: this.state.widget,
+        setWidget: this.setWidget.bind(this)
+      }}>
+        <div id='main'>
+          <AppBar position='static'>
+            <Toolbar>
+              {leftIcon}
+              <Typography variant='h6' color='inherit'>
+                {headerText}
+              </Typography>
+              {rightIcon}
+              <div className={classes.grow} />
+              <div className={classes.widget}>{this.state.widget}</div>
+            </Toolbar>
+          </AppBar>
 
-        {children}
-      </div>
+          {children}
+        </div>
+      </AppBarContextProvider>
     )
   }
 }
 
-export default PageLayout
+export default withStyles(styles)(PageLayout)

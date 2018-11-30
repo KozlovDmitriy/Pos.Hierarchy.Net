@@ -55,10 +55,26 @@ export function toggleShowingType (type) {
   }
 }
 
+function debounce (func, wait, immediate) {
+  let timeout
+  return function (...args) {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => {
+      timeout = null
+      if (!immediate) func.apply(this, args)
+    }, wait)
+    if (immediate && !timeout) func.apply(this, [...args])
+  }
+}
+
+const filterDataFromDbDebouncing = debounce((dispatch, filters, filterWithPpd) => {
+  dispatch(loadFilteredEntities(filters, filterWithPpd))
+}, 300)
+
 export function filterDataFromDb () {
   return (dispatch, getState) => {
     const { filters, filterWithPpd } = getState().devices
-    dispatch(loadFilteredEntities(filters, filterWithPpd))
+    filterDataFromDbDebouncing(dispatch, filters, filterWithPpd)
   }
 }
 
@@ -80,8 +96,14 @@ export function changeFilterWithPpd (flag) {
 
 export function setmodelNameFilter (value) {
   return (dispatch, getState) => {
-    const { filters } = getState().devices
-    dispatch(setFilters({ ...filters, modelName: value }))
+    const { filters, models } = getState().devices
+    const model = models.find(i => i.modelName === value)
+    if (model === void 0) {
+      dispatch(setFilters({ ...filters, physicalDeviceTypeId: '', logicalDeviceTypeId: '' }))
+    } else {
+      const { physicalDeviceTypeId, logicalDeviceTypeId } = model
+      dispatch(setFilters({ ...filters, physicalDeviceTypeId, logicalDeviceTypeId }))
+    }
     dispatch(filterDataFromDb())
   }
 }
@@ -152,21 +174,55 @@ export function setRegionFilter (value) {
 
 export function setCountryFilter (value) {
   return (dispatch, getState) => {
-    const { filters } = getState().devices
-    dispatch(setFilters({ ...filters, country: value }))
+    const { filters, countries } = getState().devices
+    const country = countries.find(i => i.name === value)
+    const newFilters = {
+      ...filters,
+      countryId: country === void 0 ? '' : country.id
+    }
+    dispatch(setFilters(newFilters))
     dispatch(filterDataFromDb())
   }
 }
 
+function getFilteredMarks (data, filters, entitiesByType, entitiesToShow, filterWithPpd) {
+  const marks = getNewMarks(data)
+  const filledFilterFields = Object.keys(filters)
+    .filter(k => filters[k] !== void 0 && filters[k] !== '')
+  const filledFilterTypes = Object.keys(entitiesByType).filter(i => {
+    const rules = connections.filterRules[i]
+    if (rules === void 0) {
+      return false
+    }
+    const rule = rules.find(j => filledFilterFields.includes(j.filter))
+    return rule !== void 0
+  })
+  /* if (filledFilterTypes.includes('logical') || filledFilterTypes.includes('physical')) {
+    const logicalMarks = getNewMarks(data)
+    markByFilters(data, entitiesByType, filters, entitiesToShow, logicalMarks, 'logical')
+    const physicalMarks = getNewMarks(data)
+    markByFilters(data, entitiesByType, filters, entitiesToShow, physicalMarks, 'physical')
+    Object.keys(marks).forEach(i => marks[i] = logicalMarks[i] || physicalMarks[i])
+  } else { */
+  const firstFilterEntity = Object.keys(entitiesByType)
+    .find(i => filledFilterTypes.includes(i))
+  const startMarksType = firstFilterEntity || Object.keys(entitiesByType)
+    .find(type => entitiesByType[type] !== void 0 && entitiesByType[type].length !== 0)
+  markByFilters(data, entitiesByType, filters, entitiesToShow, marks, startMarksType)
+  // }
+  return marks
+}
+
 function getFilteredData (filters, data, entitiesToShow, filterWithPpd) {
+  return data.map(i => i.id)
+}
+
+function getLocalFilteredData (filters, data, entitiesToShow, filterWithPpd) {
   if (isAnyFieldNotNullOrEmty(filters)) {
     connections.fiterRulesInitialize(filterWithPpd)
     connections.connectionsInitialize(filterWithPpd)
-    const marks = getNewMarks(data)
     const entitiesByType = separateEntitiesByTypes(data)
-    const startMarksType = Object.keys(entitiesByType)
-      .find(type => entitiesByType[type] !== void 0 && entitiesByType[type].length !== 0)
-    markByFilters(data, entitiesByType, filters, entitiesToShow, marks, startMarksType)
+    const marks = getFilteredMarks(data, filters, entitiesByType, entitiesToShow, filterWithPpd)
     marksByConections(marks, data, entitiesByType, entitiesToShow)
     const filtered = Object.keys(marks)
       .filter(id => marks[id] === true/* >= filtersCount */)

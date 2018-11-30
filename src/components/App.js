@@ -4,7 +4,11 @@ import { Provider } from 'react-redux'
 import PropTypes from 'prop-types'
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 
-const theme = createMuiTheme()
+const theme = createMuiTheme({
+  typography: {
+    useNextVariants: true
+  }
+})
 
 class App extends React.Component {
   static propTypes = {

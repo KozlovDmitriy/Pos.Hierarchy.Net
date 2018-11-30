@@ -6,7 +6,8 @@ import * as EventActions from 'src/actions/events'
 
 function mapStateToProps (state) {
   return {
-    data: state.devices.data
+    data: state.devices.data,
+    isLoad: state.devices.isLoad
   }
 }
 

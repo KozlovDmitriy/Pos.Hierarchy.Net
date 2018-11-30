@@ -14,6 +14,9 @@ class Customer extends CollapsedNode {
 
   render () {
     const node = this.props.node
+    const name = node.name === null && node.customerId !== null && node.customerId !== '' ?
+      node.customerId :
+      node.name
     const plus = node.collapsed ? (
       <Plus
         color='#008ba0'
@@ -26,7 +29,7 @@ class Customer extends CollapsedNode {
         y={-22}
         fontSize={16}
         color={'#008ba0'}
-        text={node.name}
+        text={name}
         onClick={this.onClick}
       />
     )

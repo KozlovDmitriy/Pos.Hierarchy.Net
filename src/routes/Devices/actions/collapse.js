@@ -55,14 +55,11 @@ export function collapseNotLoadedEntities (dispatch, entitiesToShow, nodes, link
   const nodesForUnmark = []
   nodes.filter(n => {
     const rules = childCounts[n.type]
-      .filter(r => entitiesToShow.indexOf(r.type) !== -1)
     const need = rules
       .map(r => n[r.count])
       .reduce((x, y) => x + y, 0)
-    const has = rules
-      .map(r => getChildCount(n, r.type, links))
-      .reduce((x, y) => x + y, 0)
-    if (need > has) {
+    const has = getChildCount(rules, n, entitiesToShow, links)
+    if (need > has && !n.collapsed) {
       n.collapsed = 'not-loaded'
       nodesForMark.push(n.id)
     } else if (need === has && n.collapsed === 'not-loaded') {
@@ -84,11 +81,18 @@ export function collapseEntities (data, entitiesToShow) {
   })
 }
 
-function getChildCount (node, childType, links) {
+function getChildCount (rules, node, entitiesToShow, links) {
+  const has = rules
+    .map(r => getChildCountByChildType(node, r.type, entitiesToShow, links))
+    .reduce((x, y) => x + y, 0) - (!isNaN(parseInt(node.parentId)) ? 1 : 0)
+  return has
+}
+
+function getChildCountByChildType (node, childType, entitiesToShow, links) {
   return links.filter(l =>
-    (l.source.id === node.id && l.target.type === childType) ||
-    (l.target.id === node.id && l.source.type === childType)
-  ).length
+      (l.source.id === node.id && l.target.type === childType) ||
+      (l.target.id === node.id && l.source.type === childType)
+    ).length
 }
 
 const collapseEntity = (entity, entitiesByType, entitiesToShow, ids, isRec = false) => {
@@ -97,7 +101,7 @@ const collapseEntity = (entity, entitiesByType, entitiesToShow, ids, isRec = fal
     const type = entity.type
     const connectionTypes = connections.getAllConnectionRulesForCollapse(type)
     connectionTypes.forEach(t => {
-      if (t.isCycle || !isRec) {
+      //if (t.isCycle || !isRec) {
         const firstLevel = getFirstLevelEntityConnectionsWithHidden(entity, entitiesByType, t, entitiesToShow)
         firstLevel.forEach(e => {
           if (e.id !== ids[0]) {
@@ -105,7 +109,7 @@ const collapseEntity = (entity, entitiesByType, entitiesToShow, ids, isRec = fal
             collapseEntity(e, entitiesByType, entitiesToShow, ids, true)
           }
         })
-      }
+      //}
     })
   }
 }

@@ -4,10 +4,12 @@ import Tree from '../components/Tree'
 import * as WorkspaceActions from '../actions/workspace'
 import * as FilterActions from '../actions/filters'
 
-function mapStateToProps (state) {
+function mapStateToProps (state, ownProps) {
   return {
     tree: state.devices.tree,
-    animation: state.devices.animation
+    animation: state.devices.animation,
+    boardStyle: ownProps.boardStyle,
+    lastCollapsedEntity: state.devices.lastCollapsedEntity
   }
 }
 

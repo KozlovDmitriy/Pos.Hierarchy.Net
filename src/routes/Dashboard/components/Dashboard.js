@@ -69,7 +69,7 @@ class Dashboard extends React.Component {
           className='card'
           onClick={() => router.push('/devices')} >
           <CardContent>
-            <Typography gutterBottom variant='headline' component='h2'>
+            <Typography gutterBottom variant='h5'>
               Устройства
             </Typography>
           </CardContent>
@@ -77,10 +77,10 @@ class Dashboard extends React.Component {
         <ClickableCard className='card'
           onClick={() => router.push('/errors')} >
           <CardContent>
-            <Typography gutterBottom variant='headline' component='h2'>
+            <Typography gutterBottom variant='h5'>
               {errors.length}
             </Typography>
-            <Typography gutterBottom variant='subheading' color='textSecondary'>
+            <Typography gutterBottom variant='subtitle1' color='textSecondary'>
               Ошибок
             </Typography>
           </CardContent>
@@ -88,10 +88,10 @@ class Dashboard extends React.Component {
         <ClickableCard className='card'
           onClick={() => router.push('/idledevices')}>
           <CardContent>
-            <Typography gutterBottom variant='headline' component='h2'>
+            <Typography gutterBottom variant='h5'>
               {dashboardInfo.idleDevicesCount}
             </Typography>
-            <Typography gutterBottom variant='subheading' color='textSecondary'>
+            <Typography gutterBottom variant='subtitle1' color='textSecondary'>
               Простаивающих устройств
             </Typography>
           </CardContent>

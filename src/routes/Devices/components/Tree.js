@@ -106,67 +106,54 @@ const maxZoom = 1.5
 
 const zoomDur = 500
 
-function makeStyles (primary = 'dodgerblue', light = 'white', dark = 'black') {
-  const styles = {
-    container: {
-      position: 'absolute',
-      top: 120,
-      left: 6,
-      right: 6,
-      bottom: 6
-    },
-    graph: {
-      width: '100%',
+const styles = {
+  container: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0
+  },
+  graph: {
+    width: '100%',
+    height: '100%',
+    overflow: 'scroll',
+    background: '#fcfcfc'
+  },
+  wrapper: {
+    base: {
       height: '100%',
-      overflow: 'scroll',
-      background: '#fcfcfc'
+      margin: 0,
+      display: 'flex',
+      boxShadow: 'none',
+      opacity: 0.5,
+      background: '#F9F9F9'
     },
-    wrapper: {
-      base: {
-        height: '100%',
-        margin: 0,
-        display: 'flex',
-        boxShadow: 'none',
-        opacity: 0.5,
-        background: '#F9F9F9'
-      },
-      focused: {
-        opacity: 1
-      }
-    },
-    svg: {
-      base: {
-        display: 'block',
-        margin: 'auto',
-        // border: '1px solid #000',
-        padding: 100
-      }
+    focused: {
+      opacity: 1
+    }
+  },
+  svg: {
+    base: {
+      display: 'block',
+      margin: 'auto',
+      // border: '1px solid #000',
+      padding: 100
     }
   }
-  return styles
 }
 
 class Tree extends Component {
   static propTypes = {
     tree: PropTypes.object.isRequired,
-    primary: PropTypes.string,
-    light: PropTypes.string,
-    dark: PropTypes.string,
+    boardStyle: PropTypes.object,
+    lastCollapsedEntity: PropTypes.number,
     filterData: PropTypes.func.isRequired
-  }
-
-  static defaultProps = {
-    primary: 'dodgerblue',
-    light: '#FFF',
-    dark: '#000'
   }
 
   constructor (props) {
     super(props)
-    this.state = {
-      viewTransform: d3.zoomIdentity,
-      styles: makeStyles(props.primary, props.light, props.dark)
-    }
+    this.state = { viewTransform: d3.zoomIdentity }
     this.handleZoom = this.handleZoom.bind(this)
     this.modifyZoom = this.modifyZoom.bind(this)
     this.handleZoomToFit = this.handleZoomToFit.bind(this)
@@ -207,16 +194,19 @@ class Tree extends Component {
     if (this.state.force !== void 0) {
       this.state.force.stop()
     }
-    const nodes = [ ...nextProps.tree.nodes ]
-    const links = nextProps.tree.links
-      .map(i => {
-        return {
-          source: i.source.id,
-          target: i.target.id
-        }
-      })
+    const nodes = nextProps.tree.nodes // [ ...nextProps.tree.nodes ]
+    const links = nextProps.tree.links.map(i => ({
+      source: i.source.id,
+      target: i.target.id
+    }))
     const width = this.getSize(nodes, links)
     const height = width
+    const node = nodes.find(n => n.id === nextProps.lastCollapsedEntity)
+    if (node !== void 0) {
+      node.fx = node.x
+      node.fy = node.y
+      console.log({ ...node })
+    }
     var force = d3Force.forceSimulation(nodes)
       .force('link', d3Force.forceLink().id(d => d.id))
       .force('forceX', d3Force.forceX().strength(0.1).x(width * 0.5))
@@ -226,12 +216,20 @@ class Tree extends Component {
     force.force('link').links(links).distance(() => 70)
     if (nextProps.animation) {
       force.on('tick', () => {
-        this._mounted && this.setState({ nodes, links: nextProps.tree.links, force: this.state.force })
+        this._mounted && this.setState({
+          nodes,
+          links: nextProps.tree.links,
+          force: this.state.force
+        })
       })
     } else {
       this.computeSimulation(force)
+      this._mounted && this.setState({
+        nodes,
+        links: nextProps.tree.links,
+        force
+      })
     }
-    this._mounted && this.setState({ nodes, links: nextProps.tree.links, force })
   }
 
   componentWillReceiveProps (nextProps) {
@@ -363,7 +361,6 @@ class Tree extends Component {
   }
 
   render () {
-    const styles = this.state.styles
     if (this.state.nodes === void 0) {
       return <div id='graph' style={styles.graph} />
     }
@@ -373,7 +370,7 @@ class Tree extends Component {
     const gridSize = this.getSize(this.state.nodes, this.state.links)
     return (
       <div id='container' style={styles.container}>
-        <div id='graph' style={styles.graph} ref='viewWrapper'>
+        <div id='graph' style={{ ...this.props.boardStyle, ...styles.graph }} ref='viewWrapper'>
           <svg style={styles.svg.base} id='canvas' width={gridSize + 200} height={gridSize + 200}>
             <g id='view' ref='view'>
               <rect

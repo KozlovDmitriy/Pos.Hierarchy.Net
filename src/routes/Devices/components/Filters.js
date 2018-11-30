@@ -1,10 +1,36 @@
 import React, { Component } from 'react'
+import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
-import TextField from '@material-ui/core/TextField'
-import Switch from '@material-ui/core/Switch'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import ShowingTypesSelectField from '../containers/ShowingTypesSelectFieldContainer'
 import FilterTextField from './FilterTextField'
+import FormControl from '@material-ui/core/FormControl'
+import MenuItem from '@material-ui/core/MenuItem'
+import InputLabel from '@material-ui/core/InputLabel'
+import Select from '@material-ui/core/Select'
+import OutlinedInput from '@material-ui/core/OutlinedInput'
+import { withStyles } from '@material-ui/core/styles'
+import { AppBarContextConsumer } from 'contexts/AppBarContext'
+import AppBarFilters from '../containers/AppBarFiltersContainer'
+
+const styles = theme => ({
+  formControl: {
+    marginTop: 9,
+    width: '100%',
+    padding: 0
+  },
+  select: {
+    padding: 0
+  },
+  outlinedInput: {
+    padding: 7
+  },
+  selectEmpty: {
+    padding: 7,
+  },
+  // inputLabelRoot: { marginTop: -10 },
+  inputMarginDense: { padding: 7 },
+  inputLabelShrink: { marginTop: '0px !important' },
+  inputLabelRoot: { marginTop: -13 }
+})
 
 class Filters extends Component {
   constructor (props) {
@@ -19,7 +45,16 @@ class Filters extends Component {
     this.onChangeCity = this.onChangeCity.bind(this)
     this.onChangeRegion = this.onChangeRegion.bind(this)
     this.onChangeCountry = this.onChangeCountry.bind(this)
-    this.onTogglePpd = this.onTogglePpd.bind(this)
+    this.onGetWidgetContext = this.onGetWidgetContext.bind(this)
+  }
+
+  state = { labelWidth: 0, countryLabelWidth: 0 }
+
+  componentDidMount () {
+    this.setState({
+      labelWidth: ReactDOM.findDOMNode(this.InputLabelRef).offsetWidth,
+      countryLabelWidth: ReactDOM.findDOMNode(this.CountryInputLabelRef).offsetWidth,
+    })
   }
 
   onChangeModel (event) {
@@ -63,42 +98,59 @@ class Filters extends Component {
   }
 
   onTogglePpd (event) {
-    this.props.changeFilterWithPpd(event.target.value)
+    this.props.changeFilterWithPpd(event.target.checked)
+  }
+
+  appBarWidget = <AppBarFilters />
+
+  onGetWidgetContext (contextData) {
+    const { setWidget } = contextData
+    setWidget(this.appBarWidget)
   }
 
   render () {
-    const { filters, filterWithPpd } = this.props
+    const { filters, models, countries, classes } = this.props
+    const selectedModel = models.find(m =>
+      m.physicalDeviceTypeId === filters.physicalDeviceTypeId ||
+      m.logicalDeviceTypeId === filters.logicalDeviceTypeId
+    )
+    const selectedModelName = selectedModel ? selectedModel.modelName : ''
+    const selectedCountry = countries.find(c => c.id === filters.countryId)
+    const selectedCountryName = selectedCountry ? selectedCountry.name : ''
     return (
-      <div style={{ background: '#fcfcfc', marginRight: -15, marginLeft: -15, paddingLeft: 15, paddingRight: 15 }}>
-        <div className='row' style={{ marginTop: 30, marginBottom: -20 }}>
-          <div className='col col-sm-2'>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={filterWithPpd}
-                  onChange={this.onTogglePpd}
-                />
-              }
-              label='Фильтр по связанным ФУ'
-            />
-          </div>
-          <div className='col col-sm-10'>
-            <FormControlLabel
-              style={{ marginTop: 8 }}
-              control={<ShowingTypesSelectField />}
-              label='Отображаемые классы'
-              labelPlacement='start'
-            />
-          </div>
-        </div>
+      <div style={{ background: '#fcfcfc', marginRight: 0, marginLeft: 0, paddingLeft: 15, paddingRight: 15 }}>
+        <AppBarContextConsumer>{this.onGetWidgetContext}</AppBarContextConsumer>
         <div className='row'>
           <div className='col col-xs-1'>
-            <FilterTextField
-              id={'modelFilter'}
-              label={'Модель'}
-              value={filters.modelName}
-              onChange={this.onChangeModel}
-            />
+            <FormControl variant='outlined' id={'modelFilter'} classes={{ root: classes.formControl }}>
+              <InputLabel
+                ref={ref => { this.InputLabelRef = ref }}
+                htmlFor='outlined-model-simple'
+                classes={{ root: classes.inputLabelRoot, shrink: classes.inputLabelShrink }}
+              >
+                {'Модель'}
+              </InputLabel>
+              <Select
+                classes={{
+                  root: classes.select,
+                  select: selectedModelName === '' ? classes.selectEmpty : classes.outlinedInput
+                }}
+                value={selectedModelName}
+                onChange={this.onChangeModel}
+                input={
+                  <OutlinedInput
+                    id='outlined-model-simple'
+                    name='Модель'
+                    labelWidth={this.state.labelWidth}
+                  />
+                }
+              >
+                <MenuItem value=''>
+                  <em>None</em>
+                </MenuItem>
+                { models.map((m, i) => <MenuItem value={m.modelName} key={i}>{m.modelName}</MenuItem>) }
+              </Select>
+            </FormControl>
           </div>
           <div className='col col-xs-1'>
             <FilterTextField
@@ -165,12 +217,35 @@ class Filters extends Component {
             />
           </div>
           <div className='col col-xs-1'>
-            <FilterTextField
-              id={'countryFilter'}
-              label={'Страна'}
-              value={filters.country}
-              onChange={this.onChangeCountry}
-            />
+            <FormControl variant='outlined' id={'countryFilter'} classes={{ root: classes.formControl }}>
+              <InputLabel
+                ref={ref => { this.CountryInputLabelRef = ref }}
+                htmlFor='outlined-country-simple'
+                classes={{ root: classes.inputLabelRoot, shrink: classes.inputLabelShrink }}
+              >
+                {'Страна'}
+              </InputLabel>
+              <Select
+                classes={{
+                  root: classes.select,
+                  select: selectedCountryName === '' ? classes.selectEmpty : classes.outlinedInput
+                }}
+                value={selectedCountryName}
+                onChange={this.onChangeCountry}
+                input={
+                  <OutlinedInput
+                    id='outlined-country-simple'
+                    name='Страна'
+                    labelWidth={this.state.countryLabelWidth}
+                  />
+                }
+              >
+                <MenuItem value=''>
+                  <em>None</em>
+                </MenuItem>
+                { countries.map((c, i) => <MenuItem value={c.name} key={i}>{c.name}</MenuItem>) }
+              </Select>
+            </FormControl>
           </div>
         </div>
       </div>
@@ -179,8 +254,10 @@ class Filters extends Component {
 }
 
 Filters.propTypes = {
-  filterWithPpd: PropTypes.bool.isRequired,
+  classes: PropTypes.object.isRequired,
   filters: PropTypes.object.isRequired,
+  models: PropTypes.array.isRequired,
+  countries: PropTypes.array.isRequired,
   setmodelNameFilter: PropTypes.func.isRequired,
   setterminalIdFilter: PropTypes.func.isRequired,
   setserialNumberFilter: PropTypes.func.isRequired,
@@ -194,4 +271,4 @@ Filters.propTypes = {
   changeFilterWithPpd: PropTypes.func.isRequired
 }
 
-export default Filters
+export default withStyles(styles)(Filters)

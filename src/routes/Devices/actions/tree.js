@@ -6,7 +6,7 @@ import {
   collapseNotLoadedEntities
 } from './collapse'
 import {
-  loadEntities,
+  loadDevices,
   runQuery,
   addEntities,
   changeDeviceData
@@ -39,7 +39,10 @@ const subentities = {
   ],
   account: [{ type: 'merchant', field: 'accountId', valueField: 'accountId' }],
   merchant: [{ type: 'logical', field: 'merchantId', valueField: 'merchantId' }],
-  physical: [{ type: 'logical', field: 'physicalDeviceId', valueField: 'deviceId' }],
+  physical: [
+    { type: 'logical', field: 'physicalDeviceId', valueField: 'deviceId' },
+    { type: 'physical', field: 'parentId', valueField: 'deviceId' }
+  ],
   logical: []
 }
 
@@ -75,6 +78,8 @@ export function rewriteTree () {
   }
 }
 
+const connectedDeviceFields = [ 'child_logical', 'child_physical', 'parent_logical', 'parent_physical' ]
+
 export function loadFilteredEntities (filters, filterWithPpd) {
   return (dispatch, getState) => {
     if (isAnyFieldNotNullOrEmty(filters)) {
@@ -96,6 +101,7 @@ export function loadFilteredEntities (filters, filterWithPpd) {
         Filter: {
           FilterConcatOperator: 'and',
           Items: items,
+          WithPpdConnection: filterWithPpd,
           Count: 10
         },
         WithHierarchy: true
@@ -110,20 +116,19 @@ export function loadFilteredEntities (filters, filterWithPpd) {
             if (data.IsSuccess && data.Result) {
               const result = JSON.parse(data.Result)
               const dbEntities = result.map(
-                r => Object.keys(r)
-                  .filter(f => r[f] !== null)
-                  .map(f => r[f])
-              )
-              .reduce((x, y) => [...x, ...y], [])
-              .filter((x, i, arr) => arr.findIndex(y => y.id === x.id) === i)
+                  r => (filterWithPpd ? Object.keys(r) : Object.keys(r).filter(f => !connectedDeviceFields.includes(f)))
+                    .filter(f => r[f] !== null)
+                    .map(f => r[f])
+                )
+                .reduce((x, y) => [...x, ...y], [])
+                .filter((x, i, arr) => arr.findIndex(y => y.id === x.id) === i)
               dispatch(changeDeviceData(dbEntities))
-              dispatch(filterData())
             }
           }
         )
       )
     } else {
-      dispatch(loadEntities())
+      dispatch(loadDevices())
     }
   }
 }
@@ -138,7 +143,8 @@ export function loadCollapsedEntityChildren (node, type, field, value) {
           EntityType: r.type,
           FilterField: r.field,
           FilterValue: node[r.valueField]
-        }))
+        })),
+        WithPpdConnection: true
       }
     }
     dispatch(
@@ -149,7 +155,14 @@ export function loadCollapsedEntityChildren (node, type, field, value) {
         },
         (data) => {
           if (data.IsSuccess && data.Result) {
-            const dbEntities = JSON.parse(data.Result)
+            const result = JSON.parse(data.Result)
+            const dbEntities = result.map(
+                r => Object.keys(r)
+                  .filter(f => r[f] !== null)
+                  .map(f => r[f])
+              )
+              .reduce((x, y) => [...x, ...y], [])
+              .filter((x, i, arr) => arr.findIndex(y => y.id === x.id) === i)
             dispatch(addEntities(dbEntities))
             dispatch(collapseNode(node.id))
             dispatch(filterData())

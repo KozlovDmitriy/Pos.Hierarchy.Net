@@ -74,6 +74,8 @@ const isTradePointWithMerchantConnected = (tp, m) =>
 const filterBySubstring = (v, f) =>
   v.toLowerCase().includes(f.toLowerCase())
 
+const filterByEqual = (v, f) => v === f
+
 export default class ConnectionRules {
   constructor () {
     this.connections = {
@@ -134,6 +136,13 @@ export default class ConnectionRules {
           field: 'terminalId',
           try: filterBySubstring,
           showSiblings: false
+        },
+        {
+          filter: 'logicalDeviceTypeId',
+          type: 'logical',
+          field: 'deviceTypeId',
+          try: filterByEqual,
+          showSiblings: false
         }
       ],
       merchant: [
@@ -192,6 +201,13 @@ export default class ConnectionRules {
       ],
       country: [
         {
+          filter: 'countryId',
+          type: 'country',
+          field: 'countryId',
+          try: filterByEqual,
+          showSiblings: false
+        },
+        {
           filter: 'country',
           type: 'country',
           field: 'name',
@@ -224,10 +240,10 @@ export default class ConnectionRules {
   fiterRulesInitialize = (withSiblings) => {
     this.filterRules['physical'] = [
       {
-        filter: 'modelName',
+        filter: 'physicalDeviceTypeId',
         type: 'physical',
-        field: 'modelName',
-        try: filterBySubstring,
+        field: 'deviceTypeId',
+        try: filterByEqual,
         showSiblings: withSiblings
       },
       {

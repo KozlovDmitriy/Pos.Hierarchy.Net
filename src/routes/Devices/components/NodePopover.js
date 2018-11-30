@@ -25,9 +25,8 @@ class NodePopover extends Component {
         open={isOpen}
         anchorEl={anchor}
         style={{padding: 20}}
-        anchorOrigin={{ horizontal:'center', vertical:'top' }}
-        targetOrigin={{ horizontal:'center', vertical:'bottom' }}
-        onRequestClose={this.handleRequestClose}
+        anchorOrigin={{ horizontal: -40, vertical:'top' }}
+        onClose={this.handleRequestClose}
       >
         <pre>{JSON.stringify(data, null, 2)}</pre>
       </Popover>

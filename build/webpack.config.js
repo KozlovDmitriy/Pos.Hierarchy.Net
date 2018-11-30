@@ -40,7 +40,12 @@ const config = {
   },
   externals: project.externals,
   module: {
-    rules: [],
+    rules: [
+      {
+        test: /\.css$/,
+        use: [ 'style-loader', 'css-loader' ]
+      }
+    ],
     loaders: [
       {
         test: /\.css$/,

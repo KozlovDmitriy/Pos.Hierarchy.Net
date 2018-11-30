@@ -5,7 +5,11 @@ import {
   SET_NODES_NOT_LOADED
 } from '../actions/collapse'
 import {
+  START_LOAD,
+  FINISH_LOAD,
   SET_DEVICES,
+  SET_DEVICE_MODELS,
+  SET_COUNTRIES,
   ADD_ENTITIES,
   SET_POPOVER_IS_OPEN
 } from '../actions/workspace'
@@ -17,8 +21,10 @@ import {
 } from '../actions/filters'
 
 const initialState = {
-  animation: true,
+  animation: false,
   data: [],
+  models: [],
+  countries: [],
   tree: {},
   filterWithPpd: false,
   filteredData: [],
@@ -28,7 +34,6 @@ const initialState = {
     'region', 'country'
   ],
   filters: {
-    modelName: '',
     terminalId: '',
     serialNumber: '',
     merchant: '',
@@ -37,17 +42,29 @@ const initialState = {
     address: '',
     city: '',
     region: '',
-    country: ''
+    countryId: '',
+    physicalDeviceTypeId: '',
+    logicalDeviceTypeId: ''
   },
   nodePopover: {
     isOpen: false,
     anchor: void 0,
     data: void 0
-  }
+  },
+  isLoad: false,
+  lastCollapsedEntityId: void 0
 }
 
 export default function workspace (state = initialState, action) {
   switch (action.type) {
+    case START_LOAD:
+      return { ...state, isLoad: true }
+    case FINISH_LOAD:
+      return { ...state, isLoad: false }
+    case SET_DEVICE_MODELS:
+      return { ...state, models: action.models }
+    case SET_COUNTRIES:
+      return { ...state, countries: action.countries }
     case SET_NODES_LOADED: {
       const ids = action.ids
       const old = state.data.filter(i => ids.indexOf(i.id) === -1)
@@ -75,7 +92,8 @@ export default function workspace (state = initialState, action) {
       const now = { ...old, collapsed: !old.collapsed }
       return {
         ...state,
-        data: [...state.data.filter(i => i.id !== old.id), now]
+        data: [...state.data.filter(i => i.id !== old.id), now],
+        lastCollapsedEntity: now.id
       }
     }
     case SET_POPOVER_IS_OPEN: {
@@ -93,10 +111,18 @@ export default function workspace (state = initialState, action) {
       const newDataIds = newData.map(e => e.id)
       const distinctData = newData
         .filter((e, i, arr) => newDataIds.indexOf(e.id) === i)
-      return { ...state, data: distinctData }
+      return {
+        ...state,
+        data: distinctData,
+        lastCollapsedEntity: void 0
+      }
     }
     case SET_DEVICES: {
-      return { ...state, data: action.devices }
+      return {
+        ...state,
+        data: action.devices,
+        lastCollapsedEntity: void 0
+      }
     }
     case SET_TREE: {
       return { ...state, tree: action.tree }

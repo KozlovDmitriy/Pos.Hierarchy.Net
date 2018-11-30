@@ -14,6 +14,9 @@ class Merchant extends CollapsedNode {
 
   render () {
     const node = this.props.node
+    const name = node.name === null && node.merchantId !== null && node.merchantId !== '' ?
+      node.merchantId :
+      node.name
     const plus = node.collapsed ? (
       <Plus
         color='#008ba0'
@@ -26,7 +29,7 @@ class Merchant extends CollapsedNode {
         y={-18}
         fontSize={14}
         color={'#008ba0'}
-        text={node.name}
+        text={name}
         onClick={this.onClick}
       />
     )

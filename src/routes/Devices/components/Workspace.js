@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 // import AceEditor from 'react-ace'
 import Filters from '../containers/FiltersContainer'
 import Tree from '../containers/TreeContainer'
+import Loader from 'react-loader-advanced'
+import LoaderSpinner from 'react-loader-spinner'
 // import ReactRethinkdb, { r } from 'react-rethinkdb'
 // import reactMixin from 'react-mixin'
 // import 'brace/mode/json'
@@ -25,6 +27,7 @@ const style = {
 class Workspace extends Component {
   static propTypes = {
     data: PropTypes.array.isRequired,
+    isLoad: PropTypes.bool.isRequired,
     loadEntities: PropTypes.func.isRequired
   }
 
@@ -49,21 +52,41 @@ class Workspace extends Component {
     /* const data = this.data !== void 0 ?
       this.data.items.value().sort((a, b) => b.acceptedAt - a.acceptedAt) :
       { } */
+    const message = <LoaderSpinner
+       type="Ball-Triangle"
+       color="#008ba0"
+       height="50"	
+       width="50"
+    />      
     return (
       <div style={style}>
+        <Filters />
         <div
           id='devices'
           style={{
             position: 'absolute',
-            top: -20,
+            top: 45,
             bottom: 0,
-            left: 5,
-            right: 5,
+            left: 0,
+            right: 0,
             padding: '2px 20px'
           }}
         >
-          <Filters />
-          <Tree />
+          <Loader
+            message={message} 
+            hideContentOnLoad={false}
+            backgroundStyle={{backgroundColor: 'transparent'}}
+            show={this.props.isLoad}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0
+            }}
+          >
+            <Tree boardStyle={this.props.isLoad ? {WebkitFilter: 'blur(1.4px)', filter: 'blur(1.4px)', opacity: 0.4} : {}}/>
+          </Loader>
         </div>
       </div>
     )
