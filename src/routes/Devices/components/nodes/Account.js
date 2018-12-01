@@ -14,12 +14,15 @@ class Account extends CollapsedNode {
 
   render () {
     const node = this.props.node
-    const plus = node.collapsed ? (
-      <Plus
-        color='#008ba0'
-        onDoubleClick={this.handleDoubleClick}
-      />
-    ) : void 0
+    const loading = this.getLoading(22, 12)
+    const plus = node.collapsed ?
+      this.state.loading ? loading :
+      (
+        <Plus
+          color='#008ba0'
+          onDoubleClick={this.handleDoubleClick}
+        />
+      ) : void 0
     const label = (
       <NodeLabel
         x={0}

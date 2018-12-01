@@ -21,16 +21,16 @@ import './Tree.scss'
 
 function Node ({ node, events }) {
   switch (node.type) {
-    case 'physical': return (<PhysicalDevice node={node} />)
-    case 'logical': return (<LogicalDevice node={node} />)
-    case 'merchant': return (<Merchant node={node} />)
-    case 'account': return (<Account node={node} />)
-    case 'customer': return (<Customer node={node} />)
-    case 'address': return (<Address node={node} />)
-    case 'city': return (<City node={node} />)
-    case 'region': return (<Region node={node} />)
-    case 'country': return (<Country node={node} />)
-    case 'tradePoint': return (<TradePoint node={node} />)
+    case 'physical': return (<PhysicalDevice key={node.id} node={node} />)
+    case 'logical': return (<LogicalDevice key={node.id} node={node} />)
+    case 'merchant': return (<Merchant key={node.id} node={node} />)
+    case 'account': return (<Account key={node.id} node={node} />)
+    case 'customer': return (<Customer key={node.id} node={node} />)
+    case 'address': return (<Address key={node.id} node={node} />)
+    case 'city': return (<City key={node.id} node={node} />)
+    case 'region': return (<Region key={node.id} node={node} />)
+    case 'country': return (<Country key={node.id} node={node} />)
+    case 'tradePoint': return (<TradePoint key={node.id} node={node} />)
     default: return null
   }
 }
@@ -147,7 +147,7 @@ class Tree extends Component {
   static propTypes = {
     tree: PropTypes.object.isRequired,
     boardStyle: PropTypes.object,
-    lastCollapsedEntity: PropTypes.number,
+    lastCollapsedEntity: PropTypes.string,
     filterData: PropTypes.func.isRequired
   }
 
@@ -201,11 +201,11 @@ class Tree extends Component {
     }))
     const width = this.getSize(nodes, links)
     const height = width
-    const node = nodes.find(n => n.id === nextProps.lastCollapsedEntity)
-    if (node !== void 0) {
-      node.fx = node.x
-      node.fy = node.y
-      console.log({ ...node })
+    const node = this.props.tree.nodes.find(n => n.id === nextProps.lastCollapsedEntity)
+    const newNode = nodes.find(n => n.id === nextProps.lastCollapsedEntity)
+    if (newNode !== void 0 && node !== void 0) {
+      newNode.fx = node.x
+      newNode.fy = node.y
     }
     var force = d3Force.forceSimulation(nodes)
       .force('link', d3Force.forceLink().id(d => d.id))
@@ -229,6 +229,10 @@ class Tree extends Component {
         links: nextProps.tree.links,
         force
       })
+      if (newNode !== void 0) {
+        newNode.fx = void 0
+        newNode.fy = void 0
+      }
     }
   }
 

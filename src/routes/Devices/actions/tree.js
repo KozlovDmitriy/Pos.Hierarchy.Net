@@ -61,7 +61,8 @@ const cloneArray = (arr) => arr.map(i => { return { ...i } })
 
 function getTree (dispatch, data, filteredData, showingTypes) {
   collapseEntities(data, showingTypes)
-  const filtered = cloneArray(data.filter(d => filteredData.indexOf(d.id) !== -1))
+  const filtered = data.filter(d => filteredData.indexOf(d.id) !== -1)
+  // const filtered = cloneArray(data.filter(d => filteredData.indexOf(d.id) !== -1))
   const links = getAllConnections(filtered, showingTypes)
     .filter(i => i.source.hide !== true && i.target.hide !== true)
   const nodes = filtered.filter(i => showingTypes.indexOf(i.type) !== -1 && i.hide !== true)
@@ -167,7 +168,8 @@ export function loadCollapsedEntityChildren (node, type, field, value) {
             dispatch(collapseNode(node.id))
             dispatch(filterData())
           }
-        }
+        },
+        false
       )
     )
   }

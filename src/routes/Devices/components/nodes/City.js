@@ -14,11 +14,15 @@ class City extends CollapsedNode {
 
   render () {
     const node = this.props.node
+    const loading = this.getLoading(22, 12)
     const plus = node.collapsed ? (
-      <Plus
-        color='#00afa3'
-        onDoubleClick={this.handleDoubleClick}
-      />
+      this.state.loading ? loading :
+      (
+        <Plus
+          color='#00afa3'
+          onDoubleClick={this.handleDoubleClick}
+        />
+      )
     ) : void 0
     const label = (
       <NodeLabel

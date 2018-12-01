@@ -69,7 +69,7 @@ function debounce (func, wait, immediate) {
 
 const filterDataFromDbDebouncing = debounce((dispatch, filters, filterWithPpd) => {
   dispatch(loadFilteredEntities(filters, filterWithPpd))
-}, 300)
+}, 700)
 
 export function filterDataFromDb () {
   return (dispatch, getState) => {

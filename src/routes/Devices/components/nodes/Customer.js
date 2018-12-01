@@ -17,12 +17,15 @@ class Customer extends CollapsedNode {
     const name = node.name === null && node.customerId !== null && node.customerId !== '' ?
       node.customerId :
       node.name
-    const plus = node.collapsed ? (
-      <Plus
-        color='#008ba0'
-        onDoubleClick={this.handleDoubleClick}
-      />
-    ) : void 0
+    const loading = this.getLoading(22, 12)
+    const plus = node.collapsed ?
+      this.state.loading ? loading :
+      (
+        <Plus
+          color='#008ba0'
+          onDoubleClick={this.handleDoubleClick}
+        />
+      ) : void 0
     const label = (
       <NodeLabel
         x={0}

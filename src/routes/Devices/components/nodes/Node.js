@@ -12,7 +12,7 @@ class Node extends Component {
     this.onClick = this.onClick.bind(this)
   }
 
-  onClick = (event) => {
+  onClick (event) {
     const dim = event.target.getBoundingClientRect()
     const x = dim.left
     const y = dim.top

@@ -55,6 +55,7 @@ export function collapseNotLoadedEntities (dispatch, entitiesToShow, nodes, link
   const nodesForUnmark = []
   nodes.filter(n => {
     const rules = childCounts[n.type]
+      .filter(i => entitiesToShow.includes(i.type))
     const need = rules
       .map(r => n[r.count])
       .reduce((x, y) => x + y, 0)

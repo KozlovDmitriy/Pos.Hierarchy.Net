@@ -75,17 +75,21 @@ function runMessage (url, data, onStateChanged, onLoad) {
  * @param  {func} onStateChanged   Callback XMLHttpRequest.onreadystatechange(xhttp.readyState, xhttp.status)
  * @param  {func} onLoad           Callback XMLHttpRequest.onload(xhttp.responseText)
  */
-export function runQuery (data, onStateChanged, onLoad) {
+export function runQuery (data, onStateChanged, onLoad, showLoader = true) {
   return (dispatch, getState) => {
-    dispatch(startLoad())
-    const { restApiUrl } = { restApiUrl: config.webapiurl/*'http://localhost:5005/'*/ } // getState().keys
+    if (showLoader) {
+      dispatch(startLoad())
+    }
+    const { restApiUrl } = { restApiUrl: config.webapiurl } // getState().keys
     const runQueryUrl = Url.resolve(restApiUrl, 'Api/Query/GetEntitiesForMonitor')
     runMessage(
       runQueryUrl,
       data,
       onStateChanged,
       (data) => {
-        dispatch(finishLoad())
+        if (showLoader) {
+          dispatch(finishLoad())
+        }
         onLoad(data)
       })
   }
