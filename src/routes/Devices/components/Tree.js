@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Graph } from '@vx/network'
-import { LinkVertical } from '@vx/shape'
 import * as d3 from 'd3'
 import * as d3Force from 'd3-force'
 import PhysicalDevice from '../containers/nodes/PhysicalDeviceContainer'
@@ -15,7 +14,8 @@ import City from '../containers/nodes/CityContainer'
 import Region from '../containers/nodes/RegionContainer'
 import Country from '../containers/nodes/CountryContainer'
 import NodePopover from '../containers/NodePopoverContainer'
-import GraphControls from './GraphControls.js'
+import LinkPrimitive from '../containers/LinkContainer'
+import GraphControls from './GraphControls'
 import Radium from 'radium'
 import './Tree.scss'
 
@@ -35,70 +35,13 @@ function Node ({ node, events }) {
   }
 }
 
-function Link ({ link }) {
-  const isAddress = link.type.match(/(address)|(city)|(region)|(country)/)
-  if (isAddress !== null) {
-    return (
-      <LinkVertical
-        data={link}
-        stroke='#00afa3'
-        strokeDasharray='8, 12'
-        strokeWidth={1.5}
-        strokeOpacity={0.5}
-        fill='none'
-      />
-    )
+function LinkProvider ({ link }) {
+  if (link === void 0) {
+    return void 0
   }
-  const isOwner = link.type.match(/(merchant)|(account)|(customer)|(tradePoint)/)
-  if (isOwner !== null) {
-    return (
-      <LinkVertical
-        data={link}
-        stroke='#008ba0'
-        strokeDasharray='8, 4'
-        strokeWidth={2}
-        strokeOpacity={0.5}
-        fill='none'
-      />
-    )
-  }
-  const isLogical = link.type.match(/(logical)/)
-  if (isLogical !== null) {
-    return (
-      <LinkVertical
-        data={link}
-        stroke='#00d8d4'
-        strokeWidth={1.5}
-        strokeOpacity={0.5}
-        fill='none'
-      />
-    )
-  }
-  const isPhysical = link.type.match(/(physical)/)
-  if (isPhysical !== null) {
-    if (link.type === 'physical - physical') {
-      return (
-        <LinkVertical
-          data={link}
-          stroke='#03c0dc'
-          // strokeDasharray='12, 4'
-          strokeWidth={3.0}
-          strokeOpacity={0.5}
-          fill='none'
-        />
-      )
-    } else {
-      return (
-        <LinkVertical
-          data={link}
-          stroke='#00bde7'
-          strokeWidth={1.5}
-          strokeOpacity={0.5}
-          fill='none'
-        />
-      )
-    }
-  }
+  return (
+    <LinkPrimitive link={link} />
+  )
 }
 
 const minZoom = 0.15
@@ -396,7 +339,7 @@ class Tree extends Component {
                     gridSize
                   ]}
                   nodeComponent={Node}
-                  linkComponent={Link}
+                  linkComponent={LinkProvider}
                 />
               </g>
             </g>

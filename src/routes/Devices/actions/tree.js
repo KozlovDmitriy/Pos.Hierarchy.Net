@@ -59,7 +59,7 @@ export function collapseNodeAndRewriteTree (node) {
 
 const cloneArray = (arr) => arr.map(i => { return { ...i } })
 
-function getTree (dispatch, data, filteredData, showingTypes) {
+function getTree (dispatch, data, filteredData, showingTypes, errors) {
   collapseEntities(data, showingTypes)
   const filtered = data.filter(d => filteredData.indexOf(d.id) !== -1)
   // const filtered = cloneArray(data.filter(d => filteredData.indexOf(d.id) !== -1))
@@ -74,7 +74,8 @@ function getTree (dispatch, data, filteredData, showingTypes) {
 export function rewriteTree () {
   return (dispatch, getState) => {
     const { data, filteredData, showingTypes } = getState().devices
-    const tree = getTree(dispatch, data, filteredData, showingTypes)
+    const { errors } = getState().errors
+    const tree = getTree(dispatch, data, filteredData, showingTypes, errors)
   	dispatch(setTree(tree))
   }
 }

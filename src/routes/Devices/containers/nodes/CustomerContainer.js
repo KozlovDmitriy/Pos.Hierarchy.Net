@@ -4,8 +4,11 @@ import Customer from '../../components/nodes/Customer'
 import * as workspaceActions from '../../actions/workspace'
 import * as collapseActions from '../../actions/tree'
 
-function mapStateToProps (state) {
-  return { }
+function mapStateToProps (state, ownProps) {
+  return {
+    errors: (state.errors.errors || [])
+      .filter(i => i.customerId === ownProps.node.customerId)
+  }
 }
 
 function mapDispatchToProps (dispatch) {

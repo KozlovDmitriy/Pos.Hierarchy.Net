@@ -19,16 +19,16 @@ class PhysicalDevice extends CollapsedNode {
   render () {
     const node = this.props.node
     const loading = this.getLoading(22, 12)
+    const errors = this.props.errors
+    const isError = errors.length > 0
     const plus = node.collapsed ?
       this.state.loading ? loading :
       (
         <Plus
-          color='#00bde7'
+          color={isError ? errorColor : '#00bde7'}
           onDoubleClick={this.handleDoubleClick}
         />
       ) : void 0
-    const errors = this.props.errors
-    const isError = errors.length > 0
     const rect = (
       <rect
         ref={this.refCallback}

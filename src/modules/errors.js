@@ -6,7 +6,26 @@ import {
 } from '../actions/events'
 
 const initialState = {
-  errors: void 0
+  errors: [
+    {
+      physicalDeviceId: 30170,
+      logicalDeviceId: 30171,
+      countryId: 29,
+      regionId: 'Алтайский край',
+      cityId: 127,
+      addressId: 286,
+      tradePointId: 'RU0100311',
+      merchantId: '1013',
+      accountId: '1000000001',
+      customerId: '20109',
+      customerAddressId: void 0,
+      customerCityId: void 0,
+      customerRegionId: void 0,
+      customerCountryId: void 0,
+      code: 1,
+      content: 'Отсутствует бумага в принтере'
+    }
+  ]
 }
 
 export default function errors (state = initialState, action) {

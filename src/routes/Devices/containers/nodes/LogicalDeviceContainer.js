@@ -6,7 +6,8 @@ import * as collapseActions from '../../actions/tree'
 
 function mapStateToProps (state, ownProps) {
   return {
-    errors: []
+    errors: (state.errors.errors || [])
+      .filter(i => i.logicalDeviceId === ownProps.node.deviceId)
   }
 }
 

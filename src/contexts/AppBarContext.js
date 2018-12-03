@@ -1,6 +1,6 @@
-import { createContext } from 'react';
+import { createContext } from 'react'
 
-const AppBarContext = createContext({});
+const AppBarContext = createContext({})
 
-export const AppBarContextProvider = AppBarContext.Provider;
-export const AppBarContextConsumer = AppBarContext.Consumer;
+export const AppBarContextProvider = AppBarContext.Provider
+export const AppBarContextConsumer = AppBarContext.Consumer

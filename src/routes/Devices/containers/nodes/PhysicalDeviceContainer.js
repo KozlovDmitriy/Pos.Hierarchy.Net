@@ -7,7 +7,7 @@ import * as collapseActions from '../../actions/tree'
 function mapStateToProps (state, ownProps) {
   return {
     errors: (state.errors.errors || [])
-      .filter(i => ('' + i.deviceId) === ('' + ownProps.node.deviceId))
+      .filter(i => i.physicalDeviceId === ownProps.node.deviceId)
   }
 }
 

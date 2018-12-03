@@ -40,7 +40,7 @@ class PageLayout extends React.Component {
     super(props)
     this.onHomeBtnClick = this.onHomeBtnClick.bind(this)
     this.state = {
-      widget: <div></div>
+      widget: <div />
     }
   }
 
@@ -54,7 +54,7 @@ class PageLayout extends React.Component {
 
   componentWillMount () {
     if (this.props.errors === void 0) {
-      this.props.subscribeErrors()
+      // TODO: this.props.subscribeErrors()
     }
   }
 

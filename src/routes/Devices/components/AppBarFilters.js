@@ -23,7 +23,7 @@ class AppBarFilters extends Component {
   render () {
     const { filterWithPpd } = this.props
     return (
-      <div className='row' style={{ minWidth: 555, paddingLeft: 20, paddingRight: 20 }}>
+      <div className='row' style={{ minWidth: 570, paddingLeft: 20, paddingRight: 20 }}>
         <div
           className='col col-sm-6'
           style={{
