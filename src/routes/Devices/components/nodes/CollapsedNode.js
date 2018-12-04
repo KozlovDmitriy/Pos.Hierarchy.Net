@@ -24,10 +24,11 @@ class CollapsedNode extends Node {
   }
 
   getLoading (tx, ty) {
+    const color = this.statusColor || '#14c6a4'
     return (
       <g transform={`translate(${tx},${ty})`}>
         <g transform='translate(0 0)'>
-          <circle cx='0' cy='0' r='2' fill='#14c6a4' transform='scale(0.197092 0.197092)'>
+          <circle cx='0' cy='0' r='2' fill={color} transform='scale(0.197092 0.197092)'>
             <animateTransform
               attributeName='transform'
               type='scale'
@@ -41,7 +42,7 @@ class CollapsedNode extends Node {
           </circle>
         </g>
         <g transform='translate(5 0)'>
-          <circle cx='0' cy='0' r='2' fill='#14c6a4' transform='scale(0.654226 0.654226)'>
+          <circle cx='0' cy='0' r='2' fill={color} transform='scale(0.654226 0.654226)'>
             <animateTransform
               attributeName='transform'
               type='scale'
@@ -55,7 +56,7 @@ class CollapsedNode extends Node {
           </circle>
         </g>
         <g transform='translate(10 0)'>
-          <circle cx='0' cy='0' r='2' fill='#14c6a4' transform='scale(0.990512 0.990512)'>
+          <circle cx='0' cy='0' r='2' fill={color} transform='scale(0.990512 0.990512)'>
             <animateTransform
               attributeName='transform'
               type='scale'

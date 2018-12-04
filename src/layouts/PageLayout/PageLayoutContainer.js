@@ -5,7 +5,7 @@ import * as EventActions from 'src/actions/events'
 
 function mapStateToProps (state) {
   return {
-    errors: state.errors.errors
+    errors: state.events.errors
   }
 }
 

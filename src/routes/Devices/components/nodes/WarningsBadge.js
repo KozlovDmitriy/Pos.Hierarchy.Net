@@ -3,17 +3,17 @@ import PropTypes from 'prop-types'
 import { Group } from '@vx/group'
 import colors from './colors'
 
-class ErrorsBadge extends Component {
+class WarningsBadge extends Component {
   static propTypes = {
-    errors: PropTypes.array.isRequired,
+    warnings: PropTypes.array.isRequired,
     transform: PropTypes.string,
     color: PropTypes.string
   }
 
   render () {
-    const { errors, transform } = this.props
-    const color = this.props.color || colors.error
-    const isError = errors.length > 0
+    const { warnings, transform } = this.props
+    const color = this.props.color || colors.warning
+    const isError = warnings.length > 0
     const errorsBadge = isError ? (
       <Group transform={transform === void 0 ? 'translate(-11, 9)' : transform}>
         <circle
@@ -39,7 +39,7 @@ class ErrorsBadge extends Component {
           stroke={'#fff'}
           strokeWidth={0.5}
         >
-          <tspan textAnchor={'middle'}>{`${errors.length > 99 ? '...' : errors.length}`}</tspan>
+          <tspan textAnchor={'middle'}>{`${warnings.length > 99 ? '...' : warnings.length}`}</tspan>
         </text>
       </Group>
     ) : void 0
@@ -47,4 +47,4 @@ class ErrorsBadge extends Component {
   }
 }
 
-export default ErrorsBadge
+export default WarningsBadge

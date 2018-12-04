@@ -74,7 +74,7 @@ function getTree (dispatch, data, filteredData, showingTypes, errors) {
 export function rewriteTree () {
   return (dispatch, getState) => {
     const { data, filteredData, showingTypes } = getState().devices
-    const { errors } = getState().errors
+    const { errors } = getState().events
     const tree = getTree(dispatch, data, filteredData, showingTypes, errors)
   	dispatch(setTree(tree))
   }

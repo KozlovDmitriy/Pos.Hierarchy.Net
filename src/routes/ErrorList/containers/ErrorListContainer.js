@@ -4,7 +4,7 @@ import ErrorList from '../components/ErrorList'
 
 function mapStateToProps (state) {
   return {
-    data: state.errors.errors
+    data: state.events.errors
   }
 }
 

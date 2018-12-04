@@ -1,11 +1,15 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Group } from '@vx/group'
-import ErrorsBadge from './ErrorsBadge'
 import NodeLabel from './NodeLabel'
 import Node from './Node'
-
-const errorColor = '#d91c6b'
+import Typography from '@material-ui/core/Typography'
+import Table from '@material-ui/core/Table'
+import TableBody from '@material-ui/core/TableBody'
+import TableCell from '@material-ui/core/TableCell'
+import TableRow from '@material-ui/core/TableRow'
+import TableHead from '@material-ui/core/TableHead'
+import NodeEventsList from '../../containers/nodes/NodeEventsListContainer'
 
 class LogicalDevice extends Node {
   static propTypes = {
@@ -14,23 +18,46 @@ class LogicalDevice extends Node {
     setPopoverIsOpen: PropTypes.func.isRequired
   }
 
+  popoverContent (node, errors, warnings) {
+    return (
+      <div style={{ padding: 20 }}>
+        <Typography component='h5' variant='h6' align='center'>Terminal ID</Typography>
+        <Typography component='h6' variant='subheading' align='center'>{node.terminalId}</Typography>
+        <Table>
+          <TableHead>
+            <TableRow style={{ height: 0 }}>
+              <TableCell style={{ padding: '4px 0px' }} />
+              <TableCell style={{ padding: '4px 0px' }} />
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow key='merchantId'>
+              <TableCell><b>Идентификатор мерчанта</b></TableCell>
+              <TableCell numeric>{node.merchantId}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+        {
+          this.isError || this.isWarning ? (
+            <NodeEventsList errors={errors} warnings={warnings} />
+          ) : void 0
+        }
+      </div>
+    )
+  }
+
   render () {
     const node = this.props.node
-    const errors = this.props.errors
-    const isError = errors.length > 0
     const label = (
       <NodeLabel
         x={0}
         y={-16}
         fontSize={13}
-        color={isError ? errorColor : '#00b8b4'}
+        color={this.statusColor || '#00b8b4'}
         text={node.terminalId}
         onClick={this.onClick}
       />
     )
-    const errorsBadge = isError ? (
-      <ErrorsBadge errors={errors} />
-    ) : void 0
     return (
       <Group y={node.y} x={node.x}>
         <circle
@@ -38,10 +65,10 @@ class LogicalDevice extends Node {
           strokeWidth={2.5}
           fill={'white'}
           strokeOpacity={0.6}
-          stroke={isError ? errorColor : '#00d8d4'}
+          stroke={this.statusColor || '#00d8d4'}
         />
         {label}
-        {errorsBadge}
+        {this.badge}
       </Group>
     )
   }

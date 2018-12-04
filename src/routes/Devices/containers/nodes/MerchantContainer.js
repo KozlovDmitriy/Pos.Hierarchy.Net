@@ -6,7 +6,9 @@ import * as collapseActions from '../../actions/tree'
 
 function mapStateToProps (state, ownProps) {
   return {
-    errors: (state.errors.errors || [])
+    errors: (state.events.errors || [])
+      .filter(i => i.merchantId === ownProps.node.merchantId),
+    warnings: (state.events.warnings || [])
       .filter(i => i.merchantId === ownProps.node.merchantId)
   }
 }

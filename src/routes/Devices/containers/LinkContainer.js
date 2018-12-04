@@ -5,7 +5,8 @@ import LinkPrimitive from '../components/LinkPrimitive'
 function mapStateToProps (state, ownProps) {
   return {
     link: ownProps.link,
-    errors: state.errors.errors || []
+    errors: state.events.errors || [],
+    warnings: state.events.warnings || []
   }
 }
 

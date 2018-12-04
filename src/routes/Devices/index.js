@@ -12,9 +12,9 @@ export default (store) => ({
       /*  Add the reducer to the store on key 'devices'  */
       injectReducer(store, { key: 'devices', reducer })
 
-      const errorsReducer = require('src/modules/errors').default
+      const eventsReducer = require('src/modules/events').default
       /*  Add the reducer to the store on key 'devices'  */
-      injectReducer(store, { key: 'errors', reducer: errorsReducer })
+      injectReducer(store, { key: 'events', reducer: eventsReducer })
 
       /*  Return getComponent   */
       cb(null, Workspace)

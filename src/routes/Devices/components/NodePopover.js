@@ -6,7 +6,7 @@ class NodePopover extends Component {
   static propTypes = {
     isOpen: PropTypes.bool.isRequired,
     anchor: PropTypes.object,
-    data: PropTypes.object,
+    data: PropTypes.node,
     setPopoverIsOpen: PropTypes.func.isRequired
   }
 
@@ -24,11 +24,11 @@ class NodePopover extends Component {
       <Popover
         open={isOpen}
         anchorEl={anchor}
-        style={{padding: 20}}
+        style={{ padding: 20 }}
         anchorOrigin={{ horizontal: -40, vertical:'top' }}
         onClose={this.handleRequestClose}
       >
-        <pre>{JSON.stringify(data, null, 2)}</pre>
+        {data}
       </Popover>
     )
   }

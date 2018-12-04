@@ -1,54 +1,59 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { LinkVertical } from '@vx/shape'
-
-const errorColor = '#d91c6b'
+import colors from './nodes/colors'
 
 class LinkPrimitive extends React.Component {
   static propTypes = {
     link: PropTypes.object.isRequired,
+    warnings: PropTypes.array.isRequired,
     errors: PropTypes.array.isRequired
   }
 
-  isNodeError (node, errors) {
+  checkNode (node, events) {
     switch (node.type) {
       case 'logical':
-        return errors.find(e => e.logicalDeviceId === node.deviceId) !== void 0
+        return events.find(e => e.logicalDeviceId === node.deviceId) !== void 0
       case 'physical':
-        return errors.find(e => e.physicalDeviceId === node.deviceId) !== void 0
+        return events.find(e => e.physicalDeviceId === node.deviceId) !== void 0
       case 'merchant':
-        return errors.find(e => e.merchantId === node.merchantId) !== void 0
+        return events.find(e => e.merchantId === node.merchantId) !== void 0
       case 'account':
-        return errors.find(e => e.accountId === node.accountId) !== void 0
+        return events.find(e => e.accountId === node.accountId) !== void 0
       case 'customer':
-        return errors.find(e => e.customerId === node.customerId) !== void 0
+        return events.find(e => e.customerId === node.customerId) !== void 0
       case 'tradePoint':
-        return errors.find(e => e.tradePointId === node.tradePointId) !== void 0
+        return events.find(e => e.tradePointId === node.tradePointId) !== void 0
       case 'address':
-        return errors.find(e => [e.addressId, e.customerAddressId].includes(node.addressId)) !== void 0
+        return events.find(e => [e.addressId, e.customerAddressId].includes(node.addressId)) !== void 0
       case 'city':
-        return errors.find(e => [e.cityId, e.customerCityId].includes(node.cityId)) !== void 0
+        return events.find(e => [e.cityId, e.customerCityId].includes(node.cityId)) !== void 0
       case 'region':
-        return errors.find(e => [e.regionId, e.customerRegionId].includes(node.regionId)) !== void 0
+        return events.find(e => [e.regionId, e.customerRegionId].includes(node.regionId)) !== void 0
       case 'country':
-        return errors.find(e => [e.countryId, e.customerCountryId].includes(node.countryId)) !== void 0
+        return events.find(e => [e.countryId, e.customerCountryId].includes(node.countryId)) !== void 0
     }
     return false
   }
 
-  isError (link, errors) {
-    return this.isNodeError(link.target, errors) && this.isNodeError(link.source, errors)
+  checkLink (link, events) {
+    return this.checkNode(link.target, events) && this.checkNode(link.source, events)
   }
 
   render () {
-    const { link, errors } = this.props
-    const isError = this.isError(link, errors)
+    const { link, errors, warnings } = this.props
+    const isError = this.checkLink(link, errors)
+    const isWarning = this.checkLink(link, warnings)
+    const statusColor =
+      isError ? colors.error :
+      isWarning ? colors.warning :
+      void 0
     const isAddress = link.type.match(/(address)|(city)|(region)|(country)/)
     if (isAddress !== null) {
       return (
         <LinkVertical
           data={link}
-          stroke={isError ? errorColor : '#00afa3'}
+          stroke={statusColor || '#00afa3'}
           strokeDasharray='8, 12'
           strokeWidth={1.5}
           strokeOpacity={0.5}
@@ -61,7 +66,7 @@ class LinkPrimitive extends React.Component {
       return (
         <LinkVertical
           data={link}
-          stroke={isError ? errorColor : '#008ba0'}
+          stroke={statusColor || '#008ba0'}
           strokeDasharray='8, 4'
           strokeWidth={2}
           strokeOpacity={0.5}
@@ -74,7 +79,7 @@ class LinkPrimitive extends React.Component {
       return (
         <LinkVertical
           data={link}
-          stroke={isError ? errorColor : '#00d8d4'}
+          stroke={statusColor || '#00d8d4'}
           strokeWidth={1.5}
           strokeOpacity={0.5}
           fill='none'
@@ -87,7 +92,7 @@ class LinkPrimitive extends React.Component {
         return (
           <LinkVertical
             data={link}
-            stroke={isError ? errorColor : '#03c0dc'}
+            stroke={statusColor || '#03c0dc'}
             // strokeDasharray='12, 4'
             strokeWidth={3.0}
             strokeOpacity={0.5}
@@ -98,7 +103,7 @@ class LinkPrimitive extends React.Component {
         return (
           <LinkVertical
             data={link}
-            stroke={isError ? errorColor : '#00bde7'}
+            stroke={statusColor || '#00bde7'}
             strokeWidth={1.5}
             strokeOpacity={0.5}
             fill='none'

@@ -6,8 +6,10 @@ import * as collapseActions from '../../actions/tree'
 
 function mapStateToProps (state, ownProps) {
   return {
-    errors: (state.errors.errors || [])
-      .filter(i => i.addressId === ownProps.node.addressId)
+    errors: (state.events.errors || [])
+      .filter(i => [i.addressId, i.customerAddressId].indexOf(ownProps.node.addressId) !== -1),
+    warnings: (state.events.warnings || [])
+      .filter(i => [i.addressId, i.customerAddressId].indexOf(ownProps.node.addressId) !== -1)
   }
 }
 
