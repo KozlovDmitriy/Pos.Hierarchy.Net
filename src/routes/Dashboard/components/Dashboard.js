@@ -75,7 +75,7 @@ class Dashboard extends React.Component {
           </CardContent>
         </ClickableCard>
         <ClickableCard className='card'
-          onClick={() => router.push('/errors')} >
+          onClick={() => router.push('/events')} >
           <CardContent>
             <Typography gutterBottom variant='h5'>
               {errors.length}

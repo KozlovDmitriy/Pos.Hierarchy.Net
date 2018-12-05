@@ -14,6 +14,12 @@ import TableHead from '@material-ui/core/TableHead'
 import Button from '@material-ui/core/Button'
 import { withStyles } from '@material-ui/core/styles'
 import green from '@material-ui/core/colors/green'
+import Dialog from '@material-ui/core/Dialog'
+import DialogActions from '@material-ui/core/DialogActions'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogContentText from '@material-ui/core/DialogContentText'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import Slide from '@material-ui/core/Slide'
 import colors from './colors'
 
 const styles = theme => ({
@@ -35,6 +41,10 @@ const groupBy = (xs, key) =>
     return rv
   }, {})
 
+function Transition (props) {
+  return <Slide direction='up' {...props} />
+}
+
 class NodeEventsList extends React.Component {
   static propTypes = {
     detail: PropTypes.bool,
@@ -49,17 +59,26 @@ class NodeEventsList extends React.Component {
 
   constructor (props) {
     super(props)
-    this.onChangeTerminalID = this.onChangeTerminalID.bind(this)
-    this.state = { value: 0 }
+    this.onClickTerminalId = this.onClickTerminalId.bind(this)
+    this.agree = this.agree.bind(this)
+    this.state = { value: 0, open: false }
   }
 
-  onChangeTerminalID (terminalId) {
-    this.props.setPopoverIsOpen(false)
-    this.props.setterminalIdFilter(terminalId)
-  }
+  handleClickOpen = () => {
+    this.setState({ ...this.state, open: true })
+  };
+
+  handleClose = () => {
+    this.setState({ ...this.state, open: false })
+  };
 
   handleChange = (event, value) => {
-    this.setState({ value })
+    this.setState({ ...this.state, value })
+  }
+
+  onClickTerminalId (terminalId) {
+    this.props.setPopoverIsOpen(false)
+    this.props.setterminalIdFilter(terminalId)
   }
 
   terminalLink (terminalId) {
@@ -67,7 +86,7 @@ class NodeEventsList extends React.Component {
       <a
         key={terminalId + 'link'}
         href='javascript:void(0)'
-        onClick={this.onChangeTerminalID.bind(this, terminalId)}
+        onClick={this.onClickTerminalId.bind(this, terminalId)}
       >
         {terminalId}
       </a>
@@ -102,8 +121,12 @@ class NodeEventsList extends React.Component {
     )
   }
 
+  onResolveClick (event, isError) {
+    this.setState({ ...this.state, event, isError, open: true })
+  }
+
   getDetailEventsList (events, isErrors) {
-    const { classes, removeError, removeWarning } = this.props
+    const { classes } = this.props
     return (
       <Table>
         <TableHead>
@@ -128,7 +151,7 @@ class NodeEventsList extends React.Component {
                       size='small'
                       variant='contained'
                       className={classes.button}
-                      onClick={(event) => isErrors ? removeError(e) : removeWarning(e)}
+                      onClick={(event) => this.onResolveClick(e, isErrors)}
                     >
                       {'РЕШЕНО'}
                     </Button>
@@ -140,6 +163,17 @@ class NodeEventsList extends React.Component {
         </TableBody>
       </Table>
     )
+  }
+
+  agree () {
+    const { event, isError } = this.state
+    const { removeError, removeWarning } = this.props
+    this.handleClose()
+    if (isError) {
+      removeError(event)
+    } else {
+      removeWarning(event)
+    }
   }
 
   render () {
@@ -182,6 +216,32 @@ class NodeEventsList extends React.Component {
           { isHasWarnings ? <Tab label={warningLabel} /> : void 0 }
         </Tabs>
         {eventList}
+        <Dialog
+          open={this.state.open}
+          TransitionComponent={Transition}
+          keepMounted
+          onClose={this.handleClose}
+          aria-labelledby='alert-dialog-slide-title'
+          aria-describedby='alert-dialog-slide-description'
+        >
+          <DialogTitle id='alert-dialog-slide-title'>
+            {'Подтверждение разрешения события'}
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id='alert-dialog-slide-description'>
+              Вы уверены, что хотите выполнить разрешение события?
+              Информация о событии будет удалена и более не доступна
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleClose} color='primary'>
+              Отменить
+            </Button>
+            <Button onClick={this.agree} color='secondary'>
+              Подтвердить
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Paper>
     )
   }
