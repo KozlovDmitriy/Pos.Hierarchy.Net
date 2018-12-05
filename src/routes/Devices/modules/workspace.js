@@ -19,6 +19,12 @@ import {
   SET_SHOWING_TYPES,
   SET_FILTER_WITH_PPD
 } from '../actions/filters'
+import {
+  ADD_ERROR_EVENT,
+  REMOVE_ERROR_EVENT,
+  ADD_WARNING_EVENT,
+  REMOVE_WARNING_EVENT
+} from 'src/actions/events'
 
 const initialState = {
   animation: false,
@@ -55,8 +61,71 @@ const initialState = {
   lastCollapsedEntityId: void 0
 }
 
+function isEventForNode (node, event) {
+  switch (node.type) {
+    case 'logical': return node.deviceId === event.logicalDeviceId
+    case 'physical': return node.deviceId === event.physicalDeviceId
+    case 'tradePoint': return node.tradePointId === event.tradePointId
+    case 'merchant': return node.merchantId === event.merchantId
+    case 'account': return node.accountId === event.accountId
+    case 'customer': return node.customerId === event.customerId
+    case 'address': return node.addressId === event.addressId
+    case 'city': return node.cityId === event.cityId
+    case 'region': return node.regionId === event.regionId
+    case 'country': return node.countryId === event.countryId
+  }
+  return false
+}
+
 export default function workspace (state = initialState, action) {
+  const popover = state.nodePopover
   switch (action.type) {
+    case ADD_ERROR_EVENT:
+      if (popover.isOpen && popover.data) {
+        const node = popover.data.node
+        if (isEventForNode(node, action.error)) {
+          const errors = [ ...popover.data.errors, action.error ]
+          const newPopover = {
+            ...state.nodePopover,
+            data: { ...popover.data, errors }
+          }
+          return { ...state, newPopover }
+        }
+      }
+      return state
+    case REMOVE_ERROR_EVENT:
+      if (state.nodePopover.isOpen && state.nodePopover.data) {
+        const errors = state.nodePopover.data.errors.filter(i => i.id !== action.error.id)
+        const nodePopover = {
+          ...state.nodePopover,
+          data: { ...state.nodePopover.data, errors }
+        }
+        return { ...state, nodePopover }
+      }
+      return state
+    case ADD_WARNING_EVENT:
+      if (popover.isOpen && popover.data) {
+        const node = popover.data.node
+        if (isEventForNode(node, action.warning)) {
+          const warnings = [ ...popover.data.warnings, action.warning ]
+          const newPopover = {
+            ...state.nodePopover,
+            data: { ...popover.data, warnings }
+          }
+          return { ...state, newPopover }
+        }
+      }
+      return state
+    case REMOVE_WARNING_EVENT:
+      if (state.nodePopover.isOpen && state.nodePopover.data) {
+        const warnings = state.nodePopover.data.warnings.filter(i => i.id !== action.warning.id)
+        const nodePopover = {
+          ...state.nodePopover,
+          data: { ...state.nodePopover.data, warnings }
+        }
+        return { ...state, nodePopover }
+      }
+      return state
     case START_LOAD:
       return { ...state, isLoad: true }
     case FINISH_LOAD:

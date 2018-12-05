@@ -4,6 +4,8 @@ import config from 'config'
 export const SET_ERROR_EVENTS = 'SET_ERROR_EVENTS'
 export const ADD_ERROR_EVENT = 'ADD_ERROR_EVENT'
 export const REMOVE_ERROR_EVENT = 'REMOVE_ERROR_EVENT'
+export const ADD_WARNING_EVENT = 'ADD_WARNING_EVENT'
+export const REMOVE_WARNING_EVENT = 'REMOVE_WARNING_EVENT'
 export const UPDATE_ERROR_EVENT = 'UPDATE_ERROR_EVENT'
 
 export function setErrors (errors) {
@@ -16,6 +18,14 @@ export function addError (error) {
 
 export function removeError (error) {
   return { type: REMOVE_ERROR_EVENT, error }
+}
+
+export function addWarningEvent (warning) {
+  return { type: ADD_WARNING_EVENT, warning }
+}
+
+export function removeWarning (warning) {
+  return { type: REMOVE_WARNING_EVENT, warning }
 }
 
 export function updateError (before, after) {

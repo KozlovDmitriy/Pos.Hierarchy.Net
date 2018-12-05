@@ -188,6 +188,7 @@ class Tree extends Component {
   }
 
   componentWillMount () {
+    this._mounted = true
     if (this.props.tree.nodes === void 0) {
       this.props.filterData()
     } else {
@@ -204,7 +205,6 @@ class Tree extends Component {
   }
 
   componentDidMount () {
-    this._mounted = true
     d3.select(this.refs.viewWrapper)
       .on('touchstart', this.containZoom)
       .on('touchmove', this.containZoom)

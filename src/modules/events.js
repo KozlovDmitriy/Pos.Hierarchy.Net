@@ -2,12 +2,15 @@ import {
   SET_ERROR_EVENTS,
   ADD_ERROR_EVENT,
   REMOVE_ERROR_EVENT,
+  ADD_WARNING_EVENT,
+  REMOVE_WARNING_EVENT,
   UPDATE_ERROR_EVENT
 } from '../actions/events'
 
 const initialState = {
   errors: [
     {
+      id: 1,
       terminalId: '01/12/2017',
       physicalDeviceId: 30170,
       logicalDeviceId: 30171,
@@ -29,6 +32,7 @@ const initialState = {
   ],
   warnings: [
     {
+      id: 2,
       terminalId: '450291',
       countryId: 29,
       regionId: 'Алтайский край',
@@ -72,6 +76,16 @@ export default function events (state = initialState, action) {
       const errors = state.errors.filter(i => i.id !== action.before.id)
       errors.push(action.after)
       return { ...state, errors }
+    }
+    case ADD_WARNING_EVENT: {
+      return {
+        ...state,
+        warnings: [...state.warnings, action.warning]
+      }
+    }
+    case REMOVE_WARNING_EVENT: {
+      const warnings = state.warnings.filter(i => i.id !== action.warning.id)
+      return { ...state, warnings }
     }
     default: return state
   }

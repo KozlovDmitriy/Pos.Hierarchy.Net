@@ -11,7 +11,23 @@ import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import TableRow from '@material-ui/core/TableRow'
 import TableHead from '@material-ui/core/TableHead'
+import Button from '@material-ui/core/Button'
+import { withStyles } from '@material-ui/core/styles'
+import green from '@material-ui/core/colors/green'
 import colors from './colors'
+
+const styles = theme => ({
+  button: {
+    margin: 0,
+    minHeight: 22,
+    padding: '2px 8px',
+    color: '#fff',
+    backgroundColor: green[500],
+    '&:hover': {
+      backgroundColor: green[700],
+    }
+  }
+})
 
 const groupBy = (xs, key) =>
   xs.reduce((rv, x) => {
@@ -21,10 +37,14 @@ const groupBy = (xs, key) =>
 
 class NodeEventsList extends React.Component {
   static propTypes = {
+    detail: PropTypes.bool,
     errors: PropTypes.array.isRequired,
     warnings: PropTypes.array.isRequired,
+    classes: PropTypes.object.isRequired,
     setterminalIdFilter: PropTypes.func.isRequired,
-    setPopoverIsOpen: PropTypes.func.isRequired
+    setPopoverIsOpen: PropTypes.func.isRequired,
+    removeError: PropTypes.func.isRequired,
+    removeWarning: PropTypes.func.isRequired
   }
 
   constructor (props) {
@@ -42,27 +62,115 @@ class NodeEventsList extends React.Component {
     this.setState({ value })
   }
 
+  terminalLink (terminalId) {
+    return (
+      <a
+        key={terminalId + 'link'}
+        href='javascript:void(0)'
+        onClick={this.onChangeTerminalID.bind(this, terminalId)}
+      >
+        {terminalId}
+      </a>
+    )
+  }
+
+  getNotDetailEventsList (events) {
+    return (
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Устройство</TableCell>
+            <TableCell>Количество событий</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {
+            Object.keys(events).map(d => {
+              const terminalId = events[d][0].terminalId
+              return (
+                <TableRow key={d}>
+                  <TableCell>
+                    {this.terminalLink(terminalId)}
+                  </TableCell>
+                  <TableCell numeric>{events[d].length}</TableCell>
+                </TableRow>
+              )
+            })
+          }
+        </TableBody>
+      </Table>
+    )
+  }
+
+  getDetailEventsList (events, isErrors) {
+    const { classes, removeError, removeWarning } = this.props
+    return (
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Устройство</TableCell>
+            <TableCell>Событие</TableCell>
+            <TableCell />
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {
+            events.map(e => {
+              const terminalId = e.terminalId
+              return (
+                <TableRow key={e.terminalId}>
+                  <TableCell>
+                    {this.terminalLink(terminalId)}
+                  </TableCell>
+                  <TableCell>{e.content}</TableCell>
+                  <TableCell>
+                    <Button
+                      size='small'
+                      variant='contained'
+                      className={classes.button}
+                      onClick={(event) => isErrors ? removeError(e) : removeWarning(e)}
+                    >
+                      {'РЕШЕНО'}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              )
+            })
+          }
+        </TableBody>
+      </Table>
+    )
+  }
+
   render () {
-    const { errors, warnings } = this.props
-    const isError = errors.length > 0
-    const isWarning = warnings.length > 0
-    const events = (isError && isWarning) ? (this.state.value === 0 ? errors : warnings) :
-      isError ? errors :
+    const { errors, warnings, detail } = this.props
+    const isHasErrors = errors.length > 0
+    const isHasWarnings = warnings.length > 0
+    const isError = (isHasErrors && isHasWarnings) ?
+      this.state.value === 0 :
+      isHasErrors
+    const isWarning = (isHasErrors && isHasWarnings) ?
+      this.state.value === 1 :
+      isHasWarnings
+    const events = isError ? errors :
       isWarning ? warnings :
       void 0
     const eventsByDevice = groupBy(events, 'logicalDeviceId')
-    const errorLabel = isError ? (
+    const errorLabel = isHasErrors ? (
       <Typography component='span' color='error'>
         <ErrorIcon />
         <span> {errors.length}</span>
       </Typography>
     ) : void 0
-    const warningLabel = isWarning ? (
+    const warningLabel = isHasWarnings ? (
       <Typography component='span' style={{ color: colors.warning }}>
         <WarningIcon />
         <span> {warnings.length}</span>
       </Typography>
     ) : void 0
+    const eventList = detail ?
+      this.getDetailEventsList(events, isError) :
+      this.getNotDetailEventsList(eventsByDevice)
     return (
       <Paper square>
         <Tabs
@@ -70,37 +178,13 @@ class NodeEventsList extends React.Component {
           onChange={this.handleChange}
           fullWidth
         >
-          { isError ? <Tab label={errorLabel} /> : void 0 }
-          { isWarning ? <Tab label={warningLabel} /> : void 0 }
+          { isHasErrors ? <Tab label={errorLabel} /> : void 0 }
+          { isHasWarnings ? <Tab label={warningLabel} /> : void 0 }
         </Tabs>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Устройство</TableCell>
-              <TableCell>Количество событий</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {
-              Object.keys(eventsByDevice).map(d => {
-                const terminalId = eventsByDevice[d][0].terminalId
-                return (
-                  <TableRow key={d}>
-                    <TableCell>
-                      <a href='#' onClick={this.onChangeTerminalID.bind(this, terminalId)}>
-                        {terminalId}
-                      </a>
-                    </TableCell>
-                    <TableCell numeric>{eventsByDevice[d].length}</TableCell>
-                  </TableRow>
-                )
-              })
-            }
-          </TableBody>
-        </Table>
+        {eventList}
       </Paper>
     )
   }
 }
 
-export default NodeEventsList
+export default withStyles(styles)(NodeEventsList)

@@ -4,10 +4,13 @@ import NodePopover from '../components/NodePopover'
 import * as WorkspaceActions from '../actions/workspace'
 
 function mapStateToProps (state) {
+  const data = state.devices.nodePopover.data
   return {
     isOpen: state.devices.nodePopover.isOpen,
     anchor: state.devices.nodePopover.anchor,
-    data: state.devices.nodePopover.data
+    node: data ? data.node : void 0,
+    errors: data ? data.errors : [],
+    warnings: data ? data.warnings : []
   }
 }
 

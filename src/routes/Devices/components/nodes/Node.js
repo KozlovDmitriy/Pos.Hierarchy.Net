@@ -12,9 +12,17 @@ class Node extends Component {
     setPopoverIsOpen: PropTypes.func.isRequired
   }
 
+  state = {
+    isPopoverOpen: false
+  }
+
   constructor (props) {
     super(props)
     this.onClick = this.onClick.bind(this)
+    this.init(props)
+  }
+
+  init (props) {
     this.isError = (props.errors || []).length > 0
     this.isWarning = (props.warnings || []).length > 0
     this.statusColor =
@@ -24,6 +32,10 @@ class Node extends Component {
     this.badge = this.isError ? <ErrorsBadge errors={props.errors} /> :
       this.isWarning ? <WarningsBadge warnings={props.warnings} /> :
       void 0
+  }
+
+  componentWillReceiveProps (nextProps) {
+    this.init(nextProps)
   }
 
   onClick (event) {
@@ -37,7 +49,7 @@ class Node extends Component {
       top: y + 20,
       bottom: 21 + y
     })
-    this.props.setPopoverIsOpen(true, this, this.popoverContent(node, errors, warnings))
+    this.props.setPopoverIsOpen(true, this, { node, errors, warnings })
   }
 }
 
