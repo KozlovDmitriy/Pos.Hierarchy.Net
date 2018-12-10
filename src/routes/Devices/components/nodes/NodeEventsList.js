@@ -54,7 +54,8 @@ class NodeEventsList extends React.Component {
     setterminalIdFilter: PropTypes.func.isRequired,
     setPopoverIsOpen: PropTypes.func.isRequired,
     removeError: PropTypes.func.isRequired,
-    removeWarning: PropTypes.func.isRequired
+    removeWarning: PropTypes.func.isRequired,
+    removeEvent: PropTypes.func.isRequired
   }
 
   constructor (props) {
@@ -126,7 +127,7 @@ class NodeEventsList extends React.Component {
   }
 
   getDetailEventsList (events, isErrors) {
-    const { classes } = this.props
+    const { classes, removeEvent } = this.props
     return (
       <Table>
         <TableHead>
@@ -141,7 +142,7 @@ class NodeEventsList extends React.Component {
             events.map(e => {
               const terminalId = e.terminalId
               return (
-                <TableRow key={e.terminalId}>
+                <TableRow key={e.id}>
                   <TableCell>
                     {this.terminalLink(terminalId)}
                   </TableCell>
@@ -151,7 +152,7 @@ class NodeEventsList extends React.Component {
                       size='small'
                       variant='contained'
                       className={classes.button}
-                      onClick={(event) => this.onResolveClick(e, isErrors)}
+                      onClick={(event) => removeEvent(e) /* this.onResolveClick(e, isErrors) */}
                     >
                       {'РЕШЕНО'}
                     </Button>

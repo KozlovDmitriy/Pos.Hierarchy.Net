@@ -53,11 +53,11 @@ class Workspace extends Component {
       this.data.items.value().sort((a, b) => b.acceptedAt - a.acceptedAt) :
       { } */
     const message = <LoaderSpinner
-       type="Ball-Triangle"
-       color="#008ba0"
-       height="50"	
-       width="50"
-    />      
+     type='Ball-Triangle'
+     color='#008ba0'
+     height='50'
+     width='50'
+    />
     return (
       <div style={style}>
         <Filters />
@@ -73,7 +73,7 @@ class Workspace extends Component {
           }}
         >
           <Loader
-            message={message} 
+            message={message}
             hideContentOnLoad={false}
             backgroundStyle={{backgroundColor: 'transparent'}}
             show={this.props.isLoad}

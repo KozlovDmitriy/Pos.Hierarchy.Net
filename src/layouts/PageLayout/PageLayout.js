@@ -54,7 +54,7 @@ class PageLayout extends React.Component {
 
   componentWillMount () {
     if (this.props.errors === void 0) {
-      // TODO: this.props.subscribeErrors()
+      this.props.subscribeErrors()
     }
   }
 

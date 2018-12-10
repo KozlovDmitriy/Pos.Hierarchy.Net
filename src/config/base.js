@@ -6,7 +6,8 @@ export default {
   webappurl: 'http://10.0.21.61/newposdevelop',
   realtimedashboardurl: 'http://localhost:3000',
   rethinkConfig: {
-    host: 'localhost',         // hostname of the websocket server
+    host: 'localhost',
+    // host: '10.0.21.61',         // hostname of the websocket server
     port: 9000,                // port number of the websocket server
     path: '/rethinkdb-proxy',  // HTTP path to websocket route
     secure: false,             // set true to use secure TLS websockets

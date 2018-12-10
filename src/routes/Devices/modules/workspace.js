@@ -86,10 +86,10 @@ export default function workspace (state = initialState, action) {
         if (isEventForNode(node, action.error)) {
           const errors = [ ...popover.data.errors, action.error ]
           const newPopover = {
-            ...state.nodePopover,
+            ...popover,
             data: { ...popover.data, errors }
           }
-          return { ...state, newPopover }
+          return { ...state, nodePopover: newPopover }
         }
       }
       return state
@@ -112,7 +112,7 @@ export default function workspace (state = initialState, action) {
             ...state.nodePopover,
             data: { ...popover.data, warnings }
           }
-          return { ...state, newPopover }
+          return { ...state, nodePopover: newPopover }
         }
       }
       return state
