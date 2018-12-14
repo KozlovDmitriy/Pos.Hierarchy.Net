@@ -10,10 +10,18 @@ import OutlinedInput from '@material-ui/core/OutlinedInput'
 import { withStyles } from '@material-ui/core/styles'
 import { AppBarContextConsumer } from 'contexts/AppBarContext'
 import AppBarFilters from '../containers/AppBarFiltersContainer'
+import IconButton from '@material-ui/core/IconButton'
+import CancelIcon from '@material-ui/icons/Cancel'
+import SearchIcon from '@material-ui/icons/Search'
 
 const styles = theme => ({
+  button: {
+    marginTop: 3,
+    marginRight: 3,
+    padding: 6
+  },
   formControl: {
-    marginTop: 9,
+    marginTop: 8.5,
     width: '100%',
     padding: 0
   },
@@ -21,15 +29,14 @@ const styles = theme => ({
     padding: 0
   },
   outlinedInput: {
-    padding: 7
+    padding: '6px 5px 4px 7px',
+    fontSize: 12
   },
   selectEmpty: {
-    padding: 7,
+    padding: 4
   },
-  // inputLabelRoot: { marginTop: -10 },
-  inputMarginDense: { padding: 7 },
-  inputLabelShrink: { marginTop: '0px !important' },
-  inputLabelRoot: { marginTop: -13 }
+  inputLabelShrink: { marginTop: '1px !important' },
+  inputLabelRoot: { marginTop: -14, fontSize: 12 }
 })
 
 class Filters extends Component {
@@ -109,7 +116,7 @@ class Filters extends Component {
   }
 
   render () {
-    const { filters, models, countries, classes } = this.props
+    const { filters, models, countries, classes, dropFilters, filterDataFromDb } = this.props
     const selectedModel = models.find(m =>
       m.physicalDeviceTypeId === filters.physicalDeviceTypeId ||
       m.logicalDeviceTypeId === filters.logicalDeviceTypeId
@@ -247,6 +254,26 @@ class Filters extends Component {
               </Select>
             </FormControl>
           </div>
+          <div className='pad-right'>
+            <IconButton
+              className={classes.button}
+              title='Искать'
+              aria-label='Искать'
+              color='primary'
+              onClick={filterDataFromDb}
+            >
+              <SearchIcon />
+            </IconButton>
+            <IconButton
+              className={classes.button}
+              title='Сбросить фильтры'
+              aria-label='Сбросить фильтры'
+              color='secondary'
+              onClick={dropFilters}
+            >
+              <CancelIcon />
+            </IconButton>
+          </div>
         </div>
       </div>
     )
@@ -268,7 +295,9 @@ Filters.propTypes = {
   setCityFilter: PropTypes.func.isRequired,
   setRegionFilter: PropTypes.func.isRequired,
   setCountryFilter: PropTypes.func.isRequired,
-  changeFilterWithPpd: PropTypes.func.isRequired
+  changeFilterWithPpd: PropTypes.func.isRequired,
+  dropFilters: PropTypes.func.isRequired,
+  filterDataFromDb: PropTypes.func.isRequired
 }
 
 export default withStyles(styles)(Filters)

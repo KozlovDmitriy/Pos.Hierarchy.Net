@@ -24,7 +24,7 @@ class LogicalDevice extends Node {
       />
     )
     return (
-      <Group y={node.y} x={node.x}>
+      <Group y={node.y} x={node.x} style={{ cursor: 'pointer' }}>
         <circle
           r={9}
           strokeWidth={2.5}

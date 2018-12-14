@@ -25,13 +25,17 @@ class LinkPrimitive extends React.Component {
       case 'tradePoint':
         return events.find(e => e.tradePointId === node.tradePointId) !== void 0
       case 'address':
-        return events.find(e => [e.addressId, e.customerAddressId].includes(node.addressId)) !== void 0
+        return events.find(e => e.addressId === node.addressId) !== void 0
+        // return events.find(e => [e.addressId, e.customerAddressId].includes(node.addressId)) !== void 0
       case 'city':
-        return events.find(e => [e.cityId, e.customerCityId].includes(node.cityId)) !== void 0
+        return events.find(e => e.cityId === node.cityId) !== void 0
+        // return events.find(e => [e.cityId, e.customerCityId].includes(node.cityId)) !== void 0
       case 'region':
-        return events.find(e => [e.regionId, e.customerRegionId].includes(node.regionId)) !== void 0
+        return events.find(e => e.regionId === node.regionId) !== void 0
+        // return events.find(e => [e.regionId, e.customerRegionId].includes(node.regionId)) !== void 0
       case 'country':
-        return events.find(e => [e.countryId, e.customerCountryId].includes(node.countryId)) !== void 0
+        return events.find(e => e.countryId === node.countryId) !== void 0
+        // return events.find(e => [e.countryId, e.customerCountryId].includes(node.countryId)) !== void 0
     }
     return false
   }

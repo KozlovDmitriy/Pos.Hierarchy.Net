@@ -51,7 +51,7 @@ class NodeEventsList extends React.Component {
     errors: PropTypes.array.isRequired,
     warnings: PropTypes.array.isRequired,
     classes: PropTypes.object.isRequired,
-    setterminalIdFilter: PropTypes.func.isRequired,
+    filterOnlyByTerminalId: PropTypes.func.isRequired,
     setPopoverIsOpen: PropTypes.func.isRequired,
     removeError: PropTypes.func.isRequired,
     removeWarning: PropTypes.func.isRequired,
@@ -79,7 +79,7 @@ class NodeEventsList extends React.Component {
 
   onClickTerminalId (terminalId) {
     this.props.setPopoverIsOpen(false)
-    this.props.setterminalIdFilter(terminalId)
+    this.props.filterOnlyByTerminalId(terminalId)
   }
 
   terminalLink (terminalId) {
@@ -133,7 +133,8 @@ class NodeEventsList extends React.Component {
         <TableHead>
           <TableRow>
             <TableCell>Устройство</TableCell>
-            <TableCell>Событие</TableCell>
+            <TableCell>Описание</TableCell>
+            <TableCell>Код</TableCell>
             <TableCell />
           </TableRow>
         </TableHead>
@@ -146,7 +147,8 @@ class NodeEventsList extends React.Component {
                   <TableCell>
                     {this.terminalLink(terminalId)}
                   </TableCell>
-                  <TableCell>{e.content}</TableCell>
+                  <TableCell>{e.description}</TableCell>
+                  <TableCell>{e.code}</TableCell>
                   <TableCell>
                     <Button
                       size='small'

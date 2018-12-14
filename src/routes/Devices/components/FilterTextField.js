@@ -4,9 +4,9 @@ import TextField from '@material-ui/core/TextField'
 import { withStyles } from '@material-ui/core/styles'
 
 const styles = {
-  inputLabelRoot: { marginTop: -10 },
-  shrink: { marginTop: 0 },
-  inputMarginDense: { padding: 7 }
+  inputLabelRoot: { marginTop: -9, fontSize: 12 },
+  shrink: { marginTop: 1 },
+  inputMarginDense: { padding: 7, fontSize: 12 }
 }
 
 class FilterTextField extends React.Component {

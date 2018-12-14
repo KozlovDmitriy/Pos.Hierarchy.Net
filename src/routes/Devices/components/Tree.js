@@ -17,11 +17,13 @@ import NodePopover from '../containers/NodePopoverContainer'
 import LinkPrimitive from '../containers/LinkContainer'
 import GraphControls from './GraphControls'
 import Radium from 'radium'
+import DragScroll from 'react-dragscroll'
+import { separateEntitiesByTypes } from '../actions/connections'
 import './Tree.scss'
 
 function Node ({ node, events }) {
   switch (node.type) {
-    case 'physical': return (<PhysicalDevice key={node.id} node={node} />)
+    case 'physical': return (<PhysicalDevice key={node.id} node={node} style={{ cursor: 'pointer' }} />)
     case 'logical': return (<LogicalDevice key={node.id} node={node} />)
     case 'merchant': return (<Merchant key={node.id} node={node} />)
     case 'account': return (<Account key={node.id} node={node} />)
@@ -60,7 +62,6 @@ const styles = {
   graph: {
     width: '100%',
     height: '100%',
-    overflow: 'scroll',
     background: '#fcfcfc'
   },
   wrapper: {
@@ -79,32 +80,39 @@ const styles = {
   svg: {
     base: {
       display: 'block',
-      margin: 'auto',
-      // border: '1px solid #000',
-      padding: 100
+      margin: 'auto'
+      // border: '1px solid #000'
     }
   }
 }
+
+const circleTypes = [
+  ['country'], ['region'], ['city'], ['address'], ['customer', 'account'],
+  ['merchant', 'tradePoint']
+]
+
+const closeLinkTypes = [ 'physical - physical', 'physical - logical', 'logical - physical' ]
 
 class Tree extends Component {
   static propTypes = {
     tree: PropTypes.object.isRequired,
     boardStyle: PropTypes.object,
     lastCollapsedEntity: PropTypes.string,
+    showingTypes: PropTypes.array.isRequired,
     filterData: PropTypes.func.isRequired
   }
 
   constructor (props) {
     super(props)
-    this.state = { viewTransform: d3.zoomIdentity }
+    this.state = { viewTransform: d3.zoomIdentity, active: false }
     this.handleZoom = this.handleZoom.bind(this)
     this.modifyZoom = this.modifyZoom.bind(this)
     this.handleZoomToFit = this.handleZoomToFit.bind(this)
     this.containZoom = this.containZoom.bind(this)
     this.renderView = this.renderView.bind(this)
-    this.zoom = d3.zoom()
-      .scaleExtent([minZoom, maxZoom])
-      .on('zoom', this.handleZoom)
+    this.svgOnMouseDown = this.svgOnMouseDown.bind(this)
+    this.svgOnMouseUp = this.svgOnMouseUp.bind(this)
+    this.onSvgWheel = this.onSvgWheel.bind(this)
   }
 
   getTreeIds = (tree) => tree === void 0 ? [] : [
@@ -128,9 +136,20 @@ class Tree extends Component {
     const zoom = this.state.viewTransform !== void 0 ?
       this.state.viewTransform.k :
       1
-    const count = Math.sqrt(nodes.length) // Math.sqrt(Math.max(nodes.length, links.length))
+    // Math.sqrt(nodes.length)
+    const count = Math.sqrt(nodes.length * Math.PI)
     const size = (zoom) * (count * 150 + nodes.length * 5)
-    return size
+    const node = d3.select(this.refs.viewWrapper).node()
+    if (node != null) {
+      const rect = node.getBoundingClientRect()
+      const width = rect.width > size ?
+        rect.width : size
+      const height = rect.height > size * 0.5 ?
+        rect.height : size * 0.5
+      return { width, height }
+    } else {
+      return { width: size, height: size * 0.5 }
+    }
   }
 
   drawTree (nextProps) {
@@ -140,29 +159,66 @@ class Tree extends Component {
     const nodes = nextProps.tree.nodes // [ ...nextProps.tree.nodes ]
     const links = nextProps.tree.links.map(i => ({
       source: i.source.id,
-      target: i.target.id
+      target: i.target.id,
+      type: i.type
     }))
-    const width = this.getSize(nodes, links)
-    const height = width
+    const { width, height } = this.getSize(nodes, links)
     const node = this.props.tree.nodes.find(n => n.id === nextProps.lastCollapsedEntity)
     const newNode = nodes.find(n => n.id === nextProps.lastCollapsedEntity)
     if (newNode !== void 0 && node !== void 0) {
       newNode.fx = node.x
       newNode.fy = node.y
     }
+    const nodesByType = separateEntitiesByTypes(nodes)
+    const circles = circleTypes.filter(c => c.find(t => nodesByType[t].length > 0) !== void 0)
+    const circlesCount = circles.length
+    const maxCoof = circlesCount * 2.5
     var force = d3Force.forceSimulation(nodes)
       .force('link', d3Force.forceLink().id(d => d.id))
-      .force('forceX', d3Force.forceX().strength(0.1).x(width * 0.5))
-      .force('forceY', d3Force.forceY().strength(0.1).y(height * 0.5))
-      .force('center', d3Force.forceCenter().x(width * 0.5).y(height * 0.5))
-      .force('charge', d3Force.forceManyBody().strength(-900))
-    force.force('link').links(links).distance(() => 70)
+      .force('radial', d3Force.forceRadial(
+        (n) => {
+          /* if (newNode && n.id === newNode.id) {
+            return 30
+          } */
+          const index = circles.findIndex(c => c.includes(n.type))
+          if (index === -1) {
+            return (circlesCount / maxCoof) * height
+          }
+          return (index / maxCoof) * height + 30
+        },
+          /* n.type === 'country' ? height * 0.03 :
+          n.type === 'region' ? height * 0.15 :
+          n.type === 'city' ? height * 0.27 :
+          n.type === 'address' ? height * 0.39 :
+          height * 0.51, */
+        width * 0.5 + 200,
+        height * 0.5 + 200
+      ).strength((n) => [ 'physical', 'logical' ].includes(n.type) ? 1 : 2))
+      // .force('forceX', d3Force.forceX().strength(0.05))
+      // .force('forceY', d3Force.forceY().strength(0.1))
+      //.force('center', d3Force.forceCenter().x(width * 0.5).y(height * 0.5))
+      .force('charge', d3Force.forceManyBody()
+        .strength(-900))
+        // .distanceMin(height * 0.10)
+        // .distanceMax(height * 0.14)
+      .force('collide', d3Force.forceCollide(40))
+    force.force('link').links(links)
+      .distance(l =>
+        closeLinkTypes.includes(l.type) ? 40 : height / (circlesCount * 2)
+      ).strength(l =>
+        closeLinkTypes.includes(l.type) ? 4 : 2
+      )
+
+    const zoom = d3.zoom()
+      .scaleExtent([minZoom, maxZoom])
+      .on('zoom', this.handleZoom)
     if (nextProps.animation) {
       force.on('tick', () => {
         this._mounted && this.setState({
           nodes,
           links: nextProps.tree.links,
-          force: this.state.force
+          force: this.state.force,
+          zoom
         })
       })
     } else {
@@ -170,7 +226,8 @@ class Tree extends Component {
       this._mounted && this.setState({
         nodes,
         links: nextProps.tree.links,
-        force
+        force,
+        zoom
       })
       if (newNode !== void 0) {
         newNode.fx = void 0
@@ -196,22 +253,8 @@ class Tree extends Component {
     }
   }
 
-  drag () {
-    this._mounted && this.setState({
-      ...this.state,
-      translate: d3.event.translate,
-      scale: d3.event.scale
-    })
-  }
-
   componentDidMount () {
-    d3.select(this.refs.viewWrapper)
-      .on('touchstart', this.containZoom)
-      .on('touchmove', this.containZoom)
-      // .on('click', this.handleSvgClicked)
-      .select('svg')
-      .call(this.zoom)
-      .call(d3.drag().on('drag', this.drag))
+      // .call(d3.drag().on('drag', this.drag))
     this.renderView()
   }
 
@@ -268,10 +311,10 @@ class Tree extends Component {
     // const width = parent.clientWidth
     // const height = parent.clientHeight
     // const center = [ width / 2, height / 2 ]
-    const extent = this.zoom.scaleExtent()
+    const extent = this.state.zoom.scaleExtent()
     const translate = [this.state.viewTransform.x, this.state.viewTransform.y]
     const next = { x: translate[0], y: translate[1], k: this.state.viewTransform.k }
-    const targetZoom = next.k * (1 + modK)
+    const targetZoom = next.k + modK // next.k * (1 + modK)
     if (targetZoom < extent[0] || targetZoom > extent[1]) {
       return false
     } else {
@@ -293,7 +336,7 @@ class Tree extends Component {
       .select('svg')
       .transition()
       .duration(dur)
-      .call(this.zoom.transform, t)
+      .call(this.state.zoom.transform, t)
   }
 
   renderView () {
@@ -307,6 +350,21 @@ class Tree extends Component {
     }
   }
 
+  svgOnMouseDown () {
+    this.setState({ ...this.state, active: true })
+  }
+
+  svgOnMouseUp () {
+    this.setState({ ...this.state, active: false })
+  }
+
+  onSvgWheel (e) {
+    const delta = e.deltaY / -1000
+    this.modifyZoom(delta)
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
   render () {
     if (this.state.nodes === void 0) {
       return <div id='graph' style={styles.graph} />
@@ -316,34 +374,42 @@ class Tree extends Component {
     this.renderView()
     const gridSize = this.getSize(this.state.nodes, this.state.links)
     return (
-      <div id='container' style={styles.container}>
+      <div
+        id='container'
+        style={styles.container}
+        onMouseDown={this.svgOnMouseDown}
+        onMouseUp={this.svgOnMouseUp}
+        onWheel={this.onSvgWheel}
+      >
         <div id='graph' style={{ ...this.props.boardStyle, ...styles.graph }} ref='viewWrapper'>
-          <svg style={styles.svg.base} id='canvas' width={gridSize + 200} height={gridSize + 200}>
-            <g id='view' ref='view'>
-              <rect
-                className='background'
-                width={gridSize}
-                height={gridSize}
-                fill='url(#grid)'
-              />
-              <g id='entities' ref='entities'>
-                <Graph
-                  top={-gridSize / 4}
-                  left={-gridSize / 4}
-                  graph={{
-                    nodes: this.state.nodes,
-                    links: this.state.links
-                  }}
-                  size={[
-                    gridSize,
-                    gridSize
-                  ]}
-                  nodeComponent={Node}
-                  linkComponent={LinkProvider}
-                />
+          <DragScroll height={'100%'} width={'100%'}>
+            <svg
+              id='canvas'
+              ref='canvas'
+              width={gridSize.width + 400}
+              height={gridSize.height + 400}
+              style={{ ...styles.svg.base, cursor: this.state.active ? 'grabbing' : 'grab' }}
+            >
+              <g id='view' ref='view'>
+                <g id='entities' ref='entities'>
+                  <Graph
+                    top={0}
+                    left={0}
+                    graph={{
+                      nodes: this.state.nodes,
+                      links: this.state.links
+                    }}
+                    size={[
+                      gridSize,
+                      gridSize
+                    ]}
+                    nodeComponent={Node}
+                    linkComponent={LinkProvider}
+                  />
+                </g>
               </g>
-            </g>
-          </svg>
+            </svg>
+          </DragScroll>
         </div>
         <GraphControls
           primary={'dodgerblue'}

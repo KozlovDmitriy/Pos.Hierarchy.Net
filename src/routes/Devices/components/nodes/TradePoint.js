@@ -36,7 +36,7 @@ class TradePoint extends CollapsedNode {
       />
     )
     return (
-      <Group y={node.y} x={node.x}>
+      <Group y={node.y} x={node.x} style={{ cursor: 'pointer' }}>
         <polygon
           ref={this.refCallback}
           points={'-9,10, -9,-2 -12,-2, 0,-11, 12,-2, 9,-2, 9,10, 3,10, 3,2, -3,2, -3,10'}

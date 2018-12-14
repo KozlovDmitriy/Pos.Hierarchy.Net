@@ -39,7 +39,7 @@ class Customer extends CollapsedNode {
       />
     )
     return (
-      <Group y={node.y} x={node.x}>
+      <Group y={node.y} x={node.x} style={{ cursor: 'pointer' }}>
         <polygon
           ref={this.refCallback}
           points={'-7,-14 7,-14 16,0 7,14 -7,14 -16,0'}

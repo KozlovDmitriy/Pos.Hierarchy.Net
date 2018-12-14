@@ -51,7 +51,7 @@ class PhysicalDevice extends CollapsedNode {
       />
     )
     return (
-      <Group y={node.y} x={node.x}>
+      <Group y={node.y} x={node.x} style={{ cursor: 'pointer' }}>
         {rect}
         {plus}
         {label}

@@ -122,7 +122,7 @@ export function loadModels () {
               })
             dispatch(setDeviceModels(deviceModels))
           } else {
-            console.error('Device models loading failed');
+            console.error('Device models loading failed')
           }
         }
       )

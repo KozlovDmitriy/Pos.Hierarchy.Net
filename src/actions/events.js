@@ -12,15 +12,32 @@ export const ADD_WARNING_EVENT = 'ADD_WARNING_EVENT'
 export const REMOVE_WARNING_EVENT = 'REMOVE_WARNING_EVENT'
 export const UPDATE_WARNING_EVENT = 'UPDATE_WARNING_EVENT'
 
+const events = {
+  327: 'Отсутствует бумага для принтера'
+}
+
+function setEventDescription (event) {
+  event.description = events[event.code]
+  if (event.description === void 0) {
+    event.description =
+      event.type === 'error' ? 'Неизвестная ошибка' :
+      event.type === 'warning' ? 'Неизвестное предупреждение' :
+      'Неизвестное событие'
+  }
+}
+
 export function setErrors (errors) {
+  errors.forEach(setEventDescription)
   return { type: SET_ERROR_EVENTS, errors }
 }
 
 export function setWarnings (warnings) {
+  warnings.forEach(setEventDescription)
   return { type: SET_WARNING_EVENTS, warnings }
 }
 
 export function addError (error) {
+  setEventDescription(error)
   return { type: ADD_ERROR_EVENT, error }
 }
 
@@ -33,6 +50,7 @@ export function updateError (before, after) {
 }
 
 export function addWarningEvent (warning) {
+  setEventDescription(warning)
   return { type: ADD_WARNING_EVENT, warning }
 }
 
@@ -69,7 +87,12 @@ export function subscribeErrors (id) {
   return (dispatch, getState) => {
     var connPromise = RethinkdbWebsocketClient.connect(config.rethinkConfig)
     const r = RethinkdbWebsocketClient.rethinkdb
-    const query = r.table('Events')
+    const query = r.table('Events').filter((row) =>
+      r.or(
+        r.not(row.hasFields('resolved')),
+        row.getField('resolved').ne(true),
+      )
+    )
     connPromise
       .then((conn) => {
         return query.changes().run(conn).then((cursor) => {

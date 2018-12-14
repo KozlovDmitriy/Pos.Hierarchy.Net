@@ -37,7 +37,7 @@ class Region extends CollapsedNode {
       />
     )
     return (
-      <Group y={node.y} x={node.x}>
+      <Group y={node.y} x={node.x} style={{ cursor: 'pointer' }}>
         <polygon
           ref={this.refCallback}
           points={'-1, -10, -8, 11, 9, -2, -11, -2, 6, 11'}

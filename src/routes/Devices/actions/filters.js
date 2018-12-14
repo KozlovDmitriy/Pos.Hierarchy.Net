@@ -78,6 +78,48 @@ export function filterDataFromDb () {
   }
 }
 
+export function dropFilters () {
+  return (dispatch, getState) => {
+    const { filterWithPpd } = getState().devices
+    const filters = {
+      terminalId: '',
+      serialNumber: '',
+      merchant: '',
+      account: '',
+      customer: '',
+      address: '',
+      city: '',
+      region: '',
+      countryId: '',
+      physicalDeviceTypeId: '',
+      logicalDeviceTypeId: ''
+    }
+    dispatch(setFilters(filters))
+    filterDataFromDbDebouncing(dispatch, filters, filterWithPpd)
+  }
+}
+
+export function filterOnlyByTerminalId (terminalId) {
+  return (dispatch, getState) => {
+    const { filterWithPpd } = getState().devices
+    const filters = {
+      terminalId,
+      serialNumber: '',
+      merchant: '',
+      account: '',
+      customer: '',
+      address: '',
+      city: '',
+      region: '',
+      countryId: '',
+      physicalDeviceTypeId: '',
+      logicalDeviceTypeId: ''
+    }
+    dispatch(setFilters(filters))
+    filterDataFromDbDebouncing(dispatch, filters, filterWithPpd)
+  }
+}
+
 export function filterData () {
   return (dispatch, getState) => {
     const { filters, data, showingTypes, filterWithPpd } = getState().devices
@@ -104,7 +146,7 @@ export function setmodelNameFilter (value) {
       const { physicalDeviceTypeId, logicalDeviceTypeId } = model
       dispatch(setFilters({ ...filters, physicalDeviceTypeId, logicalDeviceTypeId }))
     }
-    dispatch(filterDataFromDb())
+    // dispatch(filterDataFromDb())
   }
 }
 
@@ -112,7 +154,7 @@ export function setterminalIdFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, terminalId: value }))
-    dispatch(filterDataFromDb())
+    // dispatch(filterDataFromDb())
   }
 }
 
@@ -120,7 +162,7 @@ export function setserialNumberFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, serialNumber: value }))
-    dispatch(filterDataFromDb())
+    // dispatch(filterDataFromDb())
   }
 }
 
@@ -128,7 +170,7 @@ export function setMerchantFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, merchant: value }))
-    dispatch(filterDataFromDb())
+    // dispatch(filterDataFromDb())
   }
 }
 
@@ -136,7 +178,7 @@ export function setAccountFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, account: value }))
-    dispatch(filterDataFromDb())
+    // dispatch(filterDataFromDb())
   }
 }
 
@@ -144,7 +186,7 @@ export function setCustomerFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, customer: value }))
-    dispatch(filterDataFromDb())
+    // dispatch(filterDataFromDb())
   }
 }
 
@@ -152,7 +194,7 @@ export function setAddressFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, address: value }))
-    dispatch(filterDataFromDb())
+    // dispatch(filterDataFromDb())
   }
 }
 
@@ -160,7 +202,7 @@ export function setCityFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, city: value }))
-    dispatch(filterDataFromDb())
+    // dispatch(filterDataFromDb())
   }
 }
 
@@ -168,7 +210,7 @@ export function setRegionFilter (value) {
   return (dispatch, getState) => {
     const { filters } = getState().devices
     dispatch(setFilters({ ...filters, region: value }))
-    dispatch(filterDataFromDb())
+    // dispatch(filterDataFromDb())
   }
 }
 
@@ -181,7 +223,7 @@ export function setCountryFilter (value) {
       countryId: country === void 0 ? '' : country.id
     }
     dispatch(setFilters(newFilters))
-    dispatch(filterDataFromDb())
+    // dispatch(filterDataFromDb())
   }
 }
 

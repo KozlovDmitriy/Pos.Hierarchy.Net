@@ -58,6 +58,7 @@
   },
   "devDependencies": {
     "@vx/curve": "0.0.153",
+    "@vx/text": "0.0.182",
     "babel-core": "^6.24.1",
     "babel-eslint": "^7.2.3",
     "babel-loader": "^7.0.0",
@@ -107,6 +108,7 @@
     "node-uuid": "^1.4.8",
     "phantomjs-prebuilt": "^2.1.14",
     "react-addons-test-utils": "^15.5.1",
+    "react-dragscroll": "^2.0.1",
     "react-mixin": "^4.0.0",
     "react-test-renderer": "^15.5.4",
     "rethinkdb": "^2.3.3",

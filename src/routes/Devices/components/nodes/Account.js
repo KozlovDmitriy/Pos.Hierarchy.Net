@@ -36,7 +36,7 @@ class Account extends CollapsedNode {
       />
     )
     return (
-      <Group y={node.y} x={node.x}>
+      <Group y={node.y} x={node.x} style={{ cursor: 'pointer' }}>
         <polygon
           ref={this.refCallback}
           points={'0,-15 15,0 0,15 -15,0'}
