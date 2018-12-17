@@ -8,7 +8,6 @@ function mapStateToProps (state, ownProps) {
   return {
     tree: state.devices.tree,
     animation: state.devices.animation,
-    showingTypes: state.devices.showingTypes,
     boardStyle: ownProps.boardStyle,
     lastCollapsedEntity: state.devices.lastCollapsedEntity
   }

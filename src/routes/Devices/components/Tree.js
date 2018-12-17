@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import { Graph } from '@vx/network'
 import * as d3 from 'd3'
@@ -88,7 +89,7 @@ const styles = {
 
 const circleTypes = [
   ['country'], ['region'], ['city'], ['address'], ['customer', 'account'],
-  ['merchant', 'tradePoint']
+  ['merchant', 'tradePoint'], ['physical', 'logical']
 ]
 
 const closeLinkTypes = [ 'physical - physical', 'physical - logical', 'logical - physical' ]
@@ -98,7 +99,6 @@ class Tree extends Component {
     tree: PropTypes.object.isRequired,
     boardStyle: PropTypes.object,
     lastCollapsedEntity: PropTypes.string,
-    showingTypes: PropTypes.array.isRequired,
     filterData: PropTypes.func.isRequired
   }
 
@@ -142,10 +142,10 @@ class Tree extends Component {
     const node = d3.select(this.refs.viewWrapper).node()
     if (node != null) {
       const rect = node.getBoundingClientRect()
-      const width = rect.width > size ?
-        rect.width : size
-      const height = rect.height > size * 0.5 ?
-        rect.height : size * 0.5
+      const width = rect.width - 400 > size ?
+        rect.width - 400 : size
+      const height = rect.height - 400 > size * 0.5 ?
+        rect.height - 400 : size * 0.5
       return { width, height }
     } else {
       return { width: size, height: size * 0.5 }
@@ -172,31 +172,33 @@ class Tree extends Component {
     const nodesByType = separateEntitiesByTypes(nodes)
     const circles = circleTypes.filter(c => c.find(t => nodesByType[t].length > 0) !== void 0)
     const circlesCount = circles.length
-    const maxCoof = circlesCount * 2.5
+    const maxCoof = circlesCount * 2
     var force = d3Force.forceSimulation(nodes)
       .force('link', d3Force.forceLink().id(d => d.id))
-      .force('radial', d3Force.forceRadial(
-        (n) => {
-          /* if (newNode && n.id === newNode.id) {
-            return 30
-          } */
-          const index = circles.findIndex(c => c.includes(n.type))
-          if (index === -1) {
-            return (circlesCount / maxCoof) * height
-          }
-          return (index / maxCoof) * height + 30
-        },
-          /* n.type === 'country' ? height * 0.03 :
-          n.type === 'region' ? height * 0.15 :
-          n.type === 'city' ? height * 0.27 :
-          n.type === 'address' ? height * 0.39 :
-          height * 0.51, */
-        width * 0.5 + 200,
-        height * 0.5 + 200
-      ).strength((n) => [ 'physical', 'logical' ].includes(n.type) ? 1 : 2))
+      .force('radial',
+        d3Force.forceRadial(
+          (n) => {
+            /* if (newNode && n.id === newNode.id) {
+              return 30
+            } */
+            const index = circles.findIndex(c => c.includes(n.type))
+            if (index === -1) {
+              return (circlesCount / maxCoof) * height
+            }
+            return (index / maxCoof) * height + 30
+          },
+            /* n.type === 'country' ? height * 0.03 :
+            n.type === 'region' ? height * 0.15 :
+            n.type === 'city' ? height * 0.27 :
+            n.type === 'address' ? height * 0.39 :
+            height * 0.51, */
+          width * 0.5 + 200,
+          height * 0.5 + 200
+        ).strength((n) => /* [ 'physical', 'logical' ].includes(n.type) ? 1 : */ 2)
+      )
       // .force('forceX', d3Force.forceX().strength(0.05))
       // .force('forceY', d3Force.forceY().strength(0.1))
-      //.force('center', d3Force.forceCenter().x(width * 0.5).y(height * 0.5))
+      // .force('center', d3Force.forceCenter().x(width * 0.5).y(height * 0.5))
       .force('charge', d3Force.forceManyBody()
         .strength(-900))
         // .distanceMin(height * 0.10)
@@ -232,6 +234,28 @@ class Tree extends Component {
       if (newNode !== void 0) {
         newNode.fx = void 0
         newNode.fy = void 0
+      }
+    }
+  }
+
+  componentDidUpdate (prevProps, prevState, snapshot) {
+    // If we have a snapshot value, we've just added new items.
+    // Adjust scroll so these new items don't push the old ones out of view.
+    // (snapshot here is the value returned from getSnapshotBeforeUpdate)
+    if (this.props.lastCollapsedEntity === void 0) {
+      if (
+        (prevState.nodes === void 0 && this.state.nodes) ||
+        (prevState.nodes && prevState.nodes.length !== this.state.nodes.length)
+      ) {
+        const scrollDiv = ReactDOM.findDOMNode(this.refs.dragScroll)
+        const clientWidth = scrollDiv.clientWidth
+        const clientHeight = scrollDiv.clientHeight
+        const scrollWidth = scrollDiv.scrollWidth
+        const scrollHeight = scrollDiv.scrollHeight
+        const scrollX = (scrollWidth - clientWidth) / 2
+        const scrollY = (scrollHeight - clientHeight) / 2
+        scrollDiv.scrollTop = scrollY
+        scrollDiv.scrollLeft = scrollX
       }
     }
   }
@@ -382,7 +406,7 @@ class Tree extends Component {
         onWheel={this.onSvgWheel}
       >
         <div id='graph' style={{ ...this.props.boardStyle, ...styles.graph }} ref='viewWrapper'>
-          <DragScroll height={'100%'} width={'100%'}>
+          <DragScroll height={'100%'} width={'100%'} ref='dragScroll'>
             <svg
               id='canvas'
               ref='canvas'

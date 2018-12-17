@@ -37,7 +37,7 @@ const initialState = {
   showingTypes: [
     'logical', 'physical', 'merchant',
     'customer', 'address', 'city',
-    'region', 'country'
+    'region', 'country', 'tradePoint'
   ],
   filters: {
     terminalId: '',

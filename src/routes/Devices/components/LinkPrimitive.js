@@ -72,7 +72,7 @@ class LinkPrimitive extends React.Component {
           data={link}
           stroke={statusColor || '#008ba0'}
           strokeDasharray='8, 4'
-          strokeWidth={2}
+          strokeWidth={1}
           strokeOpacity={0.5}
           fill='none'
         />
