@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import ErrorsBadge from './ErrorsBadge'
 import WarningsBadge from './WarningsBadge'
-import colors from './colors'
+import colors from 'src/components/colors'
 
 class Node extends Component {
   static propTypes = {

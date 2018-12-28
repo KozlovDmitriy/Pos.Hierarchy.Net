@@ -6,7 +6,9 @@ import {
 } from '../actions/collapse'
 import {
   START_LOAD,
-  FINISH_LOAD,
+  FINISH_LOAD
+} from 'src/actions/tmswebapi'
+import {
   SET_DEVICES,
   SET_DEVICE_MODELS,
   SET_COUNTRIES,

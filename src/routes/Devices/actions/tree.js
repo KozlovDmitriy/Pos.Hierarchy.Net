@@ -7,10 +7,10 @@ import {
 } from './collapse'
 import {
   loadDevices,
-  runQuery,
   addEntities,
   changeDeviceData
 } from './workspace'
+import { runQuery } from 'src/actions/tmswebapi'
 import {
   filterData,
   isAnyFieldNotNullOrEmty

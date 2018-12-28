@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Group } from '@vx/group'
-import colors from './colors'
+import colors from 'src/components/colors'
 
 class WarningsBadge extends Component {
   static propTypes = {

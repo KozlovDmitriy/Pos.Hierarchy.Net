@@ -10,8 +10,9 @@ import {
 } from '../actions/events'
 
 const initialState = {
-  /* errors: [
-     {
+  /*
+  errors: [
+    {
       id: 1,
       terminalId: '01/12/2017',
       physicalDeviceId: 30170,
@@ -33,7 +34,7 @@ const initialState = {
     }
   ],
   warnings: [
-    /* {
+    {
       id: 2,
       terminalId: '450291',
       countryId: 29,
@@ -46,14 +47,15 @@ const initialState = {
       merchantId: '3000',
       accountId: '3000000001',
       customerId: '50001',
-      customerAddressId: 293,
-      customerCityId: 130,
-      customerRegionId: 'Волгоградская область',
-      customerCountryId: 29,
+      customerAddressId: void 0,
+      customerCityId: void 0,
+      customerRegionId: void 0,
+      customerCountryId: void 0,
       code: 2000,
       content: 'Отсутствует бумага в принтере'
     }
-  ] */
+  ]
+  */
 }
 
 export default function events (state = initialState, action) {

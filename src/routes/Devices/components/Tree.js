@@ -113,6 +113,7 @@ class Tree extends Component {
     this.svgOnMouseDown = this.svgOnMouseDown.bind(this)
     this.svgOnMouseUp = this.svgOnMouseUp.bind(this)
     this.onSvgWheel = this.onSvgWheel.bind(this)
+    this.centralGraphView = this.centralGraphView.bind(this)
   }
 
   getTreeIds = (tree) => tree === void 0 ? [] : [
@@ -238,24 +239,27 @@ class Tree extends Component {
     }
   }
 
+  centralGraphView () {
+    const scrollDiv = ReactDOM.findDOMNode(this.refs.dragScroll)
+    if (scrollDiv) {
+      const clientWidth = scrollDiv.clientWidth
+      const clientHeight = scrollDiv.clientHeight
+      const scrollWidth = scrollDiv.scrollWidth
+      const scrollHeight = scrollDiv.scrollHeight
+      const scrollX = (scrollWidth - clientWidth) / 2
+      const scrollY = (scrollHeight - clientHeight) / 2
+      scrollDiv.scrollTop = scrollY
+      scrollDiv.scrollLeft = scrollX
+    }
+  }
+
   componentDidUpdate (prevProps, prevState, snapshot) {
-    // If we have a snapshot value, we've just added new items.
-    // Adjust scroll so these new items don't push the old ones out of view.
-    // (snapshot here is the value returned from getSnapshotBeforeUpdate)
     if (this.props.lastCollapsedEntity === void 0) {
       if (
         (prevState.nodes === void 0 && this.state.nodes) ||
         (prevState.nodes && prevState.nodes.length !== this.state.nodes.length)
       ) {
-        const scrollDiv = ReactDOM.findDOMNode(this.refs.dragScroll)
-        const clientWidth = scrollDiv.clientWidth
-        const clientHeight = scrollDiv.clientHeight
-        const scrollWidth = scrollDiv.scrollWidth
-        const scrollHeight = scrollDiv.scrollHeight
-        const scrollX = (scrollWidth - clientWidth) / 2
-        const scrollY = (scrollHeight - clientHeight) / 2
-        scrollDiv.scrollTop = scrollY
-        scrollDiv.scrollLeft = scrollX
+        this.centralGraphView()
       }
     }
   }
@@ -278,8 +282,8 @@ class Tree extends Component {
   }
 
   componentDidMount () {
-      // .call(d3.drag().on('drag', this.drag))
     this.renderView()
+    this.centralGraphView()
   }
 
   componentWillUnmount () {

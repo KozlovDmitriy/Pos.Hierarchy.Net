@@ -1,6 +1,7 @@
 // We only need to import the modules necessary for initial render
 import CoreLayout from '../layouts/PageLayout/PageLayoutContainer'
 import DevicesRoute from './Devices'
+import DeviceRoute from './Device'
 import DashboardRoute from './Dashboard'
 import ErrorsRoute from './ErrorList'
 
@@ -13,7 +14,8 @@ export const createRoutes = (store) => ({
   indexRoute  : DashboardRoute(store),
   childRoutes : [
     DevicesRoute(store),
-    ErrorsRoute(store)
+    ErrorsRoute(store),
+    DeviceRoute(store)
   ]
 })
 

@@ -39,9 +39,16 @@ class PageLayout extends React.Component {
   constructor (props) {
     super(props)
     this.onHomeBtnClick = this.onHomeBtnClick.bind(this)
+    this.onRouteChanged = this.onRouteChanged.bind(this)
+    this.goBack = this.goBack.bind(this)
     this.state = {
       widget: <div />
     }
+    browserHistory.listen(this.onRouteChanged)
+  }
+
+  static contextTypes = {
+    router: PropTypes.object
   }
 
   static propTypes = {
@@ -50,6 +57,20 @@ class PageLayout extends React.Component {
     location: PropTypes.object,
     errors: PropTypes.array,
     subscribeErrors: PropTypes.func.isRequired
+  }
+
+  onRouteChanged (location) {
+    this.setState({ ...this.state, widget: <div /> })
+  }
+
+  goBack () {
+    this.context.router.goBack()
+  }
+
+  componentDidUpdate (prevProps) {
+    if (this.props.location !== prevProps.location) {
+      this.onRouteChanged(this.props.location)
+    }
   }
 
   componentWillMount () {
@@ -77,7 +98,7 @@ class PageLayout extends React.Component {
   render () {
     const { headerText, location, children, classes } = this.props
     const leftIcon = location.pathname !== '/' ? (
-      <IconButton onClick={browserHistory.goBack}>
+      <IconButton onClick={this.goBack}>
         <ArrowBackIcon />
       </IconButton>
     ) : <noscript />

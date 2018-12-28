@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { LinkVertical } from '@vx/shape'
-import colors from './nodes/colors'
+import colors from 'src/components/colors'
 
 class LinkPrimitive extends React.Component {
   static propTypes = {

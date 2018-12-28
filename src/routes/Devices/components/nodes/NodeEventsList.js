@@ -14,13 +14,9 @@ import TableHead from '@material-ui/core/TableHead'
 import Button from '@material-ui/core/Button'
 import { withStyles } from '@material-ui/core/styles'
 import green from '@material-ui/core/colors/green'
-import Dialog from '@material-ui/core/Dialog'
-import DialogActions from '@material-ui/core/DialogActions'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import Slide from '@material-ui/core/Slide'
-import colors from './colors'
+import ResolveEventDialog from 'src/containers/ResolveEventDialogContainer'
+import { Link } from 'react-router'
+import colors from 'src/components/colors'
 
 const styles = theme => ({
   button: {
@@ -41,10 +37,6 @@ const groupBy = (xs, key) =>
     return rv
   }, {})
 
-function Transition (props) {
-  return <Slide direction='up' {...props} />
-}
-
 class NodeEventsList extends React.Component {
   static propTypes = {
     detail: PropTypes.bool,
@@ -52,26 +44,28 @@ class NodeEventsList extends React.Component {
     warnings: PropTypes.array.isRequired,
     classes: PropTypes.object.isRequired,
     filterOnlyByTerminalId: PropTypes.func.isRequired,
-    setPopoverIsOpen: PropTypes.func.isRequired,
-    removeError: PropTypes.func.isRequired,
-    removeWarning: PropTypes.func.isRequired,
-    removeEvent: PropTypes.func.isRequired
+    setPopoverIsOpen: PropTypes.func.isRequired
   }
 
   constructor (props) {
     super(props)
     this.onClickTerminalId = this.onClickTerminalId.bind(this)
-    this.agree = this.agree.bind(this)
-    this.state = { value: 0, open: false }
+    this.state = {
+      value: 0,
+      openResolveDialog: false,
+      event: null
+    }
+    this.onResolveClick = this.onResolveClick.bind(this)
+    this.onCloseResolveDialog = this.onCloseResolveDialog.bind(this)
   }
 
-  handleClickOpen = () => {
-    this.setState({ ...this.state, open: true })
-  };
+  onCloseResolveDialog (event) {
+    this.setState({ ...this.state, event: null, openResolveDialog: false })
+  }
 
-  handleClose = () => {
-    this.setState({ ...this.state, open: false })
-  };
+  onResolveClick (event) {
+    this.setState({ ...this.state, event, openResolveDialog: true })
+  }
 
   handleChange = (event, value) => {
     this.setState({ ...this.state, value })
@@ -82,8 +76,11 @@ class NodeEventsList extends React.Component {
     this.props.filterOnlyByTerminalId(terminalId)
   }
 
-  terminalLink (terminalId) {
+  terminalLink (deviceId, terminalId) {
     return (
+      <Link to={`/device/${deviceId}`} tooltip='Подробнее'>{terminalId}</Link>
+    )
+    /* return (
       <a
         key={terminalId + 'link'}
         href='javascript:void(0)'
@@ -91,7 +88,7 @@ class NodeEventsList extends React.Component {
       >
         {terminalId}
       </a>
-    )
+    ) */
   }
 
   getNotDetailEventsList (events) {
@@ -122,12 +119,8 @@ class NodeEventsList extends React.Component {
     )
   }
 
-  onResolveClick (event, isError) {
-    this.setState({ ...this.state, event, isError, open: true })
-  }
-
   getDetailEventsList (events, isErrors) {
-    const { classes, removeEvent } = this.props
+    const { classes } = this.props
     return (
       <Table>
         <TableHead>
@@ -145,7 +138,7 @@ class NodeEventsList extends React.Component {
               return (
                 <TableRow key={e.id}>
                   <TableCell>
-                    {this.terminalLink(terminalId)}
+                    {this.terminalLink(e.logicalDeviceId, terminalId)}
                   </TableCell>
                   <TableCell>{e.description}</TableCell>
                   <TableCell>{e.code}</TableCell>
@@ -154,7 +147,7 @@ class NodeEventsList extends React.Component {
                       size='small'
                       variant='contained'
                       className={classes.button}
-                      onClick={(event) => removeEvent(e) /* this.onResolveClick(e, isErrors) */}
+                      onClick={(event) => this.onResolveClick(e)}
                     >
                       {'РЕШЕНО'}
                     </Button>
@@ -166,17 +159,6 @@ class NodeEventsList extends React.Component {
         </TableBody>
       </Table>
     )
-  }
-
-  agree () {
-    const { event, isError } = this.state
-    const { removeError, removeWarning } = this.props
-    this.handleClose()
-    if (isError) {
-      removeError(event)
-    } else {
-      removeWarning(event)
-    }
   }
 
   render () {
@@ -219,32 +201,11 @@ class NodeEventsList extends React.Component {
           { isHasWarnings ? <Tab label={warningLabel} /> : void 0 }
         </Tabs>
         {eventList}
-        <Dialog
-          open={this.state.open}
-          TransitionComponent={Transition}
-          keepMounted
-          onClose={this.handleClose}
-          aria-labelledby='alert-dialog-slide-title'
-          aria-describedby='alert-dialog-slide-description'
-        >
-          <DialogTitle id='alert-dialog-slide-title'>
-            {'Подтверждение разрешения события'}
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText id='alert-dialog-slide-description'>
-              Вы уверены, что хотите выполнить разрешение события?
-              Информация о событии будет удалена и более не доступна
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleClose} color='primary'>
-              Отменить
-            </Button>
-            <Button onClick={this.agree} color='secondary'>
-              Подтвердить
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <ResolveEventDialog
+          event={this.state.event}
+          open={this.state.openResolveDialog}
+          onClose={this.onCloseResolveDialog}
+        />
       </Paper>
     )
   }

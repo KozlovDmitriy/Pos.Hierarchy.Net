@@ -2,6 +2,7 @@ import RethinkdbWebsocketClient from 'rethinkdb-websocket-client'
 import request from 'superagent'
 import uuid from 'node-uuid'
 import config from 'config'
+import { getEventDescription } from 'src/actions/codes'
 
 export const SET_ERROR_EVENTS = 'SET_ERROR_EVENTS'
 export const SET_WARNING_EVENTS = 'SET_WARNING_EVENTS'
@@ -12,18 +13,8 @@ export const ADD_WARNING_EVENT = 'ADD_WARNING_EVENT'
 export const REMOVE_WARNING_EVENT = 'REMOVE_WARNING_EVENT'
 export const UPDATE_WARNING_EVENT = 'UPDATE_WARNING_EVENT'
 
-const events = {
-  327: 'Отсутствует бумага для принтера'
-}
-
 function setEventDescription (event) {
-  event.description = events[event.code]
-  if (event.description === void 0) {
-    event.description =
-      event.type === 'error' ? 'Неизвестная ошибка' :
-      event.type === 'warning' ? 'Неизвестное предупреждение' :
-      'Неизвестное событие'
-  }
+  event.description = getEventDescription(event)
 }
 
 export function setErrors (errors) {
@@ -74,7 +65,7 @@ export function removeEvent (event) {
         if (err) {
           console.warn(err)
         } else {
-          console.log(res)
+          // console.log(res)
         }
       })
   }

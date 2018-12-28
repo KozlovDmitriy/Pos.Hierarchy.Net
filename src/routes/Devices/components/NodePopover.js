@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router'
 import PropTypes from 'prop-types'
 import Popover from '@material-ui/core/Popover'
 import Typography from '@material-ui/core/Typography'
@@ -8,6 +9,13 @@ import TableCell from '@material-ui/core/TableCell'
 import TableRow from '@material-ui/core/TableRow'
 import TableHead from '@material-ui/core/TableHead'
 import NodeEventsList from '../containers/nodes/NodeEventsListContainer'
+import { withStyles } from '@material-ui/core/styles'
+
+const styles = theme => ({
+  fullscreen: {
+    padding: 5
+  }
+})
 
 class NodePopover extends Component {
   static propTypes = {
@@ -45,7 +53,9 @@ class NodePopover extends Component {
 
   getNodeNameText (node) {
     switch (node.type) {
-      case 'logical': return node.terminalId
+      case 'logical': return (
+        <Link to={`/device/${node.deviceId}`} tooltip='Подробнее'>{node.terminalId}</Link>
+      )
       case 'physical': return node.serialNumber
       case 'tradePoint': return node.name
       case 'merchant': return node.name
@@ -106,7 +116,7 @@ class NodePopover extends Component {
   }
 
   render () {
-    const { isOpen, anchor, node, errors, warnings } = this.props
+    const { isOpen, anchor, node, errors, warnings, classes } = this.props
     const isError = errors.length > 0
     const isWarning = warnings.length > 0
     const content = isOpen ? (
@@ -156,4 +166,4 @@ class NodePopover extends Component {
   }
 }
 
-export default NodePopover
+export default withStyles(styles)(NodePopover)

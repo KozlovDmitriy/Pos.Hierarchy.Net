@@ -6,8 +6,8 @@ import TableCell from '@material-ui/core/TableCell'
 import TableRow from '@material-ui/core/TableRow'
 import ActionGoToDevice from '@material-ui/icons/Build'
 import ActionDelete from '@material-ui/icons/Delete'
-import RequestType from './RequestType'
-import StatusCode from './StatusCode'
+import RequestType from 'src/components/RequestType'
+import StatusCode from 'src/components/StatusCode'
 import IconButton from '@material-ui/core/IconButton'
 import config from 'config'
 import request from 'superagent'
@@ -124,7 +124,7 @@ class ErrorList extends React.Component {
                 </TableCell>
 
                 <TableCell >
-                  <StatusCode codes={row['statusCode']} />
+                  <StatusCode code={row['statusCode']} />
                 </TableCell>
                 <TableCell style={{ width: '130px' }}>
                   <IconButton
