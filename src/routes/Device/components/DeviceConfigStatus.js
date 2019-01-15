@@ -7,18 +7,21 @@ import codes from 'src/actions/codes'
 import reactMixin from 'react-mixin'
 import ReactRethinkdb, { r } from 'react-rethinkdb'
 import colors from 'src/components/colors'
+import green from '@material-ui/core/colors/green'
+import red from '@material-ui/core/colors/red'
+import orange from '@material-ui/core/colors/orange'
 
 class DeviceConfigStatus extends Component {
   static propTypes = {
     deviceId: PropTypes.number.isRequired,
-    className: PropTypes.object.isRequired
+    className: PropTypes.string.isRequired
   }
 
   observe (props, state) {
     return {
       event: new ReactRethinkdb.QueryRequest({
         query: r.table('Events')
-          .orderBy({ index: r.asc('acceptedAt') })
+          .orderBy({ index: r.desc('acceptedAt') })
           .filter((row) => r.and(
             row.getField('logicalDeviceId').eq(props.deviceId),
             row.getField('subtype').eq('config-task')
@@ -34,13 +37,15 @@ class DeviceConfigStatus extends Component {
     const { className } = this.props
     const event = this.data.event.value()[0]
     const textColor = event === void 0 ? void 0 :
-      event.type !== 'info' ? '#fff' :
+      ['error', 'warning', 'success'].includes(event.type) ? '#fff' :
       void 0
     const backgroundColor = event === void 0 ? void 0 :
       event.type === 'error' ? colors.error :
       event.type === 'warning' ? colors.warning :
+      event.type === 'success' ? colors.success :
       void 0
     const statusText = event ?
+      event.code === 0 ? 'Статус: конфигурация устройства успешно обновлена' :
       `Статус: ${codes[event.code]}` :
       'Задания на обновление конфигурации отсутствуют'
     const status = (
@@ -49,11 +54,13 @@ class DeviceConfigStatus extends Component {
       </Typography>
     )
     const downloadProgress = event && event.content ?
-      <DownloadPackProgress progressInfo={event.content} /> :
+      <DownloadPackProgress progressInfo={event.content.value} /> :
       void 0
     return (
-      <Paper style={{ padding: 10, flexGrow: 1 }} className={className} >
-        <Typography component='h5' variant='h6' align='center'>Конфигурация</Typography>
+      <Paper style={{ padding: 10, flexGrow: 1, backgroundColor }} className={className} >
+        <Typography component='h5' variant='h6' align='center' style={{ color: textColor }}>
+          Конфигурация
+        </Typography>
         {status}
         {downloadProgress}
       </Paper>

@@ -11,14 +11,14 @@ import colors from 'src/components/colors'
 class DeviceSoftwareStatus extends Component {
   static propTypes = {
     deviceId: PropTypes.number.isRequired,
-    className: PropTypes.object.isRequired
+    className: PropTypes.string.isRequired
   }
 
   observe (props, state) {
     return {
       event: new ReactRethinkdb.QueryRequest({
         query: r.table('Events')
-          .orderBy({ index: r.asc('acceptedAt') })
+          .orderBy({ index: r.desc('acceptedAt') })
           .filter((row) => r.and(
             row.getField('logicalDeviceId').eq(props.deviceId),
             row.getField('subtype').eq('software-task')
@@ -34,22 +34,15 @@ class DeviceSoftwareStatus extends Component {
     const { className } = this.props
     const event = this.data.event.value()[0]
     const textColor = event === void 0 ? void 0 :
-      event.type !== 'info' ? '#fff' :
+      ['error', 'warning', 'success'].includes(event.type) ? '#fff' :
       void 0
     const backgroundColor = event === void 0 ? void 0 :
       event.type === 'error' ? colors.error :
       event.type === 'warning' ? colors.warning :
+      event.type === 'success' ? colors.success :
       void 0
-    /* {
-      downloadProgress: {
-        downloadedFiles: 4,
-        filesCount: 6,
-        fileName: 'package.apk',
-        fileSize: 100000,
-        downloadedBytes: 64239
-      }
-    } */
     const statusText = event ?
+      event.code === 0 ? 'Статус: программное обеспечение устройства успешно обновлено' :
       `Статус: ${codes[event.code]}` :
       'Задания на обновление ПО отсутствуют'
     const status = (
@@ -58,11 +51,13 @@ class DeviceSoftwareStatus extends Component {
       </Typography>
     )
     const downloadProgress = event && event.content ?
-      <DownloadPackProgress progressInfo={event.content} /> :
+      <DownloadPackProgress progressInfo={event.content.value} /> :
       void 0
     return (
       <Paper style={{ padding: 10, flexGrow: 1, backgroundColor }} className={className} >
-        <Typography component='h5' variant='h6' align='center'>Программное обеспечение</Typography>
+        <Typography component='h5' variant='h6' align='center' style={{ color: textColor }}>
+          Программное обеспечение
+        </Typography>
         {status}
         {downloadProgress}
       </Paper>

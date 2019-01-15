@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "clean": "rimraf dist",
+    "dist": "npm run copy & webpack --env=dist",
     "compile": "node build/scripts/compile",
     "build": "npm run clean && cross-env NODE_ENV=production npm run compile",
     "start": "cross-env NODE_ENV=development node build/scripts/start",

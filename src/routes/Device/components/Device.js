@@ -97,7 +97,7 @@ class Device extends React.Component {
       }),
       lastEvent: new ReactRethinkdb.QueryRequest({
         query: r.table('Events')
-          .orderBy({ index: r.asc('acceptedAt') })
+          .orderBy({ index: r.desc('acceptedAt') })
           .filter((row) => r.and(
             row.getField('logicalDeviceId').eq(props.deviceId),
             row.getField('code').ne(LOST_TERMINAL)
@@ -184,6 +184,15 @@ class Device extends React.Component {
         />
       </Paper>
     ) : void 0
+    const merchant = data.MerchantNumberX && data.MerchantName ? `${data.MerchantName} (${data.MerchantNumberX})` :
+      data.MerchantName ? data.MerchantName :
+      '[unknown]'
+    const customer = data.CustomerNumberX && data.CustomerName ? `${data.CustomerName} (${data.CustomerNumberX})` :
+      data.CustomerName ? data.CustomerName :
+      '[unknown]'
+    const account = data.AccountNumberX && data.AccountName ? `${data.AccountName} (${data.AccountNumberX})` :
+      data.AccountName ? data.AccountName :
+      '[unknown]'
     return (
       <div>
         <Paper className={classes.root} elevation={1}>
@@ -207,9 +216,9 @@ class Device extends React.Component {
                 <TableCell>
                   <DeviceLink deviceId={data.Id} name={data.TerminalId} />
                 </TableCell>
-                <TableCell>{data.MerchantName} ({data.MerchantNumberX})</TableCell>
-                <TableCell>{data.CustomerName} ({data.CustomerNumberX})</TableCell>
-                <TableCell>{data.AccountName} ({data.AccountNumberX})</TableCell>
+                <TableCell>{merchant}</TableCell>
+                <TableCell>{customer}</TableCell>
+                <TableCell>{account}</TableCell>
                 <TableCell>{data.SerialNumber}</TableCell>
                 <TableCell>{data.ModelName}</TableCell>
               </TableRow>

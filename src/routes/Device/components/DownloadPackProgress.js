@@ -28,7 +28,7 @@ class DownloadPackProgress extends Component {
     const fileProgress = Math.round(progressInfo.downloadedBytes / progressInfo.fileSize * 100)
     return (
       <div>
-        <Typography variant='subheading' gutterBottom style={{ marginTop: 0 }}>
+        <Typography variant='subtitle1' gutterBottom style={{ marginTop: 0 }}>
           Загрузка:
         </Typography>
         <Paper style={{ padding: 10 }}>
