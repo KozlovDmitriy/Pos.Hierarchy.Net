@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import TimerIcon from '@material-ui/icons/Timer'
+import Localization from 'localization'
 import colors from 'src/components/colors'
 
 const SECOND = 1000
@@ -42,7 +43,7 @@ class Timer extends React.Component {
     const hours = Math.floor((elapsed % DAY) / HOUR)
     const minutes = Math.floor((elapsed % HOUR) / MINUTE)
     const seconds = (Math.floor((elapsed % MINUTE) / SECOND * 10) / 10).toFixed(1)
-    return `${days} дней ${hours}:${minutes}:${seconds}`
+    return `${days} ${Localization.Days} ${hours}:${minutes}:${seconds}`
   }
 
   render () {

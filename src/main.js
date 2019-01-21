@@ -2,6 +2,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import createStore from './store/createStore'
 import './styles/main.scss'
+import ReactRethinkdb from 'react-rethinkdb'
+import config from 'config'
 // import injectTapEventPlugin from 'react-tap-event-plugin'
 
 // injectTapEventPlugin()
@@ -14,9 +16,11 @@ const store = createStore(window.__INITIAL_STATE__)
 const MOUNT_NODE = document.getElementById('root')
 
 let render = () => {
+  try {
+    ReactRethinkdb.DefaultSession.connect(config.rethinkConfig)
+  } catch (e) {}
   const App = require('./components/App').default
   const routes = require('./routes/index').default(store)
-
   ReactDOM.render(
     <App store={store} routes={routes} />,
     MOUNT_NODE

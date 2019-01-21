@@ -5,6 +5,7 @@ import Input from '@material-ui/core/Input'
 import MenuItem from '@material-ui/core/MenuItem'
 import FormControl from '@material-ui/core/FormControl'
 import Select from '@material-ui/core/Select'
+import NodeTypes from 'src/utils/NodeTypes'
 
 const styles = theme => ({
   formControl: {
@@ -34,19 +35,6 @@ const MenuProps = {
   },
 }
 
-const names = {
-  'logical': 'ЛУ',
-  'physical': 'ФУ',
-  'tradePoint': 'Торговая точка',
-  'merchant': 'Мерчант',
-  'account': 'Счет клиента',
-  'customer': 'Кастомер',
-  'address': 'Адрес',
-  'city': 'Город',
-  'region': 'Регион',
-  'country': 'Страна'
-}
-
 class ShowingTypesSelectField extends React.Component {
   handleChange = event => {
     this.props.updateShowingTypes(event.target.value)
@@ -63,12 +51,12 @@ class ShowingTypesSelectField extends React.Component {
           input={<Input id='select-multiple-chip' />}
           renderValue={selected => (
             <span>
-              {selected.length + ' / ' + Object.keys(names).length}
+              {selected.length + ' / ' + Object.keys(NodeTypes).length}
             </span>
           )}
           MenuProps={MenuProps}
         >
-          {Object.keys(names).map(key => (
+          {Object.keys(NodeTypes).map(key => (
             <MenuItem
               key={key}
               value={key}
@@ -79,7 +67,7 @@ class ShowingTypesSelectField extends React.Component {
                     : theme.typography.fontWeightMedium,
               }}
             >
-              {names[key]}
+              {NodeTypes[key]}
             </MenuItem>
           ))}
         </Select>

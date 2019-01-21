@@ -1,3 +1,5 @@
+import Localization from 'localization'
+
 export const NEW_SCRIPT = 1
 export const FILE_DOWNLOADING = 2
 export const SCRIPT_DOWNLOADED = 3
@@ -6,39 +8,44 @@ export const UPDATE_KIT_SUCCESSFULLY_APPLY = 5
 export const LOST_TERMINAL = 300
 // перенести в локализующий фреймворк
 const codes = {
-  [NEW_SCRIPT]: 'обнаружен скрипт задания',
-  [FILE_DOWNLOADING]: 'загрузка файла',
-  [SCRIPT_DOWNLOADED]: 'скрипт загружен',
-  [UPDATE_KIT_DOWNLOADED]: 'пакет обновления загружен',
-  [UPDATE_KIT_SUCCESSFULLY_APPLY]: 'пакет обновления успешно применено',
-  [LOST_TERMINAL]: 'отсутствует актуальная информация о статусе терминала',
-  327: 'отсутствует бумага для принтера',
-  500: 'неизвестный тип Action',
-  501: 'ошибка файла — не совпадает CRC',
-  502: 'файл отсутствует',
-  503: 'файл уже загружен в устройство',
-  504: 'ошибка сохранения файла',
-  505: 'ошибка удаления файла',
-  506: 'неизвестный тип Type передаваемого файла',
-  507: 'неизвестный флаг применения загруженного файла Immediately',
-  508: 'ошибка применения файла',
-  1000: 'ошибка применения пакета обновления ПО',
-  2000: 'ошибка применения пакета обновления конфигурации',
-  3000: 'ошибка применения сертификата обновления',
-  10006: 'отсутствует конфигурация',
-  10007: 'отсутствуют ключи',
-  10008: 'отсутствует сертификат',
-  10013: 'отсутствует ПО'
+  [NEW_SCRIPT]: Localization.TaskScriptFound,
+  [FILE_DOWNLOADING]: Localization.FileDownloading,
+  [SCRIPT_DOWNLOADED]: Localization.ScriptHasBeenLoaded,
+  [UPDATE_KIT_DOWNLOADED]: Localization.UpdateKitDownloaded,
+  [UPDATE_KIT_SUCCESSFULLY_APPLY]: Localization.UpdateKitSuccessfullyApplied,
+  [LOST_TERMINAL]: Localization.HasNotActualInformationAboutDevice,
+  327: Localization.ThereIsNoPrinterPaper,
+  500: Localization.UnknownTypeOfAction,
+  501: Localization.FileCrcDoesNotMatch,
+  502: Localization.FileMissing,
+  503: Localization.FileAlreadyUploadedToDevice,
+  504: Localization.FileSaveFailed,
+  505: Localization.FileDeleteError,
+  506: Localization.UnknownTypeOfFileBeingTransferred,
+  507: Localization.UnknownImmediatelyFlag,
+  508: Localization.FileApplyError,
+  1000: Localization.SoftwareUpdateKitFailed,
+  2000: Localization.ConfigurationUpdateKitFailed,
+  3000: Localization.SslCertApplyFailed,
+  10006: Localization.NoConfiguration,
+  10007: Localization.NoKey,
+  10008: Localization.NoSslCert,
+  10013: Localization.NoSoftware
 }
 
-export function getEventDescription (event) {
-  const description = codes[event.code]
-  if (event.description === void 0) {
-    return event.type === 'error' ? 'Неизвестная ошибка' :
-      event.type === 'warning' ? 'Неизвестное предупреждение' :
-      'Неизвестное событие'
+function getDescriptionByCode (code) {
+  const description = codes[code]
+  if (description === void 0) {
+    return event.type === 'error' ? Localization.UnknownError :
+      event.type === 'warning' ? Localization.UnknownWarning :
+      Localization.UnknownEvent
   }
   return description
 }
 
-export default codes
+export function getEventDescription (value) {
+  const code = typeof value === 'object' ? value.code : value
+  return getDescriptionByCode(code)
+}
+
+export default getEventDescription

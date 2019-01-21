@@ -13,6 +13,7 @@ import AppBarFilters from '../containers/AppBarFiltersContainer'
 import IconButton from '@material-ui/core/IconButton'
 import CancelIcon from '@material-ui/icons/Cancel'
 import SearchIcon from '@material-ui/icons/Search'
+import Localization from 'localization'
 
 const styles = theme => ({
   button: {
@@ -135,7 +136,7 @@ class Filters extends Component {
                 htmlFor='outlined-model-simple'
                 classes={{ root: classes.inputLabelRoot, shrink: classes.inputLabelShrink }}
               >
-                {'Модель'}
+                {Localization.Model}
               </InputLabel>
               <Select
                 classes={{
@@ -147,7 +148,7 @@ class Filters extends Component {
                 input={
                   <OutlinedInput
                     id='outlined-model-simple'
-                    name='Модель'
+                    name={Localization.Model}
                     labelWidth={this.state.labelWidth}
                   />
                 }
@@ -162,7 +163,7 @@ class Filters extends Component {
           <div className='col col-xs-1'>
             <FilterTextField
               id={'terminalIdFilter'}
-              label={'Terminal ID'}
+              label={Localization.TerminalId}
               value={filters.terminalId}
               onChange={this.onChangeTerminalID}
             />
@@ -170,7 +171,7 @@ class Filters extends Component {
           <div className='col col-xs-1'>
             <FilterTextField
               id={'modelFilter'}
-              label={'Serial Number'}
+              label={Localization.SerialNumber}
               value={filters.serialNumber}
               onChange={this.onChangeSerNum}
             />
@@ -178,7 +179,7 @@ class Filters extends Component {
           <div className='col col-xs-1'>
             <FilterTextField
               id={'modelFilter'}
-              label={'Merchant'}
+              label={Localization.Merchant}
               value={filters.merchant}
               onChange={this.onChangeMerchant}
             />
@@ -186,7 +187,7 @@ class Filters extends Component {
           <div className='col col-xs-1'>
             <FilterTextField
               id={'accountFilter'}
-              label={'Account'}
+              label={Localization.Account}
               value={filters.account}
               onChange={this.onChangeAccount}
             />
@@ -194,7 +195,7 @@ class Filters extends Component {
           <div className='col col-xs-1'>
             <FilterTextField
               id={'customerFilter'}
-              label={'Customer'}
+              label={Localization.Customer}
               value={filters.customer}
               onChange={this.onChangeCustomer}
             />
@@ -202,7 +203,7 @@ class Filters extends Component {
           <div className='col col-xs-1'>
             <FilterTextField
               id={'addressFilter'}
-              label={'Адрес'}
+              label={Localization.Address}
               value={filters.address}
               onChange={this.onChangeAddress}
             />
@@ -210,7 +211,7 @@ class Filters extends Component {
           <div className='col col-xs-1'>
             <FilterTextField
               id={'cityFilter'}
-              label={'Город'}
+              label={Localization.City}
               value={filters.city}
               onChange={this.onChangeCity}
             />
@@ -218,7 +219,7 @@ class Filters extends Component {
           <div className='col col-xs-1'>
             <FilterTextField
               id={'regionFilter'}
-              label={'Регион'}
+              label={Localization.Region}
               value={filters.region}
               onChange={this.onChangeRegion}
             />
@@ -230,7 +231,7 @@ class Filters extends Component {
                 htmlFor='outlined-country-simple'
                 classes={{ root: classes.inputLabelRoot, shrink: classes.inputLabelShrink }}
               >
-                {'Страна'}
+                {Localization.Country}
               </InputLabel>
               <Select
                 classes={{
@@ -242,7 +243,7 @@ class Filters extends Component {
                 input={
                   <OutlinedInput
                     id='outlined-country-simple'
-                    name='Страна'
+                    name={Localization.Country}
                     labelWidth={this.state.countryLabelWidth}
                   />
                 }
@@ -257,8 +258,8 @@ class Filters extends Component {
           <div className='pad-right'>
             <IconButton
               className={classes.button}
-              title='Искать'
-              aria-label='Искать'
+              title={Localization.Find}
+              aria-label={Localization.Find}
               color='primary'
               onClick={filterDataFromDb}
             >
@@ -266,8 +267,8 @@ class Filters extends Component {
             </IconButton>
             <IconButton
               className={classes.button}
-              title='Сбросить фильтры'
-              aria-label='Сбросить фильтры'
+              title={Localization.ResetFilters}
+              aria-label={Localization.ResetFilters}
               color='secondary'
               onClick={dropFilters}
             >

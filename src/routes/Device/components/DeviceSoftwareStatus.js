@@ -7,6 +7,7 @@ import codes from 'src/actions/codes'
 import reactMixin from 'react-mixin'
 import ReactRethinkdb, { r } from 'react-rethinkdb'
 import colors from 'src/components/colors'
+import Localization from 'localization'
 
 class DeviceSoftwareStatus extends Component {
   static propTypes = {
@@ -42,9 +43,9 @@ class DeviceSoftwareStatus extends Component {
       event.type === 'success' ? colors.success :
       void 0
     const statusText = event ?
-      event.code === 0 ? 'Статус: программное обеспечение устройства успешно обновлено' :
-      `Статус: ${codes[event.code]}` :
-      'Задания на обновление ПО отсутствуют'
+      event.code === 0 ? `${Localization.Status}: ${Localization.SoftwareSuccessfullyUpdated}` :
+      `${Localization.Status}: ${codes(event.code)}` :
+      Localization.ThereAreNoSoftwareUpdateTasks
     const status = (
       <Typography component='h6' variant='subtitle1' align='center' style={{ color: textColor }}>
         {statusText}
@@ -56,7 +57,7 @@ class DeviceSoftwareStatus extends Component {
     return (
       <Paper style={{ padding: 10, flexGrow: 1, backgroundColor }} className={className} >
         <Typography component='h5' variant='h6' align='center' style={{ color: textColor }}>
-          Программное обеспечение
+          {Localization.Software}
         </Typography>
         {status}
         {downloadProgress}

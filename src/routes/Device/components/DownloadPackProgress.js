@@ -6,6 +6,7 @@ import LinearProgress from '@material-ui/core/LinearProgress'
 import { withStyles } from '@material-ui/core/styles'
 import green from '@material-ui/core/colors/green'
 import grey from '@material-ui/core/colors/grey'
+import Localization from 'localization'
 
 const styles = theme => ({
   colorPrimary: {
@@ -29,11 +30,17 @@ class DownloadPackProgress extends Component {
     return (
       <div>
         <Typography variant='subtitle1' gutterBottom style={{ marginTop: 0 }}>
-          Загрузка:
+          {Localization.Loading}:
         </Typography>
         <Paper style={{ padding: 10 }}>
           <Typography variant='body2' gutterBottom>
-            Загружается {progressInfo.downloadedFiles} / {progressInfo.filesCount} файл "{progressInfo.fileName}" ...
+            {
+              Localization.PackageLoadingMessage(
+                progressInfo.downloadedFiles,
+                progressInfo.filesCount,
+                progressInfo.fileName
+              )
+            }
           </Typography>
           <LinearProgress
             classes={{ colorPrimary: classes.colorPrimary, barColorPrimary: classes.barColorPrimary }}
@@ -41,7 +48,13 @@ class DownloadPackProgress extends Component {
             value={filesProgress}
           />
           <Typography variant='body2' gutterBottom style={{ marginTop: 10 }}>
-            Загружено {progressInfo.downloadedBytes} из {progressInfo.fileSize} байт ({fileProgress}%) ...
+            {
+              Localization.FileLoadingMessage(
+                progressInfo.downloadedBytes,
+                progressInfo.fileSize,
+                progressInfo.fileProgress
+              )
+            }
           </Typography>
           <LinearProgress
             classes={{ colorPrimary: classes.colorPrimary, barColorPrimary: classes.barColorPrimary }}

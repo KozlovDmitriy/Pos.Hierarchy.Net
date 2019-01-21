@@ -6,10 +6,8 @@ import DownloadPackProgress from './DownloadPackProgress'
 import codes from 'src/actions/codes'
 import reactMixin from 'react-mixin'
 import ReactRethinkdb, { r } from 'react-rethinkdb'
+import Localization from 'localization'
 import colors from 'src/components/colors'
-import green from '@material-ui/core/colors/green'
-import red from '@material-ui/core/colors/red'
-import orange from '@material-ui/core/colors/orange'
 
 class DeviceConfigStatus extends Component {
   static propTypes = {
@@ -45,9 +43,9 @@ class DeviceConfigStatus extends Component {
       event.type === 'success' ? colors.success :
       void 0
     const statusText = event ?
-      event.code === 0 ? 'Статус: конфигурация устройства успешно обновлена' :
-      `Статус: ${codes[event.code]}` :
-      'Задания на обновление конфигурации отсутствуют'
+      event.code === 0 ? `${Localization.Status}: ${Localization.ConfigurationSuccessfullyUpdated}` :
+      `${Localization.Status}: ${codes(event.code)}` :
+      Localization.ThereAreNoConfigUpdateTasks
     const status = (
       <Typography component='h6' variant='subtitle1' align='center' style={{ color: textColor }}>
         {statusText}
@@ -59,7 +57,7 @@ class DeviceConfigStatus extends Component {
     return (
       <Paper style={{ padding: 10, flexGrow: 1, backgroundColor }} className={className} >
         <Typography component='h5' variant='h6' align='center' style={{ color: textColor }}>
-          Конфигурация
+          {Localization.Configuration}
         </Typography>
         {status}
         {downloadProgress}

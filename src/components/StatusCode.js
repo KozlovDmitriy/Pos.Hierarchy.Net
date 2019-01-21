@@ -12,12 +12,8 @@ const StatusCodeLine = ({ code }) => {
   if (code === '0') {
     return <span>{'OK'}</span>
   }
-  const description = codes[code]
-  if (!is.existy(description)) {
-    return <span>{`${code} (неизвестное событие)`}</span>
-  } else {
-    return (<span>{`${code} (${description})`}</span>)
-  }
+  const description = codes(code)
+  return <span>{`${code} (${description})`}</span>
 }
 
 StatusCodeLine.propTypes = {

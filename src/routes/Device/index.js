@@ -1,8 +1,9 @@
 import { injectReducer } from 'src/store/reducers'
 import DeviceContainer from './containers/DeviceContainer'
+import config from 'config'
 
 export default (store) => ({
-  path: 'device/:id',
+  path: config.urlPrefix + '/device/:id',
   /*  Async getComponent is only invoked when route matches   */
   getComponent (nextState, cb) {
     /*  Webpack - use 'require.ensure' to create a split point

@@ -8,10 +8,10 @@ import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import TableRow from '@material-ui/core/TableRow'
 import TableHead from '@material-ui/core/TableHead'
-import DeviceLink from 'src/components/DeviceLink'
+import DeviceLink from 'src/components/LogicalDeviceLink'
 import reactMixin from 'react-mixin'
 import ReactRethinkdb, { r } from 'react-rethinkdb'
-import config from 'config'
+import Localization from 'localization'
 import ActionDelete from '@material-ui/icons/Delete'
 import StatusCode from 'src/components/StatusCode'
 import IconButton from '@material-ui/core/IconButton'
@@ -45,10 +45,6 @@ const styles = theme => ({
   }
 })
 
-try {
-  ReactRethinkdb.DefaultSession.connect(config.rethinkConfig)
-} catch (e) {}
-
 class Device extends React.Component {
   static propTypes = {
     params: PropTypes.object,
@@ -60,6 +56,7 @@ class Device extends React.Component {
 
   constructor (props) {
     super(props)
+    // ReactRethinkdb.DefaultSession.connect(config.rethinkConfig)
     this.state = {
       openResolveDialog: false,
       event: null
@@ -127,21 +124,21 @@ class Device extends React.Component {
     const lastEvent = this.data.lastEvent.value()[0]
     const lastQueryDate = lastEvent ?
       <Timer start={new Date(lastEvent.acceptedAt * 1000)} /> :
-      'Устройство еще не прошло первичную инициализуцию в системе'
+      Localization.DeviceNotInitialized
     const eventsGrid = events.length > 0 ? (
       <Paper className={classes.root}>
         <div style={{ padding: '0px 20px 0 20px' }}>
           <Typography component='h6' variant='subtitle1' >
-            {'События'}
+            {Localization.Events}
           </Typography>
         </div>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell tooltip='Принято'>Принято</TableCell>
-              <TableCell tooltip='Тип'>Тип</TableCell>
-              <TableCell tooltip='Эмиттер сообщения'>Источник</TableCell>
-              <TableCell tooltip='Описание'>Описание</TableCell>
+              <TableCell tooltip={Localization.AcceptedAt}>{Localization.AcceptedAt}</TableCell>
+              <TableCell tooltip={Localization.Type}>{Localization.Type}</TableCell>
+              <TableCell tooltip={Localization.MessageEmitter}>{Localization.MessageEmitter}</TableCell>
+              <TableCell tooltip={Localization.Description}>{Localization.Description}</TableCell>
               <TableCell style={{ width: '130px' }} />
             </TableRow>
           </TableHead>
@@ -157,9 +154,9 @@ class Device extends React.Component {
                       {new Date(row['acceptedAt'] * 1000).toLocaleString()}
                     </TableCell>
                     <TableCell className={className}>
-                      {row.type === 'error' ? 'Ошибка' : 'Предупреждение'}
+                      {row.type === 'error' ? Localization.Error : Localization.Warning}
                     </TableCell>
-                    <TableCell className={className}>Терминал</TableCell>
+                    <TableCell className={className}>{Localization.Terminal}</TableCell>
                     <TableCell className={className}>
                       <StatusCode code={row.code} />
                     </TableCell>
@@ -186,29 +183,29 @@ class Device extends React.Component {
     ) : void 0
     const merchant = data.MerchantNumberX && data.MerchantName ? `${data.MerchantName} (${data.MerchantNumberX})` :
       data.MerchantName ? data.MerchantName :
-      '[unknown]'
+      <i>{Localization.Unknown}</i>
     const customer = data.CustomerNumberX && data.CustomerName ? `${data.CustomerName} (${data.CustomerNumberX})` :
       data.CustomerName ? data.CustomerName :
-      '[unknown]'
+      <i>{Localization.Unknown}</i>
     const account = data.AccountNumberX && data.AccountName ? `${data.AccountName} (${data.AccountNumberX})` :
       data.AccountName ? data.AccountName :
-      '[unknown]'
+      <i>{Localization.Unknown}</i>
     return (
       <div>
         <Paper className={classes.root} elevation={1}>
-          <Typography component='h5' variant='h6' align='center'>Устройство</Typography>
+          <Typography component='h5' variant='h6' align='center'>{Localization.Device}</Typography>
           <Typography component='h6' variant='subtitle1' align='center'>
             {data.SimpleModelName}
           </Typography>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell><b>Terminal ID</b></TableCell>
-                <TableCell><b>Мерчант</b></TableCell>
-                <TableCell><b>Кастомер</b></TableCell>
-                <TableCell><b>Счет клиента</b></TableCell>
-                <TableCell><b>Серийный номер</b></TableCell>
-                <TableCell><b>Комплекс</b></TableCell>
+                <TableCell><b>{Localization.TerminalId}</b></TableCell>
+                <TableCell><b>{Localization.Merchant}</b></TableCell>
+                <TableCell><b>{Localization.Customer}</b></TableCell>
+                <TableCell><b>{Localization.Account}</b></TableCell>
+                <TableCell><b>{Localization.SerialNumber}</b></TableCell>
+                <TableCell><b>{Localization.Complex}</b></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -226,10 +223,10 @@ class Device extends React.Component {
           </Table>
           <div style={{ padding: '6px 20px 0 20px' }}>
             <Typography component='h6' variant='subtitle1' >
-              {'Статус работы'}
+              {Localization.StatusOfWork}
             </Typography>
             <p>
-            Время с последнего запроса: <code>{lastQueryDate}</code>
+              {Localization.TimeSinceLastRequest}: <code>{lastQueryDate}</code>
             </p>
           </div>
         </Paper>

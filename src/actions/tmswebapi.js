@@ -43,8 +43,7 @@ export function runQuery (data, onStateChanged, onLoad, showLoader = true) {
     if (showLoader) {
       dispatch(startLoad())
     }
-    const { restApiUrl } = { restApiUrl: config.webapiurl } // getState().keys
-    const runQueryUrl = Url.resolve(restApiUrl, 'Api/Query/GetEntitiesForMonitor')
+    const runQueryUrl = Url.resolve(config.webapiurl, 'Api/Query/GetEntitiesForMonitor')
     runMessage(
       runQueryUrl,
       data,

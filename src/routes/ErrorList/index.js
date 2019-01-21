@@ -1,8 +1,9 @@
 import { injectReducer } from 'src/store/reducers'
 import ErrorList from './containers/ErrorListContainer'
+import config from 'config'
 
 export default (store) => ({
-  path: 'events',
+  path: config.urlPrefix + '/events',
   /*  Async getComponent is only invoked when route matches   */
   getComponent (nextState, cb) {
     /*  Webpack - use 'require.ensure' to create a split point
