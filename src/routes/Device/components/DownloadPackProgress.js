@@ -52,7 +52,7 @@ class DownloadPackProgress extends Component {
               Localization.FileLoadingMessage(
                 progressInfo.downloadedBytes,
                 progressInfo.fileSize,
-                progressInfo.fileProgress
+                fileProgress
               )
             }
           </Typography>

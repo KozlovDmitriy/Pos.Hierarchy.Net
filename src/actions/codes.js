@@ -15,6 +15,7 @@ const codes = {
   [UPDATE_KIT_SUCCESSFULLY_APPLY]: Localization.UpdateKitSuccessfullyApplied,
   [LOST_TERMINAL]: Localization.HasNotActualInformationAboutDevice,
   327: Localization.ThereIsNoPrinterPaper,
+  401: Localization.IncorrectMasterPasswordEntered,
   500: Localization.UnknownTypeOfAction,
   501: Localization.FileCrcDoesNotMatch,
   502: Localization.FileMissing,
@@ -33,19 +34,19 @@ const codes = {
   10013: Localization.NoSoftware
 }
 
-function getDescriptionByCode (code) {
-  const description = codes[code]
-  if (description === void 0) {
-    return event.type === 'error' ? Localization.UnknownError :
-      event.type === 'warning' ? Localization.UnknownWarning :
-      Localization.UnknownEvent
-  }
-  return description
-}
-
 export function getEventDescription (value) {
   const code = typeof value === 'object' ? value.code : value
-  return getDescriptionByCode(code)
+  const description = codes[code]
+  if (description === void 0) {
+    if (typeof value === 'object') {
+      return value.type === 'error' ? Localization.UnknownError :
+        value.type === 'warning' ? Localization.UnknownWarning :
+        Localization.UnknownEvent
+    } else {
+      return Localization.UnknownEvent
+    }
+  }
+  return description
 }
 
 export default getEventDescription
