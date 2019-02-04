@@ -7,6 +7,7 @@ import reactMixin from 'react-mixin'
 import PropTypes from 'prop-types'
 // import DeviceRequestsPerMinuteChart from './DeviceRequestsPerMinuteChart'
 import config from 'config'
+import Localization from 'localization'
 
 const defaultDashboardInfo = {
   errorsCount: '?',
@@ -20,9 +21,9 @@ const defaultDashboardInfo = {
   value: '?'
 } */
 
-try {
+/* try {
   ReactRethinkdb.DefaultSession.connect(config.rethinkConfig)
-} catch (e) {}
+} catch (e) {} */
 
 /**
  * Виджет главной страницы сайта
@@ -67,32 +68,32 @@ class Dashboard extends React.Component {
       <div className='wrap page-content'>
         <ClickableCard
           className='card'
-          onClick={() => router.push('/devices')} >
+          onClick={() => router.push(config.urlPrefix + '/devices')} >
           <CardContent>
             <Typography gutterBottom variant='h5'>
-              Устройства
+              {Localization.Devices}
             </Typography>
           </CardContent>
         </ClickableCard>
         <ClickableCard className='card'
-          onClick={() => router.push('/events')} >
+          onClick={() => router.push(config.urlPrefix + '/events')} >
           <CardContent>
             <Typography gutterBottom variant='h5'>
               {errors.length}
             </Typography>
             <Typography gutterBottom variant='subtitle1' color='textSecondary'>
-              Ошибок
+              {Localization.Errors}
             </Typography>
           </CardContent>
         </ClickableCard>
         <ClickableCard className='card'
-          onClick={() => router.push('/idledevices')}>
+          onClick={() => router.push(config.urlPrefix + '/idledevices')}>
           <CardContent>
             <Typography gutterBottom variant='h5'>
               {dashboardInfo.idleDevicesCount}
             </Typography>
             <Typography gutterBottom variant='subtitle1' color='textSecondary'>
-              Простаивающих устройств
+              {Localization.IdleDevices}
             </Typography>
           </CardContent>
         </ClickableCard>

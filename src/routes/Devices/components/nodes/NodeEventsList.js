@@ -17,6 +17,9 @@ import green from '@material-ui/core/colors/green'
 import ResolveEventDialog from 'src/containers/ResolveEventDialogContainer'
 import { Link } from 'react-router'
 import colors from 'src/components/colors'
+import config from 'config'
+import Localization from 'localization'
+import codes from 'src/actions/codes'
 
 const styles = theme => ({
   button: {
@@ -78,7 +81,7 @@ class NodeEventsList extends React.Component {
 
   terminalLink (deviceId, terminalId) {
     return (
-      <Link to={`/device/${deviceId}`} tooltip='Подробнее'>{terminalId}</Link>
+      <Link to={`${config.urlPrefix}/device/${deviceId}`} tooltip={Localization.Details}>{terminalId}</Link>
     )
     /* return (
       <a
@@ -96,8 +99,8 @@ class NodeEventsList extends React.Component {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Устройство</TableCell>
-            <TableCell>Количество событий</TableCell>
+            <TableCell>{Localization.Device}</TableCell>
+            <TableCell>{Localization.EventsCount}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -125,9 +128,9 @@ class NodeEventsList extends React.Component {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Устройство</TableCell>
-            <TableCell>Описание</TableCell>
-            <TableCell>Код</TableCell>
+            <TableCell>{Localization.Device}</TableCell>
+            <TableCell>{Localization.Description}</TableCell>
+            <TableCell>{Localization.Code}</TableCell>
             <TableCell />
           </TableRow>
         </TableHead>
@@ -140,7 +143,7 @@ class NodeEventsList extends React.Component {
                   <TableCell>
                     {this.terminalLink(e.logicalDeviceId, terminalId)}
                   </TableCell>
-                  <TableCell>{e.description}</TableCell>
+                  <TableCell>{codes(e.code)}</TableCell>
                   <TableCell>{e.code}</TableCell>
                   <TableCell>
                     <Button
@@ -149,7 +152,7 @@ class NodeEventsList extends React.Component {
                       className={classes.button}
                       onClick={(event) => this.onResolveClick(e)}
                     >
-                      {'РЕШЕНО'}
+                      {Localization.Resolve}
                     </Button>
                   </TableCell>
                 </TableRow>

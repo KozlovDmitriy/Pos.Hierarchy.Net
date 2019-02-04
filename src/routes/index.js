@@ -4,12 +4,13 @@ import DevicesRoute from './Devices'
 import DeviceRoute from './Device'
 import DashboardRoute from './Dashboard'
 import ErrorsRoute from './ErrorList'
+import config from 'config'
 
 /*  Note: Instead of using JSX, we recommend using react-router
     PlainRoute objects to build route definitions.   */
 
 export const createRoutes = (store) => ({
-  path        : '/',
+  path        : config.urlPrefix === '' ? '/' : config.urlPrefix,
   component   : CoreLayout,
   indexRoute  : DashboardRoute(store),
   childRoutes : [

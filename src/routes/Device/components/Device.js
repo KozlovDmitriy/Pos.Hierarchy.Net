@@ -8,10 +8,10 @@ import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import TableRow from '@material-ui/core/TableRow'
 import TableHead from '@material-ui/core/TableHead'
-import DeviceLink from 'src/components/DeviceLink'
+import DeviceLink from 'src/components/LogicalDeviceLink'
 import reactMixin from 'react-mixin'
 import ReactRethinkdb, { r } from 'react-rethinkdb'
-import config from 'config'
+import Localization from 'localization'
 import ActionDelete from '@material-ui/icons/Delete'
 import StatusCode from 'src/components/StatusCode'
 import IconButton from '@material-ui/core/IconButton'
@@ -21,6 +21,10 @@ import { LOST_TERMINAL } from 'src/actions/codes'
 import Timer from 'src/components/Timer'
 import DeviceSoftwareStatus from './DeviceSoftwareStatus'
 import DeviceConfigStatus from './DeviceConfigStatus'
+import CircularProgressbar from 'react-circular-progressbar'
+import 'react-circular-progressbar/dist/styles.css'
+import blue from '@material-ui/core/colors/blue'
+import grey from '@material-ui/core/colors/grey'
 
 const styles = theme => ({
   root: {
@@ -42,12 +46,14 @@ const styles = theme => ({
   warningRow: {
     backgroundColor: colors.warning,
     color: theme.palette.common.white,
+  },
+  colorPrimary: {
+    backgroundColor: grey[200],
+  },
+  barColorPrimary: {
+    backgroundColor: blue[400],
   }
 })
-
-try {
-  ReactRethinkdb.DefaultSession.connect(config.rethinkConfig)
-} catch (e) {}
 
 class Device extends React.Component {
   static propTypes = {
@@ -60,6 +66,7 @@ class Device extends React.Component {
 
   constructor (props) {
     super(props)
+    // ReactRethinkdb.DefaultSession.connect(config.rethinkConfig)
     this.state = {
       openResolveDialog: false,
       event: null
@@ -95,6 +102,19 @@ class Device extends React.Component {
         changes: true,            // subscribe to realtime changefeed
         initial: []               // return [] while loading
       }),
+      lastStatusEvent: new ReactRethinkdb.QueryRequest({
+        query: r.table('Events')
+          .orderBy({ index: r.desc('acceptedAt') })
+          .filter((row) => r.and(
+            row.getField('type').eq('info'),
+            row.getField('subtype').eq('device-status'),
+            row.getField('logicalDeviceId').eq(props.deviceId),
+            row.getField('code').ne(LOST_TERMINAL)
+          ))
+          .limit(1),             // RethinkDB query
+        changes: true,            // subscribe to realtime changefeed
+        initial: []               // return [] while loading
+      }),
       lastEvent: new ReactRethinkdb.QueryRequest({
         query: r.table('Events')
           .orderBy({ index: r.desc('acceptedAt') })
@@ -125,23 +145,33 @@ class Device extends React.Component {
     const events = (this.data.events.value() || [])
       .sort((x, y) => x.acceptedAt <= y.acceptedAt ? 1 : -1)
     const lastEvent = this.data.lastEvent.value()[0]
+    const lastStatusEvent = this.data.lastStatusEvent.value()[0]
     const lastQueryDate = lastEvent ?
       <Timer start={new Date(lastEvent.acceptedAt * 1000)} /> :
-      'Устройство еще не прошло первичную инициализуцию в системе'
+      Localization.DeviceNotInitialized
+    const lastEventContent = lastStatusEvent && lastStatusEvent.content ?
+      lastStatusEvent.content.value :
+      {}
+    const { filledRamMemory, emptyRamMemory } = lastEventContent
+    const allRam = filledRamMemory && emptyRamMemory ? filledRamMemory + emptyRamMemory : void 0
+    const ramFilled = allRam ?
+      Math.round(filledRamMemory / allRam * 100) :
+      void 0
     const eventsGrid = events.length > 0 ? (
       <Paper className={classes.root}>
         <div style={{ padding: '0px 20px 0 20px' }}>
           <Typography component='h6' variant='subtitle1' >
-            {'События'}
+            {Localization.Events}
           </Typography>
         </div>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell tooltip='Принято'>Принято</TableCell>
-              <TableCell tooltip='Тип'>Тип</TableCell>
-              <TableCell tooltip='Эмиттер сообщения'>Источник</TableCell>
-              <TableCell tooltip='Описание'>Описание</TableCell>
+              <TableCell tooltip={Localization.AcceptedAt}>{Localization.AcceptedAt}</TableCell>
+              <TableCell tooltip={Localization.NumberOfEventUpdates}>{Localization.NumberOfEventUpdates}</TableCell>
+              <TableCell tooltip={Localization.Type}>{Localization.Type}</TableCell>
+              <TableCell tooltip={Localization.MessageEmitter}>{Localization.MessageEmitter}</TableCell>
+              <TableCell tooltip={Localization.Description}>{Localization.Description}</TableCell>
               <TableCell style={{ width: '130px' }} />
             </TableRow>
           </TableHead>
@@ -157,9 +187,12 @@ class Device extends React.Component {
                       {new Date(row['acceptedAt'] * 1000).toLocaleString()}
                     </TableCell>
                     <TableCell className={className}>
-                      {row.type === 'error' ? 'Ошибка' : 'Предупреждение'}
+                      {row.count}
                     </TableCell>
-                    <TableCell className={className}>Терминал</TableCell>
+                    <TableCell className={className}>
+                      {row.type === 'error' ? Localization.Error : Localization.Warning}
+                    </TableCell>
+                    <TableCell className={className}>{Localization.Terminal}</TableCell>
                     <TableCell className={className}>
                       <StatusCode code={row.code} />
                     </TableCell>
@@ -186,29 +219,29 @@ class Device extends React.Component {
     ) : void 0
     const merchant = data.MerchantNumberX && data.MerchantName ? `${data.MerchantName} (${data.MerchantNumberX})` :
       data.MerchantName ? data.MerchantName :
-      '[unknown]'
+      <i>{Localization.Unknown}</i>
     const customer = data.CustomerNumberX && data.CustomerName ? `${data.CustomerName} (${data.CustomerNumberX})` :
       data.CustomerName ? data.CustomerName :
-      '[unknown]'
+      <i>{Localization.Unknown}</i>
     const account = data.AccountNumberX && data.AccountName ? `${data.AccountName} (${data.AccountNumberX})` :
       data.AccountName ? data.AccountName :
-      '[unknown]'
+      <i>{Localization.Unknown}</i>
     return (
       <div>
         <Paper className={classes.root} elevation={1}>
-          <Typography component='h5' variant='h6' align='center'>Устройство</Typography>
+          <Typography component='h5' variant='h6' align='center'>{Localization.Device}</Typography>
           <Typography component='h6' variant='subtitle1' align='center'>
             {data.SimpleModelName}
           </Typography>
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell><b>Terminal ID</b></TableCell>
-                <TableCell><b>Мерчант</b></TableCell>
-                <TableCell><b>Кастомер</b></TableCell>
-                <TableCell><b>Счет клиента</b></TableCell>
-                <TableCell><b>Серийный номер</b></TableCell>
-                <TableCell><b>Комплекс</b></TableCell>
+                <TableCell><b>{Localization.TerminalId}</b></TableCell>
+                <TableCell><b>{Localization.Merchant}</b></TableCell>
+                <TableCell><b>{Localization.Customer}</b></TableCell>
+                <TableCell><b>{Localization.Account}</b></TableCell>
+                <TableCell><b>{Localization.SerialNumber}</b></TableCell>
+                <TableCell><b>{Localization.Complex}</b></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -224,18 +257,55 @@ class Device extends React.Component {
               </TableRow>
             </TableBody>
           </Table>
-          <div style={{ padding: '6px 20px 0 20px' }}>
-            <Typography component='h6' variant='subtitle1' >
-              {'Статус работы'}
-            </Typography>
-            <p>
-            Время с последнего запроса: <code>{lastQueryDate}</code>
-            </p>
+          <div style={{ display: 'flex', alignItems: 'stretch', padding: '6px 20px 0 20px' }}>
+            <div style={{ flexGrow: 1 }}>
+              <Typography component='h6' variant='subtitle1' >
+                {Localization.StatusOfWork}
+              </Typography>
+              <p>
+                {Localization.TimeSinceLastRequest}: <code>{lastQueryDate}</code>
+              </p>
+            </div>
+            {
+              ramFilled ? (
+                <div style={{ flexGrow: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'stretch' }}>
+                    <div style={{ flexGrow: void 0, padding: '5px 10px' }}>
+                      <div style={{ display: 'inline-block', width: 50 }}>
+                        <CircularProgressbar
+                          text={`${ramFilled}%`}
+                          percentage={ramFilled}
+                          strokeWidth={12}
+                          initialAnimation
+                          styles={{ text: { fontSize: '26px', fontWeight: 600 } }}
+                        />
+                      </div>
+                    </div>
+                    <div style={{ flexGrow: 1 }}>
+                      <Typography component='h6' variant='subtitle1' >
+                        {'RAM'}
+                      </Typography>
+                      <p>
+                        {Localization.FilledMemory}:&nbsp;{Math.floor(filledRamMemory / (1024 * 1024))} MB
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : void 0
+            }
           </div>
         </Paper>
         <div style={{ display: 'flex', alignItems: 'stretch' }}>
-          <DeviceSoftwareStatus deviceId={data.Id} className={classes.root} />
-          <DeviceConfigStatus deviceId={data.Id} className={classes.root} />
+          <DeviceSoftwareStatus
+            version={lastEventContent ? lastEventContent.softwareVersion : void 0}
+            deviceId={data.Id}
+            className={classes.root}
+          />
+          <DeviceConfigStatus
+            version={lastEventContent ? lastEventContent.configVersion : void 0}
+            deviceId={data.Id}
+            className={classes.root}
+          />
         </div>
         {eventsGrid}
       </div>

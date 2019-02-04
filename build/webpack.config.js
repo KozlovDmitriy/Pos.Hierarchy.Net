@@ -20,16 +20,18 @@ const config = {
       inProjectSrc(project.main),
     ],
   },
+  // devtool: 'eval',
   devtool: project.sourcemaps ? 'source-map' : false,
   output: {
     path: inProject(project.outDir),
-    filename: __DEV__ ? '[name].js' : '[name].[chunkhash].js',
+    filename: '[name].js', // DEV__ ? '[name].js' : '[name].[chunkhash].js',
     publicPath: project.publicPath,
   },
   resolve: {
     alias: {
       src: `${project.basePath}/src`,
       config: `${project.basePath}/src/config/${project.env}`,
+      localization: `${project.basePath}/src/utils/Localization.js`,
       net: `${project.basePath}/node_modules/net-browserify-ws/index.js`
     },
     modules: [
@@ -125,7 +127,7 @@ config.module.rules.push({
 // Styles
 // ------------------------------------
 const extractStyles = new ExtractTextPlugin({
-  filename: 'styles/[name].[contenthash].css',
+  filename: 'styles/[name].css',
   allChunks: true,
   disable: __DEV__,
 })
@@ -249,6 +251,9 @@ if (__PROD__) {
     new webpack.optimize.UglifyJsPlugin({
       sourceMap: !!config.devtool,
       comments: false,
+      mangle: {
+        except: [ 'Feed', 'AtomFeed', 'OrderByLimitFeed' ]
+      },
       compress: {
         warnings: false,
         screw_ie8: true,

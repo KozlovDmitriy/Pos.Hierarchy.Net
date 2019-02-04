@@ -13,39 +13,24 @@ import config from 'config'
 import request from 'superagent'
 import uuid from 'node-uuid'
 import PropTypes from 'prop-types'
+import PhysicalDeviceLink from 'src/components/PhysicalDeviceLink'
+import LogicalDeviceLink from 'src/components/LogicalDeviceLink'
 
 const iconStyles = {
   marginRight: 24
-}
-
-const PhysicalDeviceLink = ({ item }) =>
-  <a href={`${config.webappurl}/PhysicalDevices/Details/${item.deviceId}`} target='_blank' >{item.serialNumber}</a>
-
-PhysicalDeviceLink.propTypes = {
-  item: PropTypes.object
-}
-
-const LogicalDeviceLink = ({ item }) =>
-  <a href={`${config.webappurl}/LogicalDevices/Details/${item.logicalDeviceId}`} target='_blank' >{item.terminalId}</a>
-
-LogicalDeviceLink.propTypes = {
-  item: PropTypes.object
 }
 
 /**
  * Виджет таблица ошибочных реквестов от устройств
  */
 class ErrorList extends React.Component {
-  constructor(props) {
-    super(props)
-  }
 
   static propTypes = {
     data: PropTypes.array
   }
 
   onGoToDevicePageBtnClick (row, e) {
-    const url = `${config.webapiurl}/PhysicalDevices/Details/${row.deviceId}`
+    const url = `${config.webappurl}/PhysicalDevices/Details/${row.deviceId}`
     const win = window.open(url, '_blank')
     win.focus()
   }
@@ -104,11 +89,11 @@ class ErrorList extends React.Component {
                 </TableCell>
 
                 <TableCell>
-                  <LogicalDeviceLink item={row} />
+                  <LogicalDeviceLink deviceId={row.logicalDeviceId} name={row.terminalId} />
                 </TableCell>
 
                 <TableCell>
-                  <PhysicalDeviceLink item={row} />
+                  <PhysicalDeviceLink deviceId={row.deviceId} name={row.serialNumber} />
                 </TableCell>
 
                 <TableCell>

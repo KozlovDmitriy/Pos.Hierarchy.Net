@@ -10,6 +10,9 @@ import TableRow from '@material-ui/core/TableRow'
 import TableHead from '@material-ui/core/TableHead'
 import NodeEventsList from '../containers/nodes/NodeEventsListContainer'
 import { withStyles } from '@material-ui/core/styles'
+import config from 'config'
+import NodeTypes from 'src/utils/NodeTypes'
+import Localization from 'localization'
 
 const styles = theme => ({
   fullscreen: {
@@ -36,25 +39,18 @@ class NodePopover extends Component {
     this.props.setPopoverIsOpen(false)
 
   getTypeText (node) {
-    switch (node.type) {
-      case 'logical': return 'Terminal ID'
-      case 'physical': return 'Устройство'
-      case 'tradePoint': return 'Торговая точка'
-      case 'merchant': return 'Мерчант'
-      case 'account': return 'Счет клиента'
-      case 'customer': return 'Кастомер'
-      case 'address': return 'Адрес'
-      case 'city': return 'Город'
-      case 'region': return 'Регион'
-      case 'country': return 'Страна'
-    }
-    return 'Неизвестный тип узла'
+    return NodeTypes[node.type] || Localization.UnknownNodeType
   }
 
   getNodeNameText (node) {
     switch (node.type) {
       case 'logical': return (
-        <Link to={`/device/${node.deviceId}`} tooltip='Подробнее'>{node.terminalId}</Link>
+        <Link
+          to={`${config.urlPrefix}/device/${node.deviceId}`}
+          tooltip={Localization.Details}
+        >
+          {node.terminalId}
+        </Link>
       )
       case 'physical': return node.serialNumber
       case 'tradePoint': return node.name
@@ -72,51 +68,51 @@ class NodePopover extends Component {
   getParams (node) {
     switch (node.type) {
       case 'logical': return [
-        { k: 'Идентификатор мерчанта', v: node.merchantId }
+        { k: Localization.MerchantId, v: node.merchantId }
       ]
       case 'physical': return [
-        { k: 'Модель', v: node.modelName },
-        { k: 'Количество Terminal ID', v: node.devicesCount },
-        { k: 'Количество дочерних устройств', v: node.childsCount }
+        { k: Localization.Model, v: node.modelName },
+        { k: Localization.TerminalIdCount, v: node.devicesCount },
+        { k: Localization.ChildDevicesCount, v: node.childsCount }
       ]
       case 'tradePoint': return [
-        { k: 'Количество мерчантов', v: node.merchantsCount },
-        { k: 'Количество устройств', v: node.devicesCount }
+        { k: Localization.MerchantsCount, v: node.merchantsCount },
+        { k: Localization.DevicesCount, v: node.devicesCount }
       ]
       case 'merchant': return [
-        { k: 'Идентификатор мерчанта', v: node.merchantId },
-        { k: 'Количество Terminal ID', v: node.logicalDevicesCount },
-        { k: 'Количество торговых точек', v: node.tradePointsCount }
+        { k: Localization.MerchantId, v: node.merchantId },
+        { k: Localization.TerminalIdCount, v: node.logicalDevicesCount },
+        { k: Localization.TradePointsCount, v: node.tradePointsCount }
       ]
       case 'account': return [
-        { k: 'Идентификатор аккаунта', v: node.accountId },
-        { k: 'Количество мерчантов', v: node.merchantsCount }
+        { k: Localization.AccountId, v: node.accountId },
+        { k: Localization.MerchantsCount, v: node.merchantsCount }
       ]
       case 'customer': return [
-        { k: 'Идентификатор кастомера', v: node.customerId },
-        { k: 'Количество мерчантов', v: node.merchantsCount },
-        { k: 'Количество аккаунтов', v: node.accountsCount }
+        { k: Localization.CustomerId, v: node.customerId },
+        { k: Localization.MerchantsCount, v: node.merchantsCount },
+        { k: Localization.AccountsCount, v: node.accountsCount }
       ]
       case 'address': return [
-        { k: 'Количество кастомеров', v: node.customersCount },
-        { k: 'Количество торговых точек', v: node.tradePointsCount }
+        { k: Localization.CustomersCount, v: node.customersCount },
+        { k: Localization.TradePointsCount, v: node.tradePointsCount }
       ]
       case 'city': return [
-        { k: 'Количество адресов', v: node.addressesCount }
+        { k: Localization.AddressesCount, v: node.addressesCount }
       ]
       case 'region': return [
-        { k: 'Код региона', v: node.regionId },
-        { k: 'Количество городов', v: node.citiesCount }
+        { k: Localization.RegionCode, v: node.regionId },
+        { k: Localization.CitiesCount, v: node.citiesCount }
       ]
       case 'country': return [
-        { k: 'Количество регионов', v: node.regionsCount }
+        { k: Localization.RegionsCount, v: node.regionsCount }
       ]
     }
     return []
   }
 
   render () {
-    const { isOpen, anchor, node, errors, warnings, classes } = this.props
+    const { isOpen, anchor, node, errors, warnings } = this.props
     const isError = errors.length > 0
     const isWarning = warnings.length > 0
     const content = isOpen ? (

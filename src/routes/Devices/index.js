@@ -1,8 +1,9 @@
 import { injectReducer } from 'src/store/reducers'
 import Workspace from './containers/WorkspaceContainer'
+import config from 'config'
 
 export default (store) => ({
-  path: 'devices',
+  path: config.urlPrefix + '/devices',
   /*  Async getComponent is only invoked when route matches   */
   getComponent (nextState, cb) {
     /*  Webpack - use 'require.ensure' to create a split point

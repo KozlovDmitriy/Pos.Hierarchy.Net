@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { AppBarContextConsumer } from 'contexts/AppBarContext'
 import Switch from '@material-ui/core/Switch'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
 import ShowingTypesSelectField from '../containers/ShowingTypesSelectFieldContainer'
+import Localization from 'localization'
 
 class AppBarFilters extends Component {
   static propTypes = {
@@ -28,8 +28,8 @@ class AppBarFilters extends Component {
           className='col col-sm-6'
           style={{
             borderRight: 'solid 1px #3f51b5',
-            paddingLeft:5,
-            paddingRight:5,
+            paddingLeft: 5,
+            paddingRight: 5,
             maxHeight: 34
           }}
         >
@@ -41,14 +41,14 @@ class AppBarFilters extends Component {
                 onChange={this.onTogglePpd}
               />
             }
-            label='Фильтр по связанным ФУ'
+            label={Localization.FilterByConnectedDevices}
           />
         </div>
         <div className='col col-sm-6' style={{ maxHeight: 34, paddingLeft:10, paddingRight:5 }}>
           <FormControlLabel
             style={{ margin: 0, marginTop: 3, padding: 0 }}
             control={<ShowingTypesSelectField />}
-            label='Отображаемые классы'
+            label={Localization.DisplayedNodeTypes}
             labelPlacement='start'
           />
         </div>
